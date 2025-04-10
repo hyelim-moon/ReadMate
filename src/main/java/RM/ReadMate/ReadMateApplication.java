@@ -1,13 +1,13 @@
-package SR.SR_Test;
+package RM.ReadMate;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SrTestApplication {
+public class ReadMateApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SrTestApplication.class, args);
+		SpringApplication.run(ReadMateApplication.class, args);
 	}
 
 }

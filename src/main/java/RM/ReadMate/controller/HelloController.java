@@ -1,4 +1,4 @@
-package SR.SR_Test.controller;
+package RM.ReadMate.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

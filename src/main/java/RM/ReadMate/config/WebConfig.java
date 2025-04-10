@@ -1,4 +1,4 @@
-package SR.SR_Test.config;
+package RM.ReadMate.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

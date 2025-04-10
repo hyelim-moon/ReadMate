@@ -1,4 +1,4 @@
-package SR.SR_Test;
+package RM.ReadMate;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
