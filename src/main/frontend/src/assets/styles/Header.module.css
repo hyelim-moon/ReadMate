@@ -1,75 +1,117 @@
 .header {
     position: relative;
-    padding-top: 0.5rem; /* 로그인과 겹치지 않도록 여유 공간 확보 */
 }
 
-.userInfo {
-    position: fixed;
-    top: 0.5rem;
-    right: 1.4rem;
-    font-size: clamp(0.8rem, 2vw, 1rem);
+.userRanking {
+    height: 3rem;
+    background-color: #003016;
+    display: flex;
+    align-items: center;   /* 세로 정중앙 */
+    justify-content: center; /* 가로 정중앙 */
+    color: white;
 }
 
 .mainHeaderContent {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     align-items: center;
     gap: 1rem;
+    padding: 0.5rem 1rem;
+    flex-wrap: wrap;
 }
 
 .logo {
-    width: 130px;
+    width: 100px;
 }
 
-.logo img{
+.logo img {
     max-width: 100%;
     min-width: 60px;
 }
 
 .search {
     display: flex;
-    align-items: center; /* 세로 중앙 정렬 */
-    gap: 0.5rem;
-    flex-shrink: 1; /* 필요한 경우 줄어들 수 있도록 */
-}
-
-.search input {
-    width: 20rem;
-}
-
-.search button,
-.search input {
-    margin: 0.8rem;
-    font-size: clamp(0.875rem, 2vw, 1.125rem);
-    height: 3rem; /* 직접 높이 지정해서 동일하게 */
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-    text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
-    line-height: 1.25rem;
-}
-
-.userRanking {
-    width: auto;
-    min-width: 10rem;
-    background-color: #f0f0f0;
-    border: 1px solid #282c34;
-    padding: 1rem;
-    text-align: center;
+    align-items: center;
+    gap: 1rem;
     flex-shrink: 1;
-    white-space: nowrap;
-    font-size: clamp(0.75rem, 2vw, 1rem);
+    position: relative;
 }
 
-@media (max-width: 768px) {
-    .userRanking {
-        width: 80%; /* 화면 너비의 80%로 조정 */
-        padding: 0.5rem; /* 패딩 줄이기 */
-        font-size: 0.9rem; /* 글자 크기 줄이기 */
-        margin: 1rem auto 0; /* 중앙 정렬 + 위쪽 여백 */
-    }
+/* 드롭다운 버튼 */
+.dropdown {
+    position: relative;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.arrow {
+    font-size: 0.75rem;
+}
+
+/* 드롭다운 메뉴 */
+.dropdownMenu {
+    position: absolute;
+    top: 3.5rem;
+    left: 0;
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    padding: 0.5rem 0;
+    width: max-content;
+    z-index: 999;
+}
+
+.dropdownMenu li {
+    list-style: none;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.dropdownMenu li:hover {
+    background-color: #f0f0f0;
+}
+
+.search input {
+    width: 30rem;
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+    border: 1px solid #ccc;
+    font-size: clamp(0.875rem, 2vw, 1.125rem);
+    height: 3rem;
+    box-sizing: border-box;
+}
+
+.searchBtn {
+    background-color: #00753C;
+    color: white;
+    padding: 0.5rem 1.2rem;
+    border: none;
+    border-radius: 2rem;
+    cursor: pointer;
+    font-weight: bold;
+    height: 3rem;
+    font-size: clamp(0.875rem, 2vw, 1.125rem);
+}
+
+/* 유저 이미지 관련 */
+.userInfo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.userInfo img {
+    width: clamp(1.5rem, 4vw, 2.5rem);
+    height: clamp(1.5rem, 4vw, 2.5rem);
+    object-fit: cover;
+    border-radius: 50%;
 }
