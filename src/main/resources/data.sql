@@ -1,0 +1,11 @@
+INSERT INTO users (nickname, points) VALUES ('Alice', 120);
+INSERT INTO users (nickname, points) VALUES ('Bob', 150);
+INSERT INTO users (nickname, points) VALUES ('Charlie', 90);
+INSERT INTO users (nickname, points) VALUES ('Diana', 170);
+INSERT INTO users (nickname, points) VALUES ('Eve', 130);
+INSERT INTO users (nickname, points) VALUES ('Frank', 95);
+INSERT INTO users (nickname, points) VALUES ('Grace', 110);
+INSERT INTO users (nickname, points) VALUES ('Hank', 105);
+INSERT INTO users (nickname, points) VALUES ('Ivy', 125);
+INSERT INTO users (nickname, points) VALUES ('Jack', 85);
+INSERT INTO users (nickname, points) VALUES ('Karen', 100);

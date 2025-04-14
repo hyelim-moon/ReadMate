@@ -30,7 +30,7 @@ function App() {
           .catch(err => console.error(err));
 
       // 유저 정보
-      axios.get('http://localhost:8080/api/user/info')
+      axios.get('http://localhost:8080/api/users/info')
           .then(res => setUserInfo(res.data))
           .catch(err => console.error(err));
 
