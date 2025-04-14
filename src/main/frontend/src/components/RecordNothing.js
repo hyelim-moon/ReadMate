@@ -1,4 +1,4 @@
-import styles from '../assets/styles/Record.module.css';
+import styles from '../assets/styles/RecordNothing.module.css';
 
 function RecordNothing() {
     return (

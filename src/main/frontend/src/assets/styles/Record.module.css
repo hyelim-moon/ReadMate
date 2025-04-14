@@ -1,7 +1,23 @@
-.nothing{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 70vh;
-    text-align: center;
+.writeBtn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    background-color: #ff6600;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s;
+}
+.writeBtn:hover {
+    background-color: #e55d00;
+}
+
+@media (max-width: 768px) {
+    .writeBtn {
+        padding: 10px 20px;
+    }
 }
