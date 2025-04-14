@@ -88,8 +88,8 @@ function Header() {
                             </ul>
                         )}
                     </div>
-                    <input type="text" placeholder="Search products..." />
-                    <button className={styles.searchBtn}>🔍︎ Search</button>
+                    <input type="text" placeholder="검색어를 입력하세요" />
+                    <button className={styles.searchBtn}>🔍︎ 검색</button>
                 </div>
 
                 <div className={styles.userInfo}>
