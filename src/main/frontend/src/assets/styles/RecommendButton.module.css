@@ -3,7 +3,7 @@
     bottom: 20px;
     right: 20px;
     padding: 15px 25px;
-    background-color: #ff6600;
+    background-color: #00753C;
     color: white;
     border: none;
     border-radius: 50px;
@@ -11,10 +11,6 @@
     cursor: pointer;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: background-color 0.3s;
-}
-
-.floatingBtn:hover {
-    background-color: #e55d00;
 }
 
 @media (max-width: 768px) {

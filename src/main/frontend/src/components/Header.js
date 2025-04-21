@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styles from '../assets/styles/Header.module.css';
 import logoImg from '../assets/images/logo.png';
 import userImg from '../assets/images/userImg.png';
+import {Link, link} from 'react-router-dom';
 
 function Header() {
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -11,12 +12,11 @@ function Header() {
     const [rankingLoading, setRankingLoading] = useState(true);
 
     const categories = [
-        'Books',
-        'Fiction',
-        'Kids Books',
-        'Non Fiction',
-        'Uncategorized',
-        'Young Adult',
+        '전체',
+        '제목',
+        '저자',
+        '장르',
+        '출판사'
     ];
 
     const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
@@ -70,7 +70,9 @@ function Header() {
 
             <div className={styles.mainHeaderContent}>
                 <div className={styles.logo}>
-                    <img src={logoImg} alt="ReadMate Logo" />
+                    <Link to={"/"}>
+                        <img src={logoImg} alt="ReadMate Logo" />
+                    </Link>
                 </div>
 
                 {/* 검색바 영역 */}
