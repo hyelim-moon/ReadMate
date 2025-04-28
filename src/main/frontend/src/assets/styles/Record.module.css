@@ -1,0 +1,145 @@
+.page {
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+    font-family: 'Pretendard', sans-serif;
+    animation: fadeInUp 0.4s ease forwards;
+    background-color: #f4f4f4;
+    min-height: 100vh;
+}
+
+.heading {
+    font-size: 2rem;
+    font-weight: 600;
+    text-align: center;
+    color: #004225;
+    margin-top: 0;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid #00753C;
+    padding-bottom: 0.5rem;
+}
+
+.form {
+    background-color: #ffffff;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.row {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 220px;
+}
+
+label {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #004225;
+    font-size: 1rem;
+}
+
+input,
+textarea {
+    padding: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    font-size: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: #fefefe;
+    transition: border-color 0.2s;
+}
+
+input:focus,
+textarea:focus {
+    border-color: #00753C;
+    outline: none;
+}
+
+textarea {
+    resize: none;
+    height: 300px;
+    line-height: 1.6;
+}
+
+.preview {
+    margin-top: 1rem;
+    max-width: 100%;
+    max-height: 400px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.submitBtn {
+    background-color: #00753C;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 1rem;
+    font-size: 1.1rem;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: background-color 0.3s;
+    align-self: flex-end;
+    width: 180px;
+}
+
+.submitBtn:hover {
+    background-color: #005b2c;
+}
+
+.error {
+    color: red;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 768px) {
+    .page {
+        padding: 1rem;
+    }
+
+    .heading {
+        font-size: 1.6rem;
+    }
+
+    .row {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .inputGroup {
+        min-width: 100%;
+    }
+
+    .submitBtn {
+        width: 100%;
+        align-self: stretch;
+    }
+}

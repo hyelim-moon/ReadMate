@@ -8,6 +8,7 @@ import MainContent from './components/MainContent';
 import RecommendButton from './components/RecommendButton';
 import RecordNothing from './components/RecordNothing';
 import RecordList from './components/RecordList';
+import Record from './components/Record';
 
 function App() {
     const [hello, setHello] = useState('');
@@ -80,6 +81,7 @@ function App() {
                     } />
                     {/*<Route path="/recordnothing" element={<RecordNothing />} />*/}
                     <Route path="/recordlist" element={<RecordList />} />
+                    <Route path="/record" element={<Record />} />
                 </Routes>
             </div>
         </BrowserRouter>
