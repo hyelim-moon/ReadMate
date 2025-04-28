@@ -6,7 +6,7 @@ import {Link, link} from 'react-router-dom';
 
 function Header() {
     const [dropdownOpen, setDropdownOpen] = useState(false);
-    const [selectedCategory, setSelectedCategory] = useState('All');
+    const [selectedCategory, setSelectedCategory] = useState('전체');
 
     const [rankingList, setRankingList] = useState([]);
     const [rankingLoading, setRankingLoading] = useState(true);

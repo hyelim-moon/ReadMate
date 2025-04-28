@@ -13,8 +13,23 @@
     transition: background-color 0.3s;
 }
 
+.banner {
+    margin-bottom: 20px;
+    padding: 20px;
+    margin-bottom: 1.25rem;
+    padding: 7rem;
+    background-color: #f0f0f0;
+    text-align: center;
+    font-size: 1.2rem;
+    border-radius: 8px;
+}
+
 @media (max-width: 768px) {
     .writeBtn {
         padding: 10px 20px;
+    }
+
+    .banner {
+        padding: 15px;
     }
 }

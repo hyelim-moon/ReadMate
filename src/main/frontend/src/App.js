@@ -7,7 +7,7 @@ import Navbar from './components/Navbar';
 import MainContent from './components/MainContent';
 import RecommendButton from './components/RecommendButton';
 import RecordNothing from './components/RecordNothing';
-import Record from './components/Record';
+import RecordList from './components/RecordList';
 
 function App() {
     const [hello, setHello] = useState('');
@@ -79,7 +79,7 @@ function App() {
                         </>
                     } />
                     {/*<Route path="/recordnothing" element={<RecordNothing />} />*/}
-                    <Route path="/record" element={<Record />} />
+                    <Route path="/recordlist" element={<RecordList />} />
                 </Routes>
             </div>
         </BrowserRouter>
