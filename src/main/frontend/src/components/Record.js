@@ -12,10 +12,14 @@ function Record() {
     const [image, setImage] = useState(null);
     const [preview, setPreview] = useState(null);
     const [error, setError] = useState('');
+    const [charCount, setCharCount] = useState(0);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setForm(prev => ({ ...prev, [name]: value }));
+        if (name === 'review') {
+            setCharCount(value.length);
+        }
     };
 
     const handleImage = (e) => {
@@ -42,7 +46,6 @@ function Record() {
         setError('');
         console.log('✅ 제출된 데이터:', { ...form, image });
 
-        // 초기화
         setForm({
             title: '',
             author: '',
@@ -52,6 +55,7 @@ function Record() {
         });
         setImage(null);
         setPreview(null);
+        setCharCount(0);
     };
 
     return (
@@ -60,10 +64,9 @@ function Record() {
             <form className={styles.form} onSubmit={handleSubmit}>
                 {error && <p className={styles.error}>{error}</p>}
 
-                {/* 책 제목 + 저자 */}
                 <div className={styles.row}>
                     <div className={styles.inputGroup}>
-                        <label>책 제목 *</label>
+                        <label>책 제목 <span>*</span></label>
                         <input
                             name="title"
                             value={form.title}
@@ -72,7 +75,7 @@ function Record() {
                         />
                     </div>
                     <div className={styles.inputGroup}>
-                        <label>저자 *</label>
+                        <label>저자 <span>*</span></label>
                         <input
                             name="author"
                             value={form.author}
@@ -82,7 +85,6 @@ function Record() {
                     </div>
                 </div>
 
-                {/* 출판사 + 장르 */}
                 <div className={styles.row}>
                     <div className={styles.inputGroup}>
                         <label>출판사</label>
@@ -102,18 +104,40 @@ function Record() {
                     </div>
                 </div>
 
-                <label>감상문 (1000자 이내)</label>
-                <textarea
-                    name="review"
-                    value={form.review}
-                    onChange={handleChange}
-                    maxLength={1000}
-                    rows={6}
-                />
+                <div className={styles.reviewImageRow}>
+                    <div className={styles.reviewBox}>
+                        <label className={styles.inputGroupLabel}>감상문</label>
+                        <textarea
+                            name="review"
+                            className={styles.textarea}
+                            value={form.review}
+                            onChange={handleChange}
+                            maxLength={1000}
+                            rows={6}
+                        />
+                        <div className={styles.charCount}>
+                            {charCount} / 1000 자
+                        </div>
+                    </div>
+                </div>
 
-                <label>사진 첨부</label>
-                <input type="file" accept="image/*" onChange={handleImage} />
-                {preview && <img src={preview} alt="preview" className={styles.preview} />}
+                <div className={styles.imageBox}>
+                    <button
+                        type="button"
+                        className={styles.imageButton}
+                        onClick={() => document.getElementById('imageInput').click()}
+                    >
+                        사진 첨부
+                    </button>
+                    <input
+                        id="imageInput"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImage}
+                        style={{ display: 'none' }}
+                    />
+                    {preview && <img src={preview} alt="preview" className={styles.preview} />}
+                </div>
 
                 <button type="submit" className={styles.submitBtn}>저장하기</button>
             </form>

@@ -1,29 +1,30 @@
 .page {
-    padding: 2rem;
-    max-width: 800px;
-    margin: 0 auto;
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+    margin: 0;
     font-family: 'Pretendard', sans-serif;
     animation: fadeInUp 0.4s ease forwards;
-    background-color: #f4f4f4;
-    min-height: 100vh;
+    background-color: transparent;
+    overflow-x: hidden;
 }
 
 .heading {
-    font-size: 2rem;
+    font-size: 2.2rem;
     font-weight: 600;
-    text-align: center;
+    text-align: left;
     color: #004225;
-    margin-top: 0;
-    margin-bottom: 2rem;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
     border-bottom: 2px solid #00753C;
     padding-bottom: 0.5rem;
+    padding-left: 2.5rem;
 }
 
 .form {
     background-color: #ffffff;
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    padding: 2rem 3rem;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
@@ -31,7 +32,8 @@
 
 .row {
     display: flex;
-    gap: 2rem;
+    flex-direction: row;
+    gap: 1.5rem;
     flex-wrap: nowrap;
     justify-content: space-between;
 }
@@ -40,14 +42,20 @@
     display: flex;
     flex-direction: column;
     flex: 1;
-    min-width: 220px;
+    min-width: 200px;
+    gap: 0.5rem;
 }
 
-label {
+.inputGroup label {
+    width: auto;
     font-weight: 600;
-    margin-bottom: 0.5rem;
     color: #004225;
     font-size: 1rem;
+}
+
+.inputGroup label span {
+    color: red;
+    font-weight: bold;
 }
 
 input,
@@ -60,6 +68,8 @@ textarea {
     box-sizing: border-box;
     background-color: #fefefe;
     transition: border-color 0.2s;
+    font-weight: 600;
+    color: black;
 }
 
 input:focus,
@@ -68,16 +78,80 @@ textarea:focus {
     outline: none;
 }
 
-textarea {
+.reviewImageRow {
+    display: flex;
+    flex-direction: row;
+    gap: 1.5rem;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+}
+
+.reviewBox {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.inputGroupLabel {
+    width: auto;
+    font-weight: 600;
+    color: #004225;
+    font-size: 1rem;
+}
+
+.textarea {
     resize: none;
-    height: 300px;
+    height: 200px;
     line-height: 1.6;
+}
+
+.charCount {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 0.5rem;
+    text-align: right;
+}
+
+.imageBox {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+/* 사진 첨부 버튼 스타일 수정 */
+.imageButton {
+    margin-left: 1rem; /* 감상문 label 옆으로 이동 */
+    padding: 0.5rem 1rem; /* 버튼 크기 줄임 */
+    background-color: #00753C;
+    color: white;
+    border: none;
+    border-radius: 30px; /* 버튼을 둥글게 */
+    cursor: pointer;
+    font-size: 1rem; /* 글자 크기 조금 줄임 */
+    transition: all 0.3s ease; /* 부드러운 변화 효과 */
+    width: 150px; /* 버튼 너비 조금 줄임 */
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 부드러운 그림자 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.imageButton:hover {
+    background-color: #005b2c;
+    transform: translateY(-2px); /* 버튼 살짝 위로 올리기 */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* 더 큰 그림자 효과 */
+}
+
+.imageButton:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 117, 60, 0.3); /* 포커스 시 초록색 외곽선 */
 }
 
 .preview {
     margin-top: 1rem;
     max-width: 100%;
-    max-height: 400px;
+    max-height: 200px;
     border-radius: 8px;
     object-fit: cover;
     border: 1px solid #ddd;
@@ -120,26 +194,33 @@ textarea {
     }
 }
 
-@media (max-width: 768px) {
-    .page {
+@media (max-width: 1024px) {
+    .form {
         padding: 1rem;
     }
 
-    .heading {
-        font-size: 1.6rem;
-    }
-
-    .row {
+    .row,
+    .reviewImageRow {
         flex-direction: column;
         gap: 1rem;
     }
 
     .inputGroup {
-        min-width: 100%;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .inputGroup label {
+        width: auto;
+        margin-bottom: 0.5rem;
     }
 
     .submitBtn {
         width: 100%;
         align-self: stretch;
+    }
+
+    .imageButton {
+        width: 100%;
     }
 }
