@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import styles from '../assets/styles/Record.module.css';
+import Popup from './RecordSavePopup';
 
 function Record() {
     const [form, setForm] = useState({
@@ -13,6 +14,8 @@ function Record() {
     const [preview, setPreview] = useState(null);
     const [error, setError] = useState('');
     const [charCount, setCharCount] = useState(0);
+    const [showPopup, setShowPopup] = useState(false); // 팝업 상태 관리
+    const [popupMessage, setPopupMessage] = useState(''); // 팝업 메시지
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -51,11 +54,7 @@ function Record() {
         formData.append('publisher', publisher);
         formData.append('genre', genre);
         formData.append('review', review);
-
-        // ✅ 이미지가 있을 경우에만 추가
-        if (image) {
-            formData.append('photo', image);
-        }
+        formData.append('photo', image);  // 이미지 추가
 
         try {
             const response = await fetch('http://localhost:8080/api/records', {
@@ -64,7 +63,8 @@ function Record() {
             });
 
             if (response.ok) {
-                alert('저장되었습니다.');
+                setPopupMessage('저장되었습니다.');
+                setShowPopup(true);  // 팝업 표시
                 // 폼 초기화
                 setForm({
                     title: '',
@@ -77,12 +77,15 @@ function Record() {
                 setPreview(null);
                 setCharCount(0);
             } else {
-                const message = await response.text();
-                setError(`저장에 실패했습니다. (${response.status}) ${message}`);
+                setError('저장에 실패했습니다.');
             }
         } catch (error) {
             setError('서버 오류가 발생했습니다.');
         }
+    };
+
+    const closePopup = () => {
+        setShowPopup(false);  // 팝업 닫기
     };
 
     return (
@@ -93,9 +96,8 @@ function Record() {
 
                 <div className={styles.row}>
                     <div className={styles.inputGroup}>
-                        <label htmlFor="title">책 제목 <span>*</span></label>
+                        <label>책 제목 <span>*</span></label>
                         <input
-                            id="title"
                             name="title"
                             value={form.title}
                             onChange={handleChange}
@@ -103,9 +105,8 @@ function Record() {
                         />
                     </div>
                     <div className={styles.inputGroup}>
-                        <label htmlFor="author">저자 <span>*</span></label>
+                        <label>저자 <span>*</span></label>
                         <input
-                            id="author"
                             name="author"
                             value={form.author}
                             onChange={handleChange}
@@ -116,18 +117,16 @@ function Record() {
 
                 <div className={styles.row}>
                     <div className={styles.inputGroup}>
-                        <label htmlFor="publisher">출판사</label>
+                        <label>출판사</label>
                         <input
-                            id="publisher"
                             name="publisher"
                             value={form.publisher}
                             onChange={handleChange}
                         />
                     </div>
                     <div className={styles.inputGroup}>
-                        <label htmlFor="genre">장르</label>
+                        <label>장르</label>
                         <input
-                            id="genre"
                             name="genre"
                             value={form.genre}
                             onChange={handleChange}
@@ -137,9 +136,8 @@ function Record() {
 
                 <div className={styles.reviewImageRow}>
                     <div className={styles.reviewBox}>
-                        <label htmlFor="review" className={styles.inputGroupLabel}>감상문</label>
+                        <label className={styles.inputGroupLabel}>감상문</label>
                         <textarea
-                            id="review"
                             name="review"
                             className={styles.textarea}
                             value={form.review}
@@ -173,6 +171,9 @@ function Record() {
 
                 <button type="submit" className={styles.submitBtn}>저장하기</button>
             </form>
+
+            {/* 팝업이 활성화되면 표시 */}
+            {showPopup && <Popup message={popupMessage} onClose={closePopup} />}
         </main>
     );
 }
