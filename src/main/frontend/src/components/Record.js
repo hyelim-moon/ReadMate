@@ -16,7 +16,7 @@ function Record() {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setForm(prev => ({ ...prev, [name]: value }));
+        setForm((prev) => ({ ...prev, [name]: value }));
         if (name === 'review') {
             setCharCount(value.length);
         }
@@ -30,9 +30,9 @@ function Record() {
         }
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        const { title, author, review } = form;
+        const { title, author, review, publisher, genre } = form;
 
         if (!title.trim() || !author.trim()) {
             setError('책 제목과 저자는 필수 입력 항목입니다.');
@@ -44,18 +44,45 @@ function Record() {
         }
 
         setError('');
-        console.log('✅ 제출된 데이터:', { ...form, image });
 
-        setForm({
-            title: '',
-            author: '',
-            publisher: '',
-            genre: '',
-            review: '',
-        });
-        setImage(null);
-        setPreview(null);
-        setCharCount(0);
+        const formData = new FormData();
+        formData.append('title', title);
+        formData.append('author', author);
+        formData.append('publisher', publisher);
+        formData.append('genre', genre);
+        formData.append('review', review);
+
+        // ✅ 이미지가 있을 경우에만 추가
+        if (image) {
+            formData.append('photo', image);
+        }
+
+        try {
+            const response = await fetch('http://localhost:8080/api/records', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (response.ok) {
+                alert('저장되었습니다.');
+                // 폼 초기화
+                setForm({
+                    title: '',
+                    author: '',
+                    publisher: '',
+                    genre: '',
+                    review: '',
+                });
+                setImage(null);
+                setPreview(null);
+                setCharCount(0);
+            } else {
+                const message = await response.text();
+                setError(`저장에 실패했습니다. (${response.status}) ${message}`);
+            }
+        } catch (error) {
+            setError('서버 오류가 발생했습니다.');
+        }
     };
 
     return (
@@ -66,8 +93,9 @@ function Record() {
 
                 <div className={styles.row}>
                     <div className={styles.inputGroup}>
-                        <label>책 제목 <span>*</span></label>
+                        <label htmlFor="title">책 제목 <span>*</span></label>
                         <input
+                            id="title"
                             name="title"
                             value={form.title}
                             onChange={handleChange}
@@ -75,8 +103,9 @@ function Record() {
                         />
                     </div>
                     <div className={styles.inputGroup}>
-                        <label>저자 <span>*</span></label>
+                        <label htmlFor="author">저자 <span>*</span></label>
                         <input
+                            id="author"
                             name="author"
                             value={form.author}
                             onChange={handleChange}
@@ -87,16 +116,18 @@ function Record() {
 
                 <div className={styles.row}>
                     <div className={styles.inputGroup}>
-                        <label>출판사</label>
+                        <label htmlFor="publisher">출판사</label>
                         <input
+                            id="publisher"
                             name="publisher"
                             value={form.publisher}
                             onChange={handleChange}
                         />
                     </div>
                     <div className={styles.inputGroup}>
-                        <label>장르</label>
+                        <label htmlFor="genre">장르</label>
                         <input
+                            id="genre"
                             name="genre"
                             value={form.genre}
                             onChange={handleChange}
@@ -106,8 +137,9 @@ function Record() {
 
                 <div className={styles.reviewImageRow}>
                     <div className={styles.reviewBox}>
-                        <label className={styles.inputGroupLabel}>감상문</label>
+                        <label htmlFor="review" className={styles.inputGroupLabel}>감상문</label>
                         <textarea
+                            id="review"
                             name="review"
                             className={styles.textarea}
                             value={form.review}
