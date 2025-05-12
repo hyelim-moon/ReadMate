@@ -1,10 +1,88 @@
+.recordListPage {
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+    margin: 0;
+    font-family: 'Pretendard', sans-serif;
+    animation: fadeInUp 0.4s ease forwards;
+    background-color: transparent;
+    overflow-x: hidden;
+}
+
+.pageTitle {
+    font-size: 2.2rem;
+    font-weight: 600;
+    text-align: left;
+    color: #004225;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid #00753C;
+    padding-bottom: 0.5rem;
+    padding-left: 2.5rem;
+}
+
+.recordListContainer {
+    background-color: #ffffff;
+    padding: 2rem 3rem;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.recordCard {
+    display: flex;
+    flex-direction: row;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.recordImage {
+    width: 140px;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.recordContent {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.reviewExcerpt {
+    color: #444;
+    font-size: 0.95rem;
+    margin-top: 0.5rem;
+}
+
+.emptyMessage {
+    text-align: center;
+    color: #666;
+    font-size: 1.5rem; /* 글씨 크기를 더 키움 */
+    font-weight: bold; /* 글씨 두껍게 */
+    margin-top: 20vh; /* 화면 중앙에 위치시키기 위해 여백 추가 */
+}
+
+.nothing {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 70vh;
+    text-align: center;
+}
+
 .writeBtn {
     position: fixed;
     bottom: 20px;
     right: 20px;
     padding: 15px 25px;
     background-color: #00753C;
-    color: white;
+    color: #ffffff;
     border: none;
     border-radius: 50px;
     font-size: 1.2rem;
@@ -13,23 +91,36 @@
     transition: background-color 0.3s;
 }
 
-.banner {
-    margin-bottom: 20px;
-    padding: 20px;
-    margin-bottom: 1.25rem;
-    padding: 7rem;
-    background-color: #f0f0f0;
-    text-align: center;
-    font-size: 1.2rem;
-    border-radius: 8px;
+.writeBtn:hover {
+    background-color: #005b2c;
 }
 
-@media (max-width: 768px) {
-    .writeBtn {
-        padding: 10px 20px;
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 1024px) {
+    .recordListContainer {
+        padding: 1rem;
     }
 
-    .banner {
-        padding: 15px;
+    .recordCard {
+        flex-direction: column;
+    }
+
+    .recordImage {
+        width: 100%;
+        height: auto;
+    }
+
+    .writeBtn {
+        padding: 10px 20px;
     }
 }
