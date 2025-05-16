@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styles from '../assets/styles/Header.module.css';
 import logoImg from '../assets/images/logo.png';
 import userImg from '../assets/images/userImg.png';
-import {Link, link} from 'react-router-dom';
+import { Link } from 'react-router-dom'
 
 function Header() {
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -10,14 +10,10 @@ function Header() {
 
     const [rankingList, setRankingList] = useState([]);
     const [rankingLoading, setRankingLoading] = useState(true);
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [slideClass, setSlideClass] = useState(styles.slideInDown);
 
-    const categories = [
-        '전체',
-        '제목',
-        '저자',
-        '장르',
-        '출판사'
-    ];
+    const categories = ['전체', '제목', '저자', '장르', '출판사'];
 
     const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
     const handleSelect = (category) => {
@@ -25,13 +21,23 @@ function Header() {
         setDropdownOpen(false);
     };
 
+    const getRankDisplay = (rank) => {
+        switch (rank) {
+            case 1:
+                return '🥇 현재 랭킹 1위';
+            case 2:
+                return '🥈 현재 랭킹 2위';
+            case 3:
+                return '🥉 현재 랭킹 3위';
+            default:
+                return `🏆 현재 랭킹 ${rank}위`;
+        }
+    };
+
     useEffect(() => {
-        // 전체 랭킹 (TOP 10)
         fetch('http://localhost:8080/api/users/ranking')
             .then(res => {
-                if (!res.ok) {
-                    throw new Error(`HTTP error! status: ${res.status}`);
-                }
+                if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
                 return res.json();
             })
             .then(data => {
@@ -45,24 +51,32 @@ function Header() {
             });
     }, []);
 
+    useEffect(() => {
+        if (rankingList.length === 0) return;
+
+        const interval = setInterval(() => {
+            setSlideClass('');
+            setTimeout(() => {
+                setCurrentIndex(prev => (prev + 1) % rankingList.length);
+                setSlideClass(styles.slideInDown);
+            }, 50);
+        }, 5000);
+
+        return () => clearInterval(interval);
+    }, [rankingList]);
+
     return (
         <header className={styles.header}>
+            {/* 슬라이드 랭킹 영역 */}
             <div className={styles.userRanking}>
-                <h4>🏅 TOP 10 유저</h4>
                 {rankingLoading ? (
                     <p>불러오는 중...</p>
                 ) : (
-                    <ul>
-                        {rankingList.slice(0, 10).map((user, index) => (
-                            <li
-                                key={user.rank}
-                                className={styles.fadeIn}
-                                style={{ animationDelay: `${index * 0.9}s` }}
-                            >
-                                {user.rank}위 - {user.nickName}
-                            </li>
-                        ))}
-                    </ul>
+                    rankingList.length > 0 && (
+                        <div className={`${slideClass} ${styles.rankDisplay}`}>
+                            {getRankDisplay(rankingList[currentIndex].rank)} - {rankingList[currentIndex].nickname} ({rankingList[currentIndex].points}점)
+                        </div>
+                    )
                 )}
             </div>
 

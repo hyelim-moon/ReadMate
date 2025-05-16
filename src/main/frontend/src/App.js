@@ -9,6 +9,7 @@ import RecommendButton from './components/RecommendButton';
 import RecordNothing from './components/RecordNothing';
 import RecordList from './components/RecordList';
 import Record from './components/Record';
+import ChatBot from './components/ChatBot';
 
 function App() {
     const [hello, setHello] = useState('');
@@ -49,12 +50,12 @@ function App() {
                 <Routes>
                     <Route path="/" element={
                         <>
-                            <MainContent />
-                            <RecommendButton />
-                            <hr />
+                            <MainContent/>
+                            <hr/>
+                            <RecommendButton/>
                             <h2>🔁 백엔드 테스트 응답</h2>
                             <p>{hello}</p>
-                            {error && <p style={{ color: 'red' }}>Error: {error}</p>}
+                            {error && <p style={{color: 'red'}}>Error: {error}</p>}
 
                             <h2>📢 배너 메시지</h2>
                             <p>{bannerText}</p>
@@ -79,6 +80,7 @@ function App() {
                             )}
                         </>
                     } />
+                    <Route path="/chat" element={<ChatBot />} />
                     {/*<Route path="/recordnothing" element={<RecordNothing />} />*/}
                     <Route path="/recordlist" element={<RecordList />} />
                     <Route path="/record" element={<Record />} />

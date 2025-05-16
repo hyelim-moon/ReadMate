@@ -3,17 +3,38 @@
 }
 
 .userRanking {
-    height: 3rem;
+    height: 3.5rem;
     background-color: #003016;
     display: flex;
-    align-items: center;   /* 세로 정중앙 */
-    justify-content: center; /* 가로 정중앙 */
-    color: white;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 1.125rem;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+/* 👇 모든 랭킹 텍스트에 적용할 스타일 */
+.rankDisplay {
+    font-family: 'Gmarket Sans', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #fdfdfd;
+    letter-spacing: 0.5px;
 }
 
 .fadeIn {
     opacity: 0;
     animation: fadeInUp 0.4s ease forwards;
+    transition: opacity 0.4s ease;
+    white-space: nowrap;
+}
+
+.slideInDown {
+    animation: slideInDown 0.5s ease-in-out forwards;
+    white-space: nowrap;
 }
 
 .mainHeaderContent {
@@ -42,7 +63,6 @@
     position: relative;
 }
 
-/* 드롭다운 버튼 */
 .dropdown {
     position: relative;
     cursor: pointer;
@@ -61,7 +81,6 @@
     font-size: 0.75rem;
 }
 
-/* 드롭다운 메뉴 */
 .dropdownMenu {
     position: absolute;
     top: 3.5rem;
@@ -107,7 +126,6 @@
     font-size: clamp(0.875rem, 2vw, 1.125rem);
 }
 
-/* 유저 이미지 관련 */
 .userInfo {
     display: flex;
     align-items: center;
@@ -121,10 +139,23 @@
     border-radius: 50%;
 }
 
+/* 🔽 애니메이션 정의는 맨 아래 */
+
 @keyframes fadeInUp {
     0% {
         opacity: 0;
         transform: translateY(10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInDown {
+    0% {
+        opacity: 0;
+        transform: translateY(-50%);
     }
     100% {
         opacity: 1;

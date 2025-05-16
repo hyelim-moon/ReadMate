@@ -1,8 +1,11 @@
+import { Link } from 'react-router-dom';
 import styles from '../assets/styles/RecommendButton.module.css';
 
 function RecommendButton() {
     return (
-        <button className={styles.floatingBtn}>독서 추천</button>
+        <Link to="/chat">
+            <button className={styles.floatingBtn}>독서 추천</button>
+        </Link>
     );
 }
 
