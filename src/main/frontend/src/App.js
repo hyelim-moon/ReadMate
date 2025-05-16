@@ -6,7 +6,6 @@ import Header from './components/Header';
 import Navbar from './components/Navbar';
 import MainContent from './components/MainContent';
 import RecommendButton from './components/RecommendButton';
-import RecordNothing from './components/RecordNothing';
 import RecordList from './components/RecordList';
 import Record from './components/Record';
 import ChatBot from './components/ChatBot';
