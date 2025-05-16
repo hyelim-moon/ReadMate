@@ -10,13 +10,25 @@ function ChatBot() {
     ]);
 
     const sendMessage = async (userInput) => {
-        setMessages(prev => [...prev, { text: userInput, sender: 'user' }]);
+        setMessages((prev) => [...prev, { text: userInput, sender: 'user' }]);
 
         try {
-            const response = await axios.post('http://localhost:8080/api/chat', { message: userInput });
-            setMessages(prev => [...prev, { text: response.data.reply, sender: 'bot' }]);
+            const res = await axios.post('http://localhost:8080/api/gemini', userInput, {
+                withCredentials: true,
+                headers: {
+                    'Content-Type': 'text/plain'
+                }
+            });
+
+            setMessages((prev) => [
+                ...prev,
+                { text: res.data, sender: 'bot' }
+            ]);
         } catch (err) {
-            setMessages(prev => [...prev, { text: '에러가 발생했어요.', sender: 'bot' }]);
+            setMessages((prev) => [
+                ...prev,
+                { text: '에러가 발생했어요.', sender: 'bot' }
+            ]);
         }
     };
 
@@ -24,7 +36,11 @@ function ChatBot() {
         <div className={styles.container}>
             <div className={styles.chatBox}>
                 {messages.map((msg, idx) => (
-                    <MessageBubble key={idx} text={msg.text} isUser={msg.sender === 'user'} />
+                    <MessageBubble
+                        key={idx}
+                        text={msg.text}
+                        isUser={msg.sender === 'user'}
+                    />
                 ))}
             </div>
             <ChatInput onSend={sendMessage} />
