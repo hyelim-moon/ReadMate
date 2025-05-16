@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import styles from '../assets/styles/ChatBot.module.css';
 import MessageBubble from '../components/MessageBubble';
@@ -8,6 +8,18 @@ function ChatBot() {
     const [messages, setMessages] = useState([
         { text: '무엇이 궁금한가요?', sender: 'bot' }
     ]);
+    const messagesEndRef = useRef(null);
+
+    // ✅ 스크롤 아래로 이동 함수
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    // ✅ messages가 바뀔 때마다 스크롤 이동
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
+
 
     const sendMessage = async (userInput) => {
         setMessages((prev) => [...prev, { text: userInput, sender: 'user' }]);
@@ -42,6 +54,7 @@ function ChatBot() {
                         isUser={msg.sender === 'user'}
                     />
                 ))}
+                <div ref={messagesEndRef}/>
             </div>
             <ChatInput onSend={sendMessage} />
         </div>
