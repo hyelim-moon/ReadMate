@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List; // ✅ 추가
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -45,7 +46,7 @@ public class RecordService {
                 Files.createDirectories(Paths.get(uploadDir));
                 Path filePath = Paths.get(uploadDir, photo.getOriginalFilename());
                 Files.write(filePath, photo.getBytes());
-                record.setPhoto(filePath.toString());
+                record.setPhoto("/uploads/" + photo.getOriginalFilename()); // ✅ 상대 경로로 저장
             } else {
                 record.setPhoto(null);
             }
@@ -59,5 +60,10 @@ public class RecordService {
 
     public Record getRecordById(Long id) {
         return recordRepository.findById(id).orElse(null);
+    }
+
+    // ✅ 새로 추가: 전체 기록 조회
+    public List<Record> getAllRecords() {
+        return recordRepository.findAll();
     }
 }

@@ -25,26 +25,34 @@ function RecordList() {
     }, []);
 
     return (
-        <main className={styles.main}>
+        <main className={styles.recordListPage}>
             <h2 className={styles.pageTitle}>독서 기록 목록</h2>
 
-            <div className={styles.recordList}>
+            <div className={styles.recordListContainer}>
                 {records.length === 0 ? (
-                    <p className={styles.emptyMessage}>독서 기록 정보가 없습니다😢</p>
+                    <div className={styles.nothing}>
+                        <p className={styles.emptyMessage}>독서 기록 정보가 없습니다 😢</p>
+                    </div>
                 ) : (
                     records.map((record) => (
                         <div key={record.id} className={styles.recordCard}>
-                            {record.photoUrl && (
+                            {record.photo && (
                                 <img
-                                    src={record.photoUrl}
+                                    src={record.photo}
                                     alt={`${record.title} 책 이미지`}
                                     className={styles.recordImage}
                                 />
                             )}
                             <div className={styles.recordContent}>
                                 <h3 className={styles.recordTitle}>{record.title}</h3>
-                                <p className={styles.recordAuthor}><strong>저자:</strong> {record.author}</p>
-                                <p className={styles.reviewExcerpt}>{record.review.slice(0, 120)}...</p>
+                                <div className={styles.recordInfo}>
+                                    <p className={styles.recordAuthor}><strong>저자:</strong> {record.author}</p>
+                                    <p className={styles.recordPublisher}><strong>출판사:</strong> {record.publisher}</p>
+                                    <p className={styles.recordGenre}><strong>장르:</strong> {record.genre}</p>
+                                </div>
+                                <p className={styles.reviewExcerpt}>
+                                    {record.review.length > 120 ? `${record.review.slice(0, 120)}...` : record.review}
+                                </p>
                             </div>
                         </div>
                     ))
