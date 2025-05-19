@@ -1,6 +1,6 @@
 spring:
   file:
-    upload-dir: ./uploads  # 업로드한 파일을 저장할 경로 (상대 경로 기준)
+    upload-dir: uploads  # 업로드한 파일을 저장할 경로 (상대 경로 기준)
 
   servlet:
     multipart:

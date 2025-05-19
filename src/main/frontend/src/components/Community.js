@@ -3,6 +3,20 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import styles from '../assets/styles/Community.module.css';
 
+function timeAgoFromDate(dateString) {
+    if (!dateString) return '등록 시간 정보 없음';
+
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMinutes = Math.floor(diffMs / (1000 * 60));
+
+    if (diffMinutes < 1) return '방금 전';
+    if (diffMinutes < 60) return `${diffMinutes}분 전`;
+    if (diffMinutes < 1440) return `${Math.floor(diffMinutes / 60)}시간 전`;
+    return `${Math.floor(diffMinutes / 1440)}일 전`;
+}
+
 function Community() {
     const [posts, setPosts] = useState([]);
     const [bestPosts, setBestPosts] = useState([]);
@@ -12,19 +26,20 @@ function Community() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get('http://localhost:8080/api/community')
+        axios.get("http://localhost:8080/api/community")
             .then(res => {
-                const allPosts = res.data;
-                setPosts(allPosts);
+                setPosts(res.data);
 
-                const sorted = [...allPosts].sort((a, b) => (b.likes || 0) - (a.likes || 0));
+                // likes 기준 정렬해서 bestPosts 설정
+                const sorted = [...res.data].sort((a, b) => (b.likes || 0) - (a.likes || 0));
                 setBestPosts(sorted.slice(0, 5));
             })
-            .catch(err => console.error(err));
+            .catch(err => console.error('게시글 불러오기 실패:', err));
     }, []);
 
     const handleSearch = () => {
         console.log('검색어:', searchTerm, '시작일:', startDate, '종료일:', endDate);
+        // 여기에 실제 검색 API 호출이나 필터링 로직 추가 가능
     };
 
     const handleWriteClick = () => {
@@ -76,9 +91,22 @@ function Community() {
                         <div className={styles.postList}>
                             {posts.map(post => (
                                 <div key={post.id} className={styles.postCard}>
-                                    <h3 className={styles.postTitle}>{post.title}</h3>
-                                    <p className={styles.postContent}>{post.content}</p>
-                                    <div className={styles.postMeta}>{post.timeAgo} · 익명</div>
+                                    {post.imagePath && (
+                                        <img
+                                            src={`http://localhost:8080${post.imagePath}`}
+                                            alt={`${post.title} 이미지`}
+                                            className={styles.postImage}
+                                        />
+                                    )}
+                                    <div className={styles.postContentBox}>
+                                        <h3 className={styles.postTitle}>{post.title}</h3>
+                                        <p className={styles.postContent}>
+                                            {post.content.length > 120 ? `${post.content.slice(0, 120)}...` : post.content}
+                                        </p>
+                                        <div className={styles.postMeta}>
+                                            {timeAgoFromDate(post.createdAt)} · 익명
+                                        </div>
+                                    </div>
                                 </div>
                             ))}
                         </div>
@@ -94,7 +122,9 @@ function Community() {
                             {bestPosts.map(post => (
                                 <div key={post.id} className={styles.bestItem}>
                                     <div className={styles.bestTitle}>{post.title}</div>
-                                    <div className={styles.bestMeta}>❤️ {post.likes} · {post.timeAgo}</div>
+                                    <div className={styles.bestMeta}>
+                                        ❤️ {post.likes || 0} · {timeAgoFromDate(post.createdAt)}
+                                    </div>
                                 </div>
                             ))}
                         </div>
