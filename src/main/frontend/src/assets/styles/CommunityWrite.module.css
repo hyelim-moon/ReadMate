@@ -1,0 +1,185 @@
+.container {
+    max-width: 900px;
+    margin: 10px auto 80px auto; /* 위쪽 여백 10px로 줄임 */
+    padding: 0 24px;
+    font-family: 'Noto Sans KR', sans-serif;
+    color: #374151;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    padding: 32px 24px;
+}
+
+
+.title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.label {
+    display: flex;
+    flex-direction: column;
+    font-weight: 600;
+    font-size: 14px;
+    color: #111827;
+}
+
+.input {
+    margin-top: 6px;
+    padding: 10px 14px;
+    font-size: 14px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 4px rgba(37, 99, 235, 0.4);
+}
+
+.textarea {
+    margin-top: 6px;
+    padding: 10px 14px;
+    font-size: 14px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    outline: none;
+    font-family: inherit;
+    overflow-y: auto;
+    resize: none;
+}
+
+.textarea:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 4px rgba(37, 99, 235, 0.4);
+}
+
+/* 해시태그 리스트 */
+.tagList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 6px;
+}
+
+.tagItem {
+    background-color: #e0f2e9;
+    color: #065f46;
+    padding: 3px 10px;
+    border-radius: 14px;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    user-select: none;
+}
+
+.removeTagButton {
+    background: none;
+    border: none;
+    color: #065f46;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    padding: 0;
+    margin-left: 2px;
+    transition: color 0.2s ease;
+}
+
+.removeTagButton:hover {
+    color: #014d37;
+}
+
+/* 사진 첨부 */
+.fileInput {
+    margin-top: 6px;
+}
+
+.imagePreviewWrapper {
+    position: relative;
+    display: inline-block;
+    margin-top: 10px;
+}
+
+.imagePreview {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 1px solid #d1d5db;
+}
+
+.removeImageButton {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #ef4444;
+    border: none;
+    color: white;
+    font-weight: 700;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    line-height: 1;
+    font-size: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 4px rgba(0,0,0,0.2);
+    transition: background-color 0.3s ease;
+}
+
+.removeImageButton:hover {
+    background-color: #b91c1c;
+}
+
+.buttonRow {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+}
+
+.submitButton {
+    background-color: #00753C;
+    color: white;
+    font-weight: 700;
+    padding: 12px 28px;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.submitButton:hover {
+    background-color: #005b29;
+}
+
+.cancelButton {
+    background-color: #e5e7eb;
+    color: #374151;
+    font-weight: 700;
+    padding: 12px 28px;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.cancelButton:hover {
+    background-color: #d1d5db;
+}
