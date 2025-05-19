@@ -21,26 +21,30 @@ public class RecordController {
         this.recordService = recordService;
     }
 
-    @PostMapping
+    @PostMapping(consumes = {"multipart/form-data"})
     public ResponseEntity<?> createRecord(
             @RequestParam(value = "userId", required = false) Long userId,
             @RequestParam("title") String title,
             @RequestParam("author") String author,
             @RequestParam(value = "publisher", required = false) String publisher,
             @RequestParam(value = "genre", required = false) String genre,
-            @RequestParam(value = "review", required = false) String review,
+            @RequestParam("review") String review,
             @RequestParam(value = "photo", required = false) MultipartFile photo) {
 
-        Record record = Record.builder()
-                .title(title)
-                .author(author)
-                .publisher(publisher)
-                .genre(genre)
-                .review(review)
-                .build();
+        try {
+            Record record = Record.builder()
+                    .title(title)
+                    .author(author)
+                    .publisher(publisher)
+                    .genre(genre)
+                    .review(review)
+                    .build();
 
-        Record saved = recordService.saveRecord(userId, record, photo);
-        return ResponseEntity.ok(saved);
+            Record saved = recordService.saveRecord(userId, record, photo);
+            return ResponseEntity.ok(saved);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("저장 중 오류 발생: " + e.getMessage());
+        }
     }
 
     // 모든 독서 기록 가져오기

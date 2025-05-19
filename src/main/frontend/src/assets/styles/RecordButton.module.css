@@ -1,0 +1,20 @@
+.floatingBtn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    background-color: #00753C;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s;
+}
+
+@media (max-width: 768px) {
+    .floatingBtn {
+        padding: 10px 20px;
+    }
+}

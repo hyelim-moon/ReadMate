@@ -1,14 +1,56 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from '../assets/styles/RecordList.module.css';
 
 function RecordList() {
     const [records, setRecords] = useState([]);
+    const [openMenuId, setOpenMenuId] = useState(null);
     const navigate = useNavigate();
+    const menuRef = useRef(null); // 드롭다운 메뉴 영역 참조
 
     const handleWriteClick = () => {
         navigate('/record');
     };
+
+    const handleDelete = async (id) => {
+        const confirmDelete = window.confirm('정말로 이 글을 삭제하시겠습니까?');
+        if (!confirmDelete) return;
+
+        try {
+            const response = await fetch(`http://localhost:8080/api/records/${id}`, {
+                method: 'DELETE',
+            });
+
+            if (response.ok) {
+                setRecords(prev => prev.filter(record => record.id !== id));
+                setOpenMenuId(null); // 삭제 후 메뉴 닫기
+            } else {
+                alert('삭제 실패');
+            }
+        } catch (error) {
+            console.error('삭제 에러:', error);
+        }
+    };
+
+    const handleEdit = (id) => {
+        navigate(`/record/edit/${id}`);
+    };
+
+    const toggleMenu = (id) => {
+        setOpenMenuId(prev => (prev === id ? null : id));
+    };
+
+    // 외부 클릭 시 드롭다운 닫기
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (menuRef.current && !menuRef.current.contains(event.target)) {
+                setOpenMenuId(null);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     useEffect(() => {
         const fetchRecords = async () => {
@@ -36,6 +78,21 @@ function RecordList() {
                 ) : (
                     records.map((record) => (
                         <div key={record.id} className={styles.recordCard}>
+                            <div className={styles.cardHeader} ref={menuRef}>
+                                <button
+                                    className={styles.menuButton}
+                                    onClick={() => toggleMenu(record.id)}
+                                >
+                                    ⋯
+                                </button>
+                                {openMenuId === record.id && (
+                                    <div className={styles.dropdownMenu}>
+                                        <button onClick={() => handleEdit(record.id)}>수정</button>
+                                        <button onClick={() => handleDelete(record.id)}>삭제</button>
+                                    </div>
+                                )}
+                            </div>
+
                             {record.photo && (
                                 <img
                                     src={record.photo}
@@ -58,8 +115,6 @@ function RecordList() {
                     ))
                 )}
             </div>
-
-            <button onClick={handleWriteClick} className={styles.writeBtn}>글쓰기</button>
         </main>
     );
 }

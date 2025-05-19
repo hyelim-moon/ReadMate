@@ -12,10 +12,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List; // ✅ 추가
+import java.util.List;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @Service
 public class RecordService {
@@ -31,6 +29,11 @@ public class RecordService {
 
     public Record saveRecord(Long userId, Record record, MultipartFile photo) {
         try {
+            // 감상문 길이 체크 (1000자 이상은 에러)
+            if (record.getReview().length() > 1000) {
+                throw new IllegalArgumentException("감상문은 1000자 이내로 작성해주세요.");
+            }
+
             if (userId != null) {
                 // 로그인 사용자인 경우만 유저 정보 확인
                 userRepository.findById(userId)
@@ -46,7 +49,7 @@ public class RecordService {
                 Files.createDirectories(Paths.get(uploadDir));
                 Path filePath = Paths.get(uploadDir, photo.getOriginalFilename());
                 Files.write(filePath, photo.getBytes());
-                record.setPhoto("/uploads/" + photo.getOriginalFilename()); // ✅ 상대 경로로 저장
+                record.setPhoto("/uploads/" + photo.getOriginalFilename()); // 상대 경로로 저장
             } else {
                 record.setPhoto(null);
             }
@@ -55,6 +58,9 @@ public class RecordService {
 
         } catch (IOException e) {
             throw new RuntimeException("파일 저장 실패", e);
+        } catch (IllegalArgumentException e) {
+            // 감상문 길이 초과 오류 처리
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -62,7 +68,7 @@ public class RecordService {
         return recordRepository.findById(id).orElse(null);
     }
 
-    // ✅ 새로 추가: 전체 기록 조회
+    // 전체 기록 조회
     public List<Record> getAllRecords() {
         return recordRepository.findAll();
     }

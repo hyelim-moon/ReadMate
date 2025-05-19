@@ -6,7 +6,10 @@
     font-family: 'Pretendard', sans-serif;
     animation: fadeInUp 0.4s ease forwards;
     background-color: transparent;
-    overflow-x: hidden;
+
+    /* 부모 요소에 영향을 주지 않도록 overflow-x: hidden 제거 */
+    overflow-x: visible;
+    position: relative; /* 버튼이 fixed로 고정될 때 부모와 독립되도록 설정 */
 }
 
 .pageTitle {
@@ -28,9 +31,12 @@
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    position: relative; /* 이 요소 안에서 버튼이 영향을 받지 않도록 설정 */
+    z-index: 1; /* 카드와 버튼이 겹칠 수 있기 때문에 z-index 설정 */
 }
 
 .recordCard {
+    position: relative;
     display: flex;
     flex-direction: row;
     gap: 1.5rem;
@@ -42,8 +48,7 @@
 }
 
 .recordCard:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    background-color: #fbfbfb;
 }
 
 .recordImage {
@@ -86,21 +91,21 @@
     color: #666;
     font-size: 1.5rem;
     font-weight: bold;
-    margin-top: 20vh;
 }
 
 .nothing {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 70vh;
+    height: 50vh;
     text-align: center;
 }
 
+/* 글쓰기 버튼 스타일 */
 .writeBtn {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
+    position: fixed; /* 고정된 위치 */
+    bottom: 20px; /* 화면 하단에 고정 */
+    right: 20px; /* 화면 우측에 고정 */
     padding: 15px 25px;
     background-color: #00753C;
     color: #ffffff;
@@ -109,11 +114,59 @@
     font-size: 1.2rem;
     cursor: pointer;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.3s;
+    z-index: 9999; /* 다른 요소들 위에 올려놓기 */
 }
 
 .writeBtn:hover {
     background-color: #005b2c;
+}
+
+/* 드롭다운 메뉴 관련 스타일 */
+.cardHeader {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 10;
+}
+
+.menuButton {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #666;
+    cursor: pointer;
+    padding: 4px;
+    line-height: 1;
+}
+
+.dropdownMenu {
+    position: absolute;
+    top: 35px;
+    right: 0;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+    min-width: 100px;
+}
+
+.dropdownMenu button {
+    background: none;
+    border: none;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-size: 0.95rem;
+    color: #333;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.dropdownMenu button:hover {
+    background-color: #f0f0f0;
 }
 
 @keyframes fadeInUp {
@@ -128,6 +181,11 @@
 }
 
 @media (max-width: 1024px) {
+    .writeBtn {
+        padding: 10px 20px;
+        font-size: 1rem;
+    }
+
     .recordListContainer {
         padding: 1rem;
     }
@@ -143,12 +201,13 @@
         object-fit: cover;
     }
 
-    .writeBtn {
-        padding: 10px 20px;
-    }
-
     .recordContent {
         align-items: flex-start;
         text-align: left;
+    }
+
+    .cardHeader {
+        top: 10px;
+        right: 10px;
     }
 }
