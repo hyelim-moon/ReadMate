@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styles from '../assets/styles/RecordList.module.css';
-import RecordButton from '../components/RecordButton';  // RecordButton 컴포넌트 임포트
+import RecordButton from '../components/RecordButton';
 import { useNavigate } from 'react-router-dom';
 
 function RecordList() {
@@ -21,8 +21,8 @@ function RecordList() {
         fetchRecords();
     }, []);
 
-    const handleWriteClick = () => {
-        navigate('/record');
+    const handleCardClick = (id) => {
+        navigate(`/record/${id}`);
     };
 
     return (
@@ -36,10 +36,15 @@ function RecordList() {
                     </div>
                 ) : (
                     records.map((record) => (
-                        <div key={record.id} className={styles.recordCard}>
+                        <div
+                            key={record.id}
+                            className={styles.recordCard}
+                            onClick={() => handleCardClick(record.id)}
+                            style={{ cursor: 'pointer' }}
+                        >
                             {record.photo && (
                                 <img
-                                    src={`http://localhost:8080${record.photo}`}  // 이미지 URL 변경
+                                    src={`http://localhost:8080${record.photo}`}
                                     alt={`${record.title} 책 이미지`}
                                     className={styles.recordImage}
                                 />

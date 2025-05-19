@@ -118,18 +118,17 @@ textarea:focus {
     align-items: flex-start;
 }
 
-/* 사진 첨부 버튼 스타일 수정 */
 .imageButton {
-    margin-left: 1rem; /* 감상문 label 옆으로 이동 */
-    padding: 0.5rem 1rem; /* 버튼 크기 줄임 */
+    margin-left: 1rem;
+    padding: 0.5rem 1rem;
     background-color: #00753C;
     color: white;
     border: none;
-    border-radius: 30px; /* 버튼을 둥글게 */
+    border-radius: 20px; /* 버튼을 둥글게 */
     cursor: pointer;
-    font-size: 1rem; /* 글자 크기 조금 줄임 */
+    font-size: 1rem;
     transition: all 0.3s ease; /* 부드러운 변화 효과 */
-    width: 150px; /* 버튼 너비 조금 줄임 */
+    width: 150px;
     text-align: center;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 부드러운 그림자 */
     display: flex;

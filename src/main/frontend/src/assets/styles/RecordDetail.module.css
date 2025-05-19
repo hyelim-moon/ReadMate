@@ -1,0 +1,142 @@
+.detailPage {
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+    margin: 0;
+    font-family: 'Pretendard', sans-serif;
+    animation: fadeInUp 0.4s ease forwards;
+    background-color: transparent;
+    overflow-x: hidden;
+}
+
+.detailContainer {
+    width: 100%; /* 화면 크기를 모두 차지 */
+    padding: 2rem;
+    margin: 0;
+    font-family: 'Pretendard', sans-serif;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* 왼쪽 정렬 */
+    box-sizing: border-box; /* padding을 포함해 전체 너비가 100%로 설정되도록 */
+}
+
+.detailTitle {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #004225;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid #00753C;
+    padding-bottom: 0.5rem;
+    padding-left: 0; /* 왼쪽 여백 없애기 */
+    width: 100%;
+}
+
+.detailInfo {
+    font-size: 1rem;
+    color: #333;
+    margin-bottom: 0.5rem;
+    padding-left: 0; /* 왼쪽 여백 없애기 */
+    width: 100%;
+}
+
+.detailReview {
+    margin-top: 1rem;
+    line-height: 1.6;
+    font-size: 1rem;
+    color: #444;
+    width: 100%;
+}
+
+.detailImage {
+    margin-top: 1.5rem;
+    max-width: 100%;
+    max-height: 300px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.buttonGroup {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: flex-end; /* 버튼을 오른쪽 정렬 */
+    width: 100%;
+}
+
+.buttonGroup button {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    border-radius: 30px;
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin-left: 1rem;
+}
+
+.editButton {
+    background-color: #00753C;
+    color: white;
+    width: 150px;
+    text-align: center;
+}
+
+.deleteButton {
+    background-color: #FF5C5C;
+    color: white;
+    width: 150px;
+    text-align: center;
+}
+
+.editButton:hover {
+    background-color: #005b2c;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.deleteButton:hover {
+    background-color: #d94343;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 1024px) {
+    .detailContainer {
+        padding: 1rem;
+    }
+
+    .detailTitle {
+        font-size: 1.8rem;
+    }
+
+    .detailInfo,
+    .detailReview {
+        font-size: 0.9rem;
+    }
+
+    .buttonGroup {
+        flex-direction: column;
+        gap: 0.8rem;
+        align-items: flex-end; /* 버튼을 오른쪽 정렬 */
+    }
+
+    .buttonGroup button {
+        width: 100%;
+        margin-left: 0;
+    }
+}

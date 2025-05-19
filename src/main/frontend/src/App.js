@@ -11,7 +11,7 @@ import Record from './components/Record';
 import ChatBot from './components/ChatBot';
 import Community from './components/Community';
 import CommunityWrite from "./components/CommunityWrite";
-import RecordButton from "./components/RecordButton";
+import RecordDetail from './components/RecordDetail';
 
 function App() {
     const [hello, setHello] = useState('');
@@ -87,6 +87,7 @@ function App() {
                     <Route path="/record" element={<Record />} />
                     <Route path="/community" element={<Community />} />
                     <Route path="/community/write" element={<CommunityWrite />} />
+                    <Route path="/record/:id" element={<RecordDetail />} />
                 </Routes>
             </div>
         </BrowserRouter>
