@@ -1,11 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import styles from '../assets/styles/RecordButton.module.css';  // CSS 모듈 파일 임포트
+import styles from '../assets/styles/RecordButton.module.css';
 
 function RecordButton() {
     return (
         <Link to="/record">
-            <button className={styles.floatingBtn}>글쓰기</button>  {/* floatingBtn 클래스 적용 */}
+            <button className={styles.floatingBtn}>✏️️ 글쓰기</button>
         </Link>
     );
 }

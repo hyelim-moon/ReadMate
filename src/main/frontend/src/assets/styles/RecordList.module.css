@@ -1,14 +1,9 @@
 .recordListPage {
     width: 100%;
-    max-width: 100%;
-    padding: 0;
     margin: 0;
-    font-family: 'Pretendard', sans-serif;
-    animation: fadeInUp 0.4s ease forwards;
-    background-color: transparent;
-    min-height: 70vh;
-    overflow-x: visible;
-    position: relative;
+    padding: 0;
+    position: static; /* fixed 버튼에 간섭 안 하도록 */
+    overflow: visible;
 }
 
 .pageTitle {

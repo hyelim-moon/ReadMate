@@ -1,7 +1,7 @@
 .floatingBtn {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
+    position: fixed;         /* 화면에 고정 */
+    bottom: 20px;            /* 하단에서 20px 떨어짐 */
+    right: 20px;             /* 우측에서 20px 떨어짐 */
     padding: 15px 25px;
     background-color: #00753C;
     color: white;
@@ -11,7 +11,7 @@
     cursor: pointer;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: background-color 0.3s;
-    z-index: 9999; /* 다른 요소보다 위로 오도록 */
+    z-index: 9999;           /* 제일 위로 올라오도록 설정 */
 }
 
 .floatingBtn:hover {
