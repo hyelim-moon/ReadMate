@@ -1,36 +1,49 @@
 spring:
   file:
-    upload-dir: ./uploads  # 파일 업로드 디렉토리 설정 (상대 경로, 루트 기준)
+    upload-dir: ./uploads  # 업로드한 파일을 저장할 경로 (상대 경로 기준)
 
   servlet:
     multipart:
-      enabled: true  # multipart 설정을 활성화
-      max-file-size: 10MB  # 업로드할 수 있는 개별 파일의 최대 크기 설정
-      max-request-size: 10MB  # 전체 요청의 최대 크기 설정
-      location: ./uploads  # 임시 파일을 저장할 경로 (일반적으로 이 경로는 서버가 실행되는 디렉토리 내의 상대 경로로 설정)
+      enabled: true              # Multipart 파일 업로드 기능 활성화
+      max-file-size: 10MB        # 개별 파일 최대 크기
+      max-request-size: 10MB     # 전체 요청 최대 크기
+      location: ./uploads        # 임시 파일 저장 경로 (업로드 시 파일 임시 저장)
 
   h2:
     console:
-      enabled: true
-      path: /h2-console  # H2 콘솔 경로 설정
+      enabled: true              # H2 콘솔 사용 가능
+      path: /h2-console          # H2 콘솔 접속 경로 설정
 
   datasource:
-    url: jdbc:h2:mem:testdb  # 메모리 내의 H2 데이터베이스 사용
+    url: jdbc:h2:mem:testdb      # 메모리 기반 H2 데이터베이스 사용
     driver-class-name: org.h2.Driver
-    username: sa  # H2 기본 사용자
-    password: ""  # H2 기본 비밀번호
+    username: sa                 # 기본 사용자
+    password:                    # 비밀번호 없음
 
   jpa:
     hibernate:
-      ddl-auto: update  # 데이터베이스 스키마 자동 업데이트
-    show-sql: true  # SQL 쿼리 로그 출력
+      ddl-auto: update           # 테이블 자동 생성 및 수정 (실행 시점)
+    show-sql: true               # 콘솔에 SQL 쿼리 출력
     properties:
       hibernate:
-        format_sql: true  # SQL 포맷팅
+        format_sql: true         # SQL 예쁘게 출력 (가독성 ↑)
 
   sql:
     init:
-      mode: never  # SQL 초기화 비활성화 (서버가 시작될 때 자동으로 데이터베이스 초기화하지 않음)
-      encoding: UTF-8  # SQL 스크립트 인코딩
-      data-locations: classpath:schema.sql  # 초기화할 SQL 스크립트 위치
-      defer-datasource-initialization: false  # 데이터베이스 초기화를 지연시키지 않음
+      mode: never                          # 서버 시작 시 SQL 스크립트 실행 안 함
+      encoding: UTF-8                      # SQL 파일 인코딩
+      data-locations: classpath:schema.sql # 초기 스키마 파일 위치
+      defer-datasource-initialization: false # 데이터베이스 초기화 지연하지 않음
+
+  ai:
+    model:
+      chat: vertexai                       # 사용 모델: Vertex AI (Gemini)
+    vertex:
+      ai:
+        gemini:
+          project-id: readmate-460002      # GCP 프로젝트 ID
+          location: us-central1            # Gemini가 배포된 지역 (고정)
+          chat:
+            options:
+              model: gemini-1.5-flash      # 사용할 Gemini 모델 (1.5-pro도 가능)
+              temperature: 0.7             # 창의성 (0 = 논리적, 1 = 창의적)

@@ -16,17 +16,18 @@ public class UserService {
     }
 
     public UserRankingDTO getUserRanking(Long userId) {
-        // 모든 유저를 포인트 순으로 정렬 (예시)
-        List<User> users = userRepository.findAllByOrderByPointsDesc();
+        // 포인트 기준으로 상위 10명 가져오기
+        List<User> users = userRepository.findTop10ByOrderByPointsDesc();
 
-        // 랭킹 찾기
+        // 유저가 랭킹에 있는지 확인
         for (int i = 0; i < users.size(); i++) {
             if (users.get(i).getId().equals(userId)) {
-                return new UserRankingDTO(i + 1, users.get(i).getNickname());
+                User user = users.get(i);
+                return new UserRankingDTO(i + 1, user.getNickname(), user.getPoints());
             }
         }
 
-        // 못 찾으면 기본값
-        return new UserRankingDTO(0, "Unknown");
+        // 못 찾았을 경우
+        return new UserRankingDTO(0, "Unknown", 0);
     }
 }

@@ -23,15 +23,4 @@ public class User {
         this.nickname = nickname;
         this.points = points;
     }
-    public Long getId() {
-        return id;
-    }
-
-    public String getNickname() {
-        return nickname;
-    }
-
-    public int getPoints() {
-        return points;
-    }
 }
