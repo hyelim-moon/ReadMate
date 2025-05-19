@@ -11,10 +11,16 @@
     cursor: pointer;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: background-color 0.3s;
+    z-index: 9999; /* 다른 요소보다 위로 오도록 */
+}
+
+.floatingBtn:hover {
+    background-color: #005b2c;
 }
 
 @media (max-width: 768px) {
     .floatingBtn {
         padding: 10px 20px;
+        font-size: 1rem;
     }
 }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
@@ -11,6 +11,7 @@ import Record from './components/Record';
 import ChatBot from './components/ChatBot';
 import Community from './components/Community';
 import CommunityWrite from "./components/CommunityWrite";
+import RecordButton from "./components/RecordButton";
 
 function App() {
     const [hello, setHello] = useState('');
@@ -82,7 +83,6 @@ function App() {
                         </>
                     } />
                     <Route path="/chat" element={<ChatBot />} />
-                    {/*<Route path="/recordnothing" element={<RecordNothing />} />*/}
                     <Route path="/recordlist" element={<RecordList />} />
                     <Route path="/record" element={<Record />} />
                     <Route path="/community" element={<Community />} />

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from '../assets/styles/RecordList.module.css';
+import RecordButton from '../components/RecordButton';  // RecordButton 컴포넌트 임포트
 
 function RecordList() {
     const [records, setRecords] = useState([]);
@@ -78,21 +79,6 @@ function RecordList() {
                 ) : (
                     records.map((record) => (
                         <div key={record.id} className={styles.recordCard}>
-                            <div className={styles.cardHeader} ref={menuRef}>
-                                <button
-                                    className={styles.menuButton}
-                                    onClick={() => toggleMenu(record.id)}
-                                >
-                                    ⋯
-                                </button>
-                                {openMenuId === record.id && (
-                                    <div className={styles.dropdownMenu}>
-                                        <button onClick={() => handleEdit(record.id)}>수정</button>
-                                        <button onClick={() => handleDelete(record.id)}>삭제</button>
-                                    </div>
-                                )}
-                            </div>
-
                             {record.photo && (
                                 <img
                                     src={record.photo}
@@ -115,6 +101,7 @@ function RecordList() {
                     ))
                 )}
             </div>
+            <RecordButton />
         </main>
     );
 }
