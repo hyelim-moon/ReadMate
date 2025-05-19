@@ -35,7 +35,6 @@ public class RecordService {
             }
 
             if (userId != null) {
-                // 로그인 사용자인 경우만 유저 정보 확인
                 userRepository.findById(userId)
                         .orElseThrow(() -> new RuntimeException("User not found"));
                 record.setUserId(userId);
@@ -59,10 +58,10 @@ public class RecordService {
         } catch (IOException e) {
             throw new RuntimeException("파일 저장 실패", e);
         } catch (IllegalArgumentException e) {
-            // 감상문 길이 초과 오류 처리
             throw new RuntimeException(e.getMessage(), e);
         }
     }
+
 
     public Record getRecordById(Long id) {
         return recordRepository.findById(id).orElse(null);

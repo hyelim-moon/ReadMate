@@ -35,15 +35,6 @@ spring:
       data-locations: classpath:schema.sql # 초기 스키마 파일 위치
       defer-datasource-initialization: false # 데이터베이스 초기화 지연하지 않음
 
-  ai:
-    model:
-      chat: vertexai                       # 사용 모델: Vertex AI (Gemini)
-    vertex:
-      ai:
-        gemini:
-          project-id: readmate-460002      # GCP 프로젝트 ID
-          location: us-central1            # Gemini가 배포된 지역 (고정)
-          chat:
-            options:
-              model: gemini-1.5-flash      # 사용할 Gemini 모델 (1.5-pro도 가능)
-              temperature: 0.7             # 창의성 (0 = 논리적, 1 = 창의적)
+  web:
+    resources:
+      static-locations: file:./uploads/

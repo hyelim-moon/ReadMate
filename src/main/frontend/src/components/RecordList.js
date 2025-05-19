@@ -1,57 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
 import styles from '../assets/styles/RecordList.module.css';
 import RecordButton from '../components/RecordButton';  // RecordButton 컴포넌트 임포트
+import { useNavigate } from 'react-router-dom';
 
 function RecordList() {
     const [records, setRecords] = useState([]);
-    const [openMenuId, setOpenMenuId] = useState(null);
     const navigate = useNavigate();
-    const menuRef = useRef(null); // 드롭다운 메뉴 영역 참조
-
-    const handleWriteClick = () => {
-        navigate('/record');
-    };
-
-    const handleDelete = async (id) => {
-        const confirmDelete = window.confirm('정말로 이 글을 삭제하시겠습니까?');
-        if (!confirmDelete) return;
-
-        try {
-            const response = await fetch(`http://localhost:8080/api/records/${id}`, {
-                method: 'DELETE',
-            });
-
-            if (response.ok) {
-                setRecords(prev => prev.filter(record => record.id !== id));
-                setOpenMenuId(null); // 삭제 후 메뉴 닫기
-            } else {
-                alert('삭제 실패');
-            }
-        } catch (error) {
-            console.error('삭제 에러:', error);
-        }
-    };
-
-    const handleEdit = (id) => {
-        navigate(`/record/edit/${id}`);
-    };
-
-    const toggleMenu = (id) => {
-        setOpenMenuId(prev => (prev === id ? null : id));
-    };
-
-    // 외부 클릭 시 드롭다운 닫기
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (menuRef.current && !menuRef.current.contains(event.target)) {
-                setOpenMenuId(null);
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
 
     useEffect(() => {
         const fetchRecords = async () => {
@@ -67,6 +21,10 @@ function RecordList() {
         fetchRecords();
     }, []);
 
+    const handleWriteClick = () => {
+        navigate('/record');
+    };
+
     return (
         <main className={styles.recordListPage}>
             <h2 className={styles.pageTitle}>독서 기록 목록</h2>
@@ -81,7 +39,7 @@ function RecordList() {
                         <div key={record.id} className={styles.recordCard}>
                             {record.photo && (
                                 <img
-                                    src={record.photo}
+                                    src={`http://localhost:8080${record.photo}`}  // 이미지 URL 변경
                                     alt={`${record.title} 책 이미지`}
                                     className={styles.recordImage}
                                 />
