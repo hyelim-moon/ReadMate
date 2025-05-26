@@ -69,7 +69,7 @@ textarea {
     background-color: #fefefe;
     transition: border-color 0.2s;
     font-weight: 600;
-    color: black;
+    color: #000000;
 }
 
 input:focus,
