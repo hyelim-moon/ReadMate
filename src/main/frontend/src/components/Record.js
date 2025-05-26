@@ -8,7 +8,7 @@ function Record() {
         author: '',
         publisher: '',
         genre: '',
-        review: '',
+        content: '',
     });
     const [image, setImage] = useState(null);
     const [preview, setPreview] = useState(null);
@@ -35,13 +35,13 @@ function Record() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const { title, author, review, publisher, genre } = form;
+        const { title, author, content, publisher, genre } = form;
 
         if (!title.trim() || !author.trim()) {
             setError('책 제목과 저자는 필수 입력 항목입니다.');
             return;
         }
-        if (review.length > 1000) {
+        if (content.length > 1000) {
             setError('감상문은 1000자 이내로 작성해주세요.');
             return;
         }
@@ -53,7 +53,7 @@ function Record() {
         formData.append('author', author);
         formData.append('publisher', publisher);
         formData.append('genre', genre);
-        formData.append('review', review);
+        formData.append('content', content);
         formData.append('photo', image);  // 이미지 추가
 
         try {
@@ -71,7 +71,7 @@ function Record() {
                     author: '',
                     publisher: '',
                     genre: '',
-                    review: '',
+                    content: '',
                 });
                 setImage(null);
                 setPreview(null);
@@ -138,9 +138,9 @@ function Record() {
                     <div className={styles.reviewBox}>
                         <label className={styles.inputGroupLabel}>감상문</label>
                         <textarea
-                            name="review"
+                            name="content"
                             className={styles.textarea}
-                            value={form.review}
+                            value={form.content}
                             onChange={handleChange}
                             maxLength={1000}
                             rows={6}

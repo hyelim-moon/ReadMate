@@ -29,7 +29,7 @@ public class Record {
     private String genre;
 
     @Column(columnDefinition = "TEXT") // 긴 텍스트 저장을 위한 TEXT 타입
-    private String review;
+    private String content;
 
     @Column(nullable = true)
     private String photo; // 사진은 null 가능

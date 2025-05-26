@@ -64,7 +64,7 @@ function RecordDetail() {
                 <p className={styles.detailInfo}><strong>저자:</strong> {record.author}</p>
                 <p className={styles.detailInfo}><strong>출판사:</strong> {record.publisher}</p>
                 <p className={styles.detailInfo}><strong>장르:</strong> {record.genre}</p>
-                <p className={styles.detailReview}><strong>감상문:</strong> {record.review}</p>
+                <p className={styles.detailReview}><strong>감상문:</strong> {record.content}</p>
                 {record.photo && (
                     <img
                         src={`http://localhost:8080${record.photo}`}
