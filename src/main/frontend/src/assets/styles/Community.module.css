@@ -17,7 +17,7 @@
     display: flex;
     justify-content: center;
     align-items: flex-end;
-    gap: 16px;
+    gap: 20px; /* 원래대로 유지 */
     margin-bottom: 24px;
     flex-wrap: wrap;
 }
@@ -25,7 +25,12 @@
 /* 날짜 입력 그룹 */
 .dateGroup {
     display: flex;
-    gap: 16px;
+    gap: 30px; /* 시작일-종료일 사이만 벌림 */
+}
+
+/* 종료일 input에 오른쪽 마진 주기 */
+.dateGroup label:last-child {
+    margin-right: 30px; /* 종료일-검색어입력칸 사이 */
 }
 
 /* 날짜 입력 라벨 */

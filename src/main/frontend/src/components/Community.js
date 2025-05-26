@@ -76,7 +76,7 @@ function Community() {
 
     return (
         <div className={styles.container}>
-            <h1 className={styles.title}>📢 커뮤니티</h1>
+            <h1 className={styles.title}>커뮤니티</h1>
 
             <div className={styles.searchRow}>
                 <div className={styles.dateGroup}>
@@ -117,7 +117,7 @@ function Community() {
 
             <div className={styles.grid}>
                 <div className={styles.sectionBox}>
-                    <h2 className={styles.subTitle}>📝 최신 글</h2>
+                    <h2 className={styles.subTitle}>최신 글</h2>
                     {filteredPosts.length > 0 ? (
                         <div className={styles.postList}>
                             {filteredPosts.map(post => (
@@ -152,7 +152,7 @@ function Community() {
                 </div>
 
                 <div className={styles.sectionBoxSmall}>
-                    <h2 className={styles.subTitle}>🔥 BEST</h2>
+                    <h2 className={styles.subTitle}>BEST</h2>
                     {bestPosts.length > 0 ? (
                         <div className={styles.bestList}>
                             {bestPosts.map(post => (
