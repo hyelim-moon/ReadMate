@@ -4,6 +4,16 @@
     padding: 20px;
 }
 
+.section {
+    margin-bottom: 3rem;
+}
+
+.title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
 @media (max-width: 768px) {
     .main {
         padding: 10px;
