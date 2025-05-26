@@ -57,7 +57,7 @@ function RecordList() {
                                     <p className={styles.recordGenre}><strong>장르:</strong> {record.genre}</p>
                                 </div>
                                 <p className={styles.reviewExcerpt}>
-                                    {record.review.length > 120 ? `${record.review.slice(0, 120)}...` : record.review}
+                                    {record.content.length > 120 ? `${record.review.slice(0, 120)}...` : record.review}
                                 </p>
                             </div>
                         </div>

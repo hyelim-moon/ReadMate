@@ -25,7 +25,7 @@ public class RecordService {
     public Record saveRecord(Long userId, Record record, MultipartFile photo) {
         try {
             // 감상문 길이 체크 (1000자 이상은 에러)
-            if (record.getReview().length() > 1000) {
+            if (record.getContent().length() > 1000) {
                 throw new IllegalArgumentException("감상문은 1000자 이내로 작성해주세요.");
             }
 

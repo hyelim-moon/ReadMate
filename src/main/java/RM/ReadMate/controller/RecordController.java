@@ -28,7 +28,7 @@ public class RecordController {
             @RequestParam("author") String author,
             @RequestParam(value = "publisher", required = false) String publisher,
             @RequestParam(value = "genre", required = false) String genre,
-            @RequestParam("review") String review,
+            @RequestParam("content") String content,
             @RequestParam(value = "photo", required = false) MultipartFile photo) {
 
         try {
@@ -37,7 +37,7 @@ public class RecordController {
                     .author(author)
                     .publisher(publisher)
                     .genre(genre)
-                    .review(review)
+                    .content(content)
                     .build();
 
             Record saved = recordService.saveRecord(userId, record, photo);
