@@ -52,4 +52,14 @@ public class RecordController {
     public ResponseEntity<List<Record>> getAllRecords() {
         return ResponseEntity.ok(recordService.getAllRecords());
     }
+    
+    //특정 독서 기록 불러오기
+    @GetMapping("/{id}")
+    public ResponseEntity<Record> getRecordById(@PathVariable Long id) {
+        Record record = recordService.getRecordById(id);
+        if (record == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(record);
+    }
 }
