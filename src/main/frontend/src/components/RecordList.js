@@ -32,7 +32,7 @@ function RecordList() {
             <div className={styles.recordListContainer}>
                 {records.length === 0 ? (
                     <div className={styles.nothing}>
-                        <p className={styles.emptyMessage}>독서 기록 정보가 없습니다 😢</p>
+                        <p className={styles.emptyMessage}>독서 기록 정보가 없습니다.</p>
                     </div>
                 ) : (
                     records.map((record) => (

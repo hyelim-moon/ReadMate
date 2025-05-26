@@ -5,7 +5,7 @@ import styles from '../assets/styles/RecordButton.module.css';
 function RecordButton() {
     return (
         <Link to="/record">
-            <button className={styles.floatingBtn}>✏️️ 글쓰기</button>
+            <button className={styles.floatingBtn}>글쓰기</button>
         </Link>
     );
 }

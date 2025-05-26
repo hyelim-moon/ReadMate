@@ -22,10 +22,11 @@ public class RecordService {
         this.recordRepository = recordRepository;
     }
 
+    // 저장 메서드 (신규)
     public Record saveRecord(Long userId, Record record, MultipartFile photo) {
         try {
             // 감상문 길이 체크 (1000자 이상은 에러)
-            if (record.getContent().length() > 1000) {
+            if (record.getContent() != null && record.getContent().length() > 1000) {
                 throw new IllegalArgumentException("감상문은 1000자 이내로 작성해주세요.");
             }
 
@@ -41,6 +42,40 @@ public class RecordService {
             }
 
             return recordRepository.save(record);
+
+        } catch (IOException e) {
+            throw new RuntimeException("파일 저장 실패", e);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    // 수정 메서드 (추가)
+    public Record updateRecord(Long id, String title, String author, String publisher, String genre, String content, MultipartFile photo) {
+        try {
+            Record existingRecord = recordRepository.findById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("해당 ID의 기록이 없습니다: " + id));
+
+            if (content != null && content.length() > 1000) {
+                throw new IllegalArgumentException("감상문은 1000자 이내로 작성해주세요.");
+            }
+
+            existingRecord.setTitle(title);
+            existingRecord.setAuthor(author);
+            existingRecord.setPublisher(publisher);
+            existingRecord.setGenre(genre);
+            existingRecord.setContent(content);
+
+            // 사진 저장 (새 사진이 있으면 덮어쓰기)
+            if (photo != null && !photo.isEmpty()) {
+                String uploadDir = Paths.get(System.getProperty("user.dir"), "uploads").toString();
+                Files.createDirectories(Paths.get(uploadDir));
+                Path filePath = Paths.get(uploadDir, photo.getOriginalFilename());
+                Files.write(filePath, photo.getBytes());
+                existingRecord.setPhoto("/uploads/" + photo.getOriginalFilename());
+            }
+
+            return recordRepository.save(existingRecord);
 
         } catch (IOException e) {
             throw new RuntimeException("파일 저장 실패", e);

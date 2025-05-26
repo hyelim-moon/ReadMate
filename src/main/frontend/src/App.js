@@ -14,6 +14,7 @@ import CommunityWrite from "./components/CommunityWrite";
 import Login from "./components/Login";
 import SignUp from "./components/SignUp";
 import RecordDetail from './components/RecordDetail';
+import RecordEdit from './components/RecordEdit';
 import RecordButton from "./components/RecordButton";
 
 function App() {
@@ -62,6 +63,7 @@ function App() {
                     <Route path="/chat" element={<ChatBot />} />
                     <Route path="/recordlist" element={<RecordList />} />
                     <Route path="/record" element={<Record />} />
+                    <Route path="/record/edit/:id" element={<RecordEdit />} />
                     <Route path="/community" element={<Community />} />
                     <Route path="/community/write" element={<CommunityWrite />} />
                     <Route path="/record/:id" element={<RecordDetail />} />

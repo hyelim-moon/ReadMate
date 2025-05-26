@@ -52,8 +52,8 @@ public class RecordController {
     public ResponseEntity<List<Record>> getAllRecords() {
         return ResponseEntity.ok(recordService.getAllRecords());
     }
-    
-    //특정 독서 기록 불러오기
+
+    // 특정 독서 기록 불러오기
     @GetMapping("/{id}")
     public ResponseEntity<Record> getRecordById(@PathVariable Long id) {
         Record record = recordService.getRecordById(id);
@@ -61,5 +61,26 @@ public class RecordController {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(record);
+    }
+
+    // 독서 기록 수정
+    @PutMapping(value = "/{id}", consumes = {"multipart/form-data"})
+    public ResponseEntity<?> updateRecord(
+            @PathVariable Long id,
+            @RequestParam("title") String title,
+            @RequestParam("author") String author,
+            @RequestParam(value = "publisher", required = false) String publisher,
+            @RequestParam(value = "genre", required = false) String genre,
+            @RequestParam(value = "content", required = false) String content,
+            @RequestParam(value = "photo", required = false) MultipartFile photo
+    ) {
+        try {
+            Record updated = recordService.updateRecord(id, title, author, publisher, genre, content, photo);
+            return ResponseEntity.ok(updated);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("업데이트 중 오류 발생: " + e.getMessage());
+        }
     }
 }
