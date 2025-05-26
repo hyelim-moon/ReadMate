@@ -23,7 +23,7 @@ function Community() {
     const [searchTerm, setSearchTerm] = useState('');
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
-    const [filteredPosts, setFilteredPosts] = useState([]); // 👈 추가
+    const [filteredPosts, setFilteredPosts] = useState([]);
 
     const navigate = useNavigate();
 
@@ -31,7 +31,7 @@ function Community() {
         axios.get("http://localhost:8080/api/community")
             .then(res => {
                 setPosts(res.data);
-                setFilteredPosts(res.data);  // 👈 초기에는 전체 게시글 표시
+                setFilteredPosts(res.data);
                 const sorted = [...res.data].sort((a, b) => (b.likes || 0) - (a.likes || 0));
                 setBestPosts(sorted.slice(0, 5));
             })
@@ -39,31 +39,28 @@ function Community() {
     }, []);
 
     const handleSearch = () => {
-        // 둘 다 값이 있을 때만 비교
-        if (startDate && endDate) {
-            if (startDate > endDate) {
-                alert('시작일이 종료일보다 늦을 수 없습니다. 날짜를 다시 선택해 주세요.');
-                return;
-            }
-        }
-
-        // 검색어, 날짜 없는 경우 전체 게시글 표시
-        if (!searchTerm && !startDate && !endDate) {
-            setFilteredPosts(posts);
-            return;
-        }
-
         const filtered = posts.filter(post => {
-            const postDateStr = new Date(post.createdAt).toISOString().split('T')[0];
+            const postDate = new Date(post.createdAt);
 
-            const titleMatch = searchTerm
+            const titleContentMatch = searchTerm
                 ? (post.title.includes(searchTerm) || post.content.includes(searchTerm))
                 : true;
 
-            const isAfterStart = startDate ? postDateStr >= startDate : true;
-            const isBeforeEnd = endDate ? postDateStr <= endDate : true;
+            let tagsArray = [];
+            try {
+                tagsArray = JSON.parse(post.tags || '[]');
+            } catch {
+                tagsArray = [];
+            }
 
-            return titleMatch && isAfterStart && isBeforeEnd;
+            const tagMatch = searchTerm
+                ? tagsArray.some(tag => tag.includes(searchTerm))
+                : true;
+
+            const isAfterStart = startDate ? postDate >= new Date(startDate) : true;
+            const isBeforeEnd = endDate ? postDate <= new Date(endDate) : true;
+
+            return (titleContentMatch || tagMatch) && isAfterStart && isBeforeEnd;
         });
 
         setFilteredPosts(filtered);
@@ -109,8 +106,13 @@ function Community() {
                     placeholder="#검색어 입력"
                     value={searchTerm}
                     onChange={e => setSearchTerm(e.target.value)}
+                    onKeyDown={e => {
+                        if (e.key === 'Enter') {
+                            handleSearch();
+                        }
+                    }}
                 />
-                <button className={styles.searchButton} onClick={handleSearch}>검색</button>
+                <button className={styles.searchButton} onClick={handleSearch}>🔍︎검색</button>
             </div>
 
             <div className={styles.grid}>

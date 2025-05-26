@@ -125,7 +125,9 @@
     height: 3rem;
     font-size: clamp(0.875rem, 2vw, 1.125rem);
 }
-
+.searchBtn:hover {
+    background-color: #005b29;
+}
 .userInfo {
     display: flex;
     align-items: center;

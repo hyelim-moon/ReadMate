@@ -71,13 +71,13 @@
 .searchButton {
     background-color: #00753C;
     color: white;
-    font-weight: 700;
-    padding: 12px 22px;
-    font-size: 15px;
+    padding: 0.5rem 1.2rem;
     border: none;
-    border-radius: 12px;
+    border-radius: 2rem;
     cursor: pointer;
-    box-shadow: 0 4px 8px rgba(0, 117, 60, 0.4);
+    font-weight: bold;
+    height: 3rem;
+    font-size: clamp(0.875rem, 2vw, 1.125rem);
     transition: background-color 0.3s ease;
 }
 
@@ -237,16 +237,17 @@
     right: 40px;
     background-color: #00753C;
     color: white;
-    font-weight: 700;
-    padding: 14px 22px;
+    padding: 0.8rem 1.6rem; /* padding 더 크게 */
     border: none;
-    border-radius: 12px;
-    box-shadow: 0 4px 8px rgba(0, 117, 60, 0.4);
+    border-radius: 2.5rem;
     cursor: pointer;
-    font-size: 16px;
+    font-weight: bold;
+    height: 3.5rem; /* height 조금 키움 */
+    font-size: clamp(1rem, 2.2vw, 1.3rem); /* 글자 크기도 살짝 업 */
     transition: background-color 0.3s ease;
     z-index: 1000;
 }
+
 
 .floatingWriteButton:hover {
     background-color: #005b29;
