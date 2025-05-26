@@ -6,7 +6,7 @@ function RecordDetail() {
     const { id } = useParams();
     const navigate = useNavigate();
     const [record, setRecord] = useState(null);
-    const [error, setError] = useState(null); // 오류 상태 추가
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         const fetchRecord = async () => {
@@ -17,12 +17,12 @@ function RecordDetail() {
 
             try {
                 const res = await fetch(`http://localhost:8080/api/records/${id}`);
-                if (!res.ok) throw new Error("데이터 없음"); // 응답이 200이 아닌 경우 오류 처리
+                if (!res.ok) throw new Error("데이터 없음");
                 const data = await res.json();
                 setRecord(data);
             } catch (err) {
                 console.error('불러오기 실패', err);
-                setError('데이터를 불러오는 중 오류가 발생했습니다.'); // 오류 메시지 설정
+                setError('데이터를 불러오는 중 오류가 발생했습니다.');
             }
         };
 
@@ -48,17 +48,23 @@ function RecordDetail() {
         navigate(`/record/edit/${id}`);
     };
 
-    if (error) return <p>{error}</p>;  // 오류 발생 시 오류 메시지 표시
+    if (error) return <p>{error}</p>;
     if (!record) return <p>불러오는 중...</p>;
 
     return (
         <main className={styles.detailPage}>
             <div className={styles.detailContainer}>
-                <h2 className={styles.detailTitle}>{record.title}</h2>
+                <div className={styles.detailHeader}>
+                    <h2 className={styles.detailTitle}>{record.title}</h2>
+                    <div className={styles.buttonGroup}>
+                        <button onClick={handleEdit} className={styles.editButton}>수정</button>
+                        <button onClick={handleDelete} className={styles.deleteButton}>삭제</button>
+                    </div>
+                </div>
                 <p className={styles.detailInfo}><strong>저자:</strong> {record.author}</p>
                 <p className={styles.detailInfo}><strong>출판사:</strong> {record.publisher}</p>
                 <p className={styles.detailInfo}><strong>장르:</strong> {record.genre}</p>
-                <p className={styles.detailReview}><strong>리뷰:</strong> {record.review}</p>
+                <p className={styles.detailReview}><strong>감상문:</strong> {record.review}</p>
                 {record.photo && (
                     <img
                         src={`http://localhost:8080${record.photo}`}
@@ -66,10 +72,6 @@ function RecordDetail() {
                         className={styles.detailImage}
                     />
                 )}
-                <div className={styles.buttonGroup}>
-                    <button onClick={handleEdit} className={styles.editButton}>수정</button>
-                    <button onClick={handleDelete} className={styles.deleteButton}>삭제</button>
-                </div>
             </div>
         </main>
     );

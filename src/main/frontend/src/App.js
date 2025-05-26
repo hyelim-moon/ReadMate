@@ -15,7 +15,6 @@ import Login from "./components/Login";
 import SignUp from "./components/SignUp";
 import RecordDetail from './components/RecordDetail';
 import RecordButton from "./components/RecordButton";
-import RecordDetail from "./components/RecordDetail";
 
 function App() {
     const [hello, setHello] = useState('');
