@@ -144,3 +144,20 @@
     font-size: 1.3rem;
     padding: 60px 0;
 }
+
+/* 해시태그 스타일 추가 */
+.tagsContainer {
+    margin-bottom: 20px;
+}
+
+.tag {
+    display: inline-block;
+    background-color: #f0f0f0;
+    color: #333;
+    padding: 4px 10px;
+    border-radius: 15px;
+    margin-right: 8px;
+    font-size: 0.9rem;
+    user-select: none;
+    cursor: default;
+}

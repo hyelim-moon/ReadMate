@@ -13,7 +13,9 @@
     transition: background-color 0.3s;
     z-index: 1000;
 }
-
+.floatingBtn:hover {
+    background-color: #005b29;
+}
 @media (max-width: 768px) {
     .floatingBtn {
         padding: 10px 20px;

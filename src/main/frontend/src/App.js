@@ -16,6 +16,7 @@ import SignUp from "./components/SignUp";
 import RecordDetail from './components/RecordDetail';
 import RecordEdit from './components/RecordEdit';
 import RecordButton from "./components/RecordButton";
+import CommunityDetail from "./components/CommunityDetail";
 
 function App() {
     const [hello, setHello] = useState('');
@@ -66,6 +67,7 @@ function App() {
                     <Route path="/record/edit/:id" element={<RecordEdit />} />
                     <Route path="/community" element={<Community />} />
                     <Route path="/community/write" element={<CommunityWrite />} />
+                    <Route path="/community/:id" element={<CommunityDetail />} />
                     <Route path="/record/:id" element={<RecordDetail />} />
                 </Routes>
             </div>
