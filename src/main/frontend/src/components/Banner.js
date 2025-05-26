@@ -1,9 +1,16 @@
-import styles from '../assets/styles/Banner.module.css';
+import BookSlider from "./BookSlider";
 
-function Banner({ type, text }) {
+function Banner({ type }) {
+    let apiUrl = "";
+    if (type === "bestseller") {
+        apiUrl = "http://localhost:8080/books/bestseller";
+    } else if (type === "picks") {
+        apiUrl = "http://localhost:8080/books/picks";
+    }
+
     return (
-        <div className={styles.banner}>
-            {text}
+        <div>
+            <BookSlider apiUrl={apiUrl} />
         </div>
     );
 }

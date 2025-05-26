@@ -4,8 +4,15 @@ import styles from '../assets/styles/MainContent.module.css';
 function MainContent() {
     return (
         <main className={styles.main}>
-            <Banner type="ranking" text="랭킹 책 광고 배너" />
-            <Banner type="recommend" text="추천 책 광고 배너" />
+            <section className={styles.section}>
+                <h2 className={styles.title}>베스트셀러</h2>
+                <Banner type="bestseller" />
+            </section>
+
+            <section className={styles.section}>
+                <h2 className={styles.title}>에디터 추천</h2>
+                <Banner type="picks" />
+            </section>
         </main>
     );
 }

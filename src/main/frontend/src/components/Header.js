@@ -109,7 +109,9 @@ function Header() {
                 </div>
 
                 <div className={styles.userInfo}>
-                    <img src={userImg} alt="userImg" />
+                    <Link to={"/login"}>
+                        <img src={userImg} alt="userImg" />
+                    </Link>
                 </div>
             </div>
         </header>
