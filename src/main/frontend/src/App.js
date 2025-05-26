@@ -15,7 +15,6 @@ import Login from "./components/Login";
 import SignUp from "./components/SignUp";
 import RecordDetail from './components/RecordDetail';
 import RecordButton from "./components/RecordButton";
-import RecordDetail from "./components/RecordDetail";
 
 function App() {
     const [hello, setHello] = useState('');
@@ -57,33 +56,7 @@ function App() {
                     <Route path="/" element={
                         <>
                             <MainContent/>
-                            <hr/>
                             <RecommendButton/>
-                            <h2>🔁 백엔드 테스트 응답</h2>
-                            <p>{hello}</p>
-                            {error && <p style={{color: 'red'}}>Error: {error}</p>}
-
-                            <h2>📢 배너 메시지</h2>
-                            <p>{bannerText}</p>
-
-                            <h2>👤 사용자 정보</h2>
-                            {userInfo && <p>닉네임: {userInfo.username}</p>}
-
-                            <h2>📚 추천 도서 목록</h2>
-                            <ul>
-                                {books.map(book => (
-                                    <li key={book.id}>
-                                        <strong>{book.title}</strong> - {book.author}
-                                    </li>
-                                ))}
-                            </ul>
-
-                            <h2>🎯 랜덤 추천 도서</h2>
-                            {randomBook && (
-                                <div>
-                                    <p><strong>{randomBook.title}</strong> - {randomBook.author}</p>
-                                </div>
-                            )}
                         </>
                     } />
                     <Route path="/chat" element={<ChatBot />} />
