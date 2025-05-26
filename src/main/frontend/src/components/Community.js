@@ -23,14 +23,15 @@ function Community() {
     const [searchTerm, setSearchTerm] = useState('');
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
+    const [filteredPosts, setFilteredPosts] = useState([]); // 👈 추가
+
     const navigate = useNavigate();
 
     useEffect(() => {
         axios.get("http://localhost:8080/api/community")
             .then(res => {
                 setPosts(res.data);
-
-                // likes 기준 정렬해서 bestPosts 설정
+                setFilteredPosts(res.data);  // 👈 초기에는 전체 게시글 표시
                 const sorted = [...res.data].sort((a, b) => (b.likes || 0) - (a.likes || 0));
                 setBestPosts(sorted.slice(0, 5));
             })
@@ -38,19 +39,48 @@ function Community() {
     }, []);
 
     const handleSearch = () => {
-        console.log('검색어:', searchTerm, '시작일:', startDate, '종료일:', endDate);
-        // 여기에 실제 검색 API 호출이나 필터링 로직 추가 가능
+        // 둘 다 값이 있을 때만 비교
+        if (startDate && endDate) {
+            if (startDate > endDate) {
+                alert('시작일이 종료일보다 늦을 수 없습니다. 날짜를 다시 선택해 주세요.');
+                return;
+            }
+        }
+
+        // 검색어, 날짜 없는 경우 전체 게시글 표시
+        if (!searchTerm && !startDate && !endDate) {
+            setFilteredPosts(posts);
+            return;
+        }
+
+        const filtered = posts.filter(post => {
+            const postDateStr = new Date(post.createdAt).toISOString().split('T')[0];
+
+            const titleMatch = searchTerm
+                ? (post.title.includes(searchTerm) || post.content.includes(searchTerm))
+                : true;
+
+            const isAfterStart = startDate ? postDateStr >= startDate : true;
+            const isBeforeEnd = endDate ? postDateStr <= endDate : true;
+
+            return titleMatch && isAfterStart && isBeforeEnd;
+        });
+
+        setFilteredPosts(filtered);
     };
 
     const handleWriteClick = () => {
         navigate('/community/write');
     };
 
+    const handlePostClick = (id) => {
+        navigate(`/community/${id}`);
+    };
+
     return (
         <div className={styles.container}>
             <h1 className={styles.title}>📢 커뮤니티</h1>
 
-            {/* 검색창 영역 */}
             <div className={styles.searchRow}>
                 <div className={styles.dateGroup}>
                     <label className={styles.dateLabel}>
@@ -83,14 +113,18 @@ function Community() {
                 <button className={styles.searchButton} onClick={handleSearch}>검색</button>
             </div>
 
-            {/* 최신 글 / BEST 영역 */}
             <div className={styles.grid}>
                 <div className={styles.sectionBox}>
                     <h2 className={styles.subTitle}>📝 최신 글</h2>
-                    {posts.length > 0 ? (
+                    {filteredPosts.length > 0 ? (
                         <div className={styles.postList}>
-                            {posts.map(post => (
-                                <div key={post.id} className={styles.postCard}>
+                            {filteredPosts.map(post => (
+                                <div
+                                    key={post.id}
+                                    className={styles.postCard}
+                                    onClick={() => handlePostClick(post.id)}
+                                    style={{ cursor: 'pointer' }}
+                                >
                                     {post.imagePath && (
                                         <img
                                             src={`http://localhost:8080${post.imagePath}`}
@@ -120,7 +154,12 @@ function Community() {
                     {bestPosts.length > 0 ? (
                         <div className={styles.bestList}>
                             {bestPosts.map(post => (
-                                <div key={post.id} className={styles.bestItem}>
+                                <div
+                                    key={post.id}
+                                    className={styles.bestItem}
+                                    onClick={() => handlePostClick(post.id)}
+                                    style={{ cursor: 'pointer' }}
+                                >
                                     <div className={styles.bestTitle}>{post.title}</div>
                                     <div className={styles.bestMeta}>
                                         ❤️ {post.likes || 0} · {timeAgoFromDate(post.createdAt)}

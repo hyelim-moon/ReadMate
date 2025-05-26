@@ -10,6 +10,7 @@ import RecordList from './components/RecordList';
 import Record from './components/Record';
 import ChatBot from './components/ChatBot';
 import Community from './components/Community';
+import CommunityDetail from './components/CommunityDetail';
 import CommunityWrite from "./components/CommunityWrite";
 import RecordButton from "./components/RecordButton";
 
@@ -87,6 +88,7 @@ function App() {
                     <Route path="/record" element={<Record />} />
                     <Route path="/community" element={<Community />} />
                     <Route path="/community/write" element={<CommunityWrite />} />
+                    <Route path="/community/:id" element={<CommunityDetail />} />
                 </Routes>
             </div>
         </BrowserRouter>
