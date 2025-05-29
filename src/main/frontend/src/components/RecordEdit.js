@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import styles from '../assets/styles/Record.module.css'; // 필요에 따라 스타일 조정
+import styles from '../assets/styles/Record.module.css';
 
 function RecordEdit() {
     const { id } = useParams();
@@ -17,9 +17,9 @@ function RecordEdit() {
     const [image, setImage] = useState(null);
     const [preview, setPreview] = useState(null);
     const [error, setError] = useState('');
+    const [deletePhoto, setDeletePhoto] = useState(false);
 
     useEffect(() => {
-        // id로 기존 기록 불러오기
         const fetchRecord = async () => {
             try {
                 const res = await fetch(`http://localhost:8080/api/records/${id}`);
@@ -50,6 +50,15 @@ function RecordEdit() {
         if (file) {
             setImage(file);
             setPreview(URL.createObjectURL(file));
+            setDeletePhoto(false); // 새 이미지 선택 시 삭제 플래그 해제
+        }
+    };
+
+    const handleDeletePhotoToggle = () => {
+        setDeletePhoto(prev => !prev);
+        if (!deletePhoto) {
+            setImage(null);
+            setPreview(null);
         }
     };
 
@@ -57,7 +66,6 @@ function RecordEdit() {
         e.preventDefault();
         setError('');
 
-        // 필수값 체크
         if (!form.title.trim() || !form.author.trim()) {
             setError('책 제목과 저자는 필수 입력 항목입니다.');
             return;
@@ -70,6 +78,7 @@ function RecordEdit() {
         formData.append('genre', form.genre);
         formData.append('content', form.content);
         if (image) formData.append('photo', image);
+        formData.append('removePhoto', deletePhoto);  // **서버쪽 변수명에 맞춰서 removePhoto로 보냄**
 
         try {
             const res = await fetch(`http://localhost:8080/api/records/${id}`, {
@@ -139,7 +148,19 @@ function RecordEdit() {
                         onChange={handleImage}
                         style={{ display: 'none' }}
                     />
-                    {preview && <img src={preview} alt="미리보기" className={styles.preview} />}
+                    {preview && (
+                        <>
+                            <img src={preview} alt="미리보기" className={styles.preview} />
+                            <button
+                                type="button"
+                                className={styles.deleteImageBtn}
+                                onClick={handleDeletePhotoToggle}
+                                style={{ marginLeft: '10px' }}
+                            >
+                                이미지 삭제
+                            </button>
+                        </>
+                    )}
                 </div>
 
                 <button type="submit" className={styles.submitBtn}>수정하기</button>

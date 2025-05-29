@@ -63,7 +63,7 @@ public class RecordController {
         return ResponseEntity.ok(record);
     }
 
-    // 독서 기록 수정
+    // 독서 기록 수정 (이미지 삭제 기능 포함)
     @PutMapping(value = "/{id}", consumes = {"multipart/form-data"})
     public ResponseEntity<?> updateRecord(
             @PathVariable Long id,
@@ -72,15 +72,30 @@ public class RecordController {
             @RequestParam(value = "publisher", required = false) String publisher,
             @RequestParam(value = "genre", required = false) String genre,
             @RequestParam(value = "content", required = false) String content,
-            @RequestParam(value = "photo", required = false) MultipartFile photo
+            @RequestParam(value = "photo", required = false) MultipartFile photo,
+            @RequestParam(value = "removePhoto", required = false, defaultValue = "false") boolean removePhoto  // 삭제 플래그 추가
     ) {
         try {
-            Record updated = recordService.updateRecord(id, title, author, publisher, genre, content, photo);
+            Record updated = recordService.updateRecord(id, title, author, publisher, genre, content, photo, removePhoto);
             return ResponseEntity.ok(updated);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("업데이트 중 오류 발생: " + e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteRecord(@PathVariable Long id) {
+        try {
+            boolean deleted = recordService.deleteRecord(id);
+            if (deleted) {
+                return ResponseEntity.noContent().build(); // 204 No Content
+            } else {
+                return ResponseEntity.notFound().build(); // 404 Not Found
+            }
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("삭제 중 오류 발생: " + e.getMessage());
         }
     }
 }

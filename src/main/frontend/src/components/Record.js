@@ -14,13 +14,14 @@ function Record() {
     const [preview, setPreview] = useState(null);
     const [error, setError] = useState('');
     const [charCount, setCharCount] = useState(0);
-    const [showPopup, setShowPopup] = useState(false); // 팝업 상태 관리
-    const [popupMessage, setPopupMessage] = useState(''); // 팝업 메시지
+    const [showPopup, setShowPopup] = useState(false);
+    const [popupMessage, setPopupMessage] = useState('');
+    const [deletePhoto, setDeletePhoto] = useState(false);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setForm((prev) => ({ ...prev, [name]: value }));
-        if (name === 'review') {
+        setForm(prev => ({ ...prev, [name]: value }));
+        if (name === 'content') {
             setCharCount(value.length);
         }
     };
@@ -30,7 +31,14 @@ function Record() {
         if (file) {
             setImage(file);
             setPreview(URL.createObjectURL(file));
+            setDeletePhoto(false);
         }
+    };
+
+    const handleDeletePhoto = () => {
+        setDeletePhoto(true);
+        setImage(null);
+        setPreview(null);
     };
 
     const handleSubmit = async (e) => {
@@ -54,7 +62,8 @@ function Record() {
         formData.append('publisher', publisher);
         formData.append('genre', genre);
         formData.append('content', content);
-        formData.append('photo', image);  // 이미지 추가
+        if (image) formData.append('photo', image);
+        formData.append('deletePhoto', deletePhoto);
 
         try {
             const response = await fetch('http://localhost:8080/api/records', {
@@ -64,8 +73,7 @@ function Record() {
 
             if (response.ok) {
                 setPopupMessage('저장되었습니다.');
-                setShowPopup(true);  // 팝업 표시
-                // 폼 초기화
+                setShowPopup(true);
                 setForm({
                     title: '',
                     author: '',
@@ -76,16 +84,17 @@ function Record() {
                 setImage(null);
                 setPreview(null);
                 setCharCount(0);
+                setDeletePhoto(false);
             } else {
                 setError('저장에 실패했습니다.');
             }
-        } catch (error) {
+        } catch {
             setError('서버 오류가 발생했습니다.');
         }
     };
 
     const closePopup = () => {
-        setShowPopup(false);  // 팝업 닫기
+        setShowPopup(false);
     };
 
     return (
@@ -97,40 +106,22 @@ function Record() {
                 <div className={styles.row}>
                     <div className={styles.inputGroup}>
                         <label>책 제목 <span>*</span></label>
-                        <input
-                            name="title"
-                            value={form.title}
-                            onChange={handleChange}
-                            required
-                        />
+                        <input name="title" value={form.title} onChange={handleChange} required />
                     </div>
                     <div className={styles.inputGroup}>
                         <label>저자 <span>*</span></label>
-                        <input
-                            name="author"
-                            value={form.author}
-                            onChange={handleChange}
-                            required
-                        />
+                        <input name="author" value={form.author} onChange={handleChange} required />
                     </div>
                 </div>
 
                 <div className={styles.row}>
                     <div className={styles.inputGroup}>
                         <label>출판사</label>
-                        <input
-                            name="publisher"
-                            value={form.publisher}
-                            onChange={handleChange}
-                        />
+                        <input name="publisher" value={form.publisher} onChange={handleChange} />
                     </div>
                     <div className={styles.inputGroup}>
                         <label>장르</label>
-                        <input
-                            name="genre"
-                            value={form.genre}
-                            onChange={handleChange}
-                        />
+                        <input name="genre" value={form.genre} onChange={handleChange} />
                     </div>
                 </div>
 
@@ -166,13 +157,24 @@ function Record() {
                         onChange={handleImage}
                         style={{ display: 'none' }}
                     />
-                    {preview && <img src={preview} alt="preview" className={styles.preview} />}
+                    {preview && (
+                        <>
+                            <img src={preview} alt="preview" className={styles.preview} />
+                            <button
+                                type="button"
+                                className={styles.deleteImageBtn}
+                                onClick={handleDeletePhoto}
+                                style={{ marginLeft: '10px' }}
+                            >
+                                이미지 삭제
+                            </button>
+                        </>
+                    )}
                 </div>
 
                 <button type="submit" className={styles.submitBtn}>저장하기</button>
             </form>
 
-            {/* 팝업이 활성화되면 표시 */}
             {showPopup && <Popup message={popupMessage} onClose={closePopup} />}
         </main>
     );

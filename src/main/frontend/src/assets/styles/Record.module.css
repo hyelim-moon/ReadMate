@@ -223,3 +223,25 @@ textarea:focus {
         width: 100%;
     }
 }
+
+.deleteImageBtn {
+    margin-top: 0.5rem;
+    padding: 0.4rem 0.8rem;
+    background-color: #cc4b37; /* 붉은색 계열 */
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.3s ease;
+    align-self: flex-start;
+}
+
+.deleteImageBtn:hover {
+    background-color: #a33a29;
+}
+
+.deleteImageBtn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(204, 75, 55, 0.5);
+}
