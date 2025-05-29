@@ -1,0 +1,134 @@
+/* PointShop.module.css */
+
+.pointShopPage {
+    width: 100%;
+    margin: 0;
+    padding: 0; /* RecordList와 동일하게 패딩 제거 */
+    box-sizing: border-box;
+    background-color: #fff;
+    position: static; /* RecordList와 동일 */
+    overflow: visible;
+    min-height: 100%;
+}
+
+.pageTitle {
+    font-size: 2.2rem;
+    font-weight: 600;
+    text-align: left;
+    color: #004225;
+    margin-top: 2.5rem; /* 독서 기록 목록 보다 살짝 아래로 내림 */
+    margin-bottom: 1rem;
+    border-bottom: 2px solid #00753C;
+    padding-bottom: 0.5rem;
+    padding-left: 2.5rem; /* 독서 기록 목록과 동일 */
+    line-height: 1.2;
+}
+
+.pointBalance {
+    font-size: 1.3rem;
+    color: #00753C;
+    margin-left: 2.5rem; /* 제목과 같은 왼쪽 여백 */
+    margin-bottom: 2rem;
+}
+
+.productList {
+    padding-left: 2.5rem; /* 왼쪽 여백 동일 */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    justify-content: flex-start;
+}
+
+.productCard {
+    background-color: #ffffff;
+    border: 2px solid #00753C;
+    border-radius: 12px;
+    width: 220px;
+    padding: 1rem;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+    cursor: default;
+}
+
+.productCard:hover {
+    box-shadow: 0 6px 12px rgba(0, 117, 60, 0.25);
+    transform: translateY(-5px);
+}
+
+.productImage {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.productName {
+    font-size: 1.2rem;
+    color: #004225;
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+
+.productPrice {
+    font-size: 1rem;
+    color: #00753C;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.buyButton {
+    background-color: #00753C;
+    color: white;
+    font-weight: 600;
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.3s ease;
+}
+
+.buyButton:hover {
+    background-color: #004225;
+}
+
+/* 상품 없을 때 메시지 스타일 — 독서 기록 목록과 동일 */
+.emptyMessage {
+    text-align: center;
+    color: #666;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.nothing {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50vh;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .pointShopPage {
+        padding: 0;
+    }
+
+    .productList {
+        padding-left: 0;
+        justify-content: center;
+    }
+
+    .productCard {
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .pointBalance {
+        margin-left: 0;
+        text-align: center;
+    }
+}

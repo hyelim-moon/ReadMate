@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.IntStream;
 
 @RestController
@@ -35,5 +36,13 @@ public class UserController {
                         topUsers.get(i).getNickname(),
                         topUsers.get(i).getPoints()))
                 .toList();
+    }
+
+    // 사용자 포인트 조회 API 추가
+    @GetMapping("/{userId}/points")
+    public Map<String, Integer> getUserPoints(@PathVariable Long userId) {
+        Optional<User> userOpt = userRepository.findById(userId);
+        int points = userOpt.map(User::getPoints).orElse(0);
+        return Map.of("points", points);
     }
 }

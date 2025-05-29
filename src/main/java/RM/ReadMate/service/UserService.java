@@ -15,6 +15,7 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
+    // 기존 랭킹 조회 메서드
     public UserRankingDTO getUserRanking(Long userId) {
         // 포인트 기준으로 상위 10명 가져오기
         List<User> users = userRepository.findTop10ByOrderByPointsDesc();
@@ -29,5 +30,12 @@ public class UserService {
 
         // 못 찾았을 경우
         return new UserRankingDTO(0, "Unknown", 0);
+    }
+
+    // 추가: 특정 유저의 포인트 조회 메서드
+    public int getPoints(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+        return user.getPoints(); // User 엔티티에 points 필드가 있다고 가정
     }
 }

@@ -1,4 +1,5 @@
 package RM.ReadMate.entity;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -7,6 +8,7 @@ import lombok.*;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -15,10 +17,10 @@ public class User {
     @Column
     private String nickname;
 
+    @Setter  // points 필드에 setter 추가
     @Column
     private int points;
 
-    @Builder
     public User(String nickname, int points) {
         this.nickname = nickname;
         this.points = points;
