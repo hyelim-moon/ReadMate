@@ -1,102 +1,103 @@
-/* PointShop.module.css */
-
 .pointShopPage {
     width: 100%;
     margin: 0;
-    padding: 0; /* RecordList와 동일하게 패딩 제거 */
+    padding: 0;
     box-sizing: border-box;
     background-color: #fff;
-    position: static; /* RecordList와 동일 */
+    position: static;
     overflow: visible;
     min-height: 100%;
+}
+
+/* 타이틀과 포인트 컨테이너 */
+.headerContainer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2.5rem 2.5rem 1rem 2.5rem;
+    border-bottom: 2px solid #00753C;
+    gap: 1rem;
 }
 
 .pageTitle {
     font-size: 2.2rem;
     font-weight: 600;
-    text-align: left;
     color: #004225;
-    margin-top: 2.5rem; /* 독서 기록 목록 보다 살짝 아래로 내림 */
-    margin-bottom: 1rem;
-    border-bottom: 2px solid #00753C;
-    padding-bottom: 0.5rem;
-    padding-left: 2.5rem; /* 독서 기록 목록과 동일 */
     line-height: 1.2;
+    margin: 0;
+    white-space: nowrap;
 }
 
 .pointBalance {
     font-size: 1.3rem;
     color: #00753C;
-    margin-left: 2.5rem; /* 제목과 같은 왼쪽 여백 */
-    margin-bottom: 2rem;
+    font-weight: 600;
+    white-space: nowrap;
 }
 
+/* 상품 리스트 스타일 */
 .productList {
-    padding-left: 2.5rem; /* 왼쪽 여백 동일 */
-    display: flex;
-    flex-wrap: wrap;
-    gap: 2rem;
-    justify-content: flex-start;
+    padding: 2rem 3rem; /* 좌우 패딩 균등하게 3rem */
+    width: 100%;
+    max-width: 1200px; /* 최대 넓이 설정, 필요시 조절 */
+    margin: 0 auto; /* 중앙 정렬 */
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 2.5rem;
+    justify-items: center;
 }
 
+
+/* 카드 정사각형 만들기 (width에 맞춰 height 결정) */
 .productCard {
-    background-color: #ffffff;
+    background-color: #fff;
     border: 2px solid #00753C;
     border-radius: 12px;
-    width: 220px;
+    width: 100%;
+    max-width: 220px;
+    aspect-ratio: 1 / 1; /* 정사각형 비율 유지 */
     padding: 1rem;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     align-items: center;
     transition: box-shadow 0.3s ease, transform 0.3s ease;
-    cursor: default;
+    cursor: pointer;
+    user-select: none;
 }
 
 .productCard:hover {
-    box-shadow: 0 6px 12px rgba(0, 117, 60, 0.25);
-    transform: translateY(-5px);
+    transform: translateY(-6px);
 }
 
 .productImage {
     width: 100%;
-    height: 180px;
+    height: 60%; /* 카드 높이 대비 이미지 비율 조정 */
     object-fit: cover;
     border-radius: 8px;
-    margin-bottom: 1rem;
+    margin-bottom: 0.8rem;
+    flex-shrink: 0;
 }
 
 .productName {
     font-size: 1.2rem;
     color: #004225;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.4rem;
     text-align: center;
+    min-height: 2.4rem;
+    flex-grow: 0;
+    flex-shrink: 0;
 }
 
 .productPrice {
     font-size: 1rem;
     color: #00753C;
     font-weight: 600;
-    margin-bottom: 1rem;
+    margin-bottom: 0;
+    flex-grow: 0;
 }
 
-.buyButton {
-    background-color: #00753C;
-    color: white;
-    font-weight: 600;
-    border: none;
-    padding: 0.6rem 1rem;
-    border-radius: 8px;
-    cursor: pointer;
-    width: 100%;
-    transition: background-color 0.3s ease;
-}
-
-.buyButton:hover {
-    background-color: #004225;
-}
-
-/* 상품 없을 때 메시지 스타일 — 독서 기록 목록과 동일 */
+/* 상품 없을 때 메시지 스타일 */
 .emptyMessage {
     text-align: center;
     color: #666;
@@ -105,30 +106,62 @@
 }
 
 .nothing {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 50vh;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     text-align: center;
+    color: #666;
+    font-size: 1.5rem;
+    font-weight: bold;
+    width: 100%;
+    max-width: 400px;
+    padding: 0 1rem;
 }
 
+/* 반응형 */
 @media (max-width: 768px) {
-    .pointShopPage {
-        padding: 0;
+    .headerContainer {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 2rem 1rem 1rem 1rem;
     }
 
-    .productList {
-        padding-left: 0;
-        justify-content: center;
-    }
-
-    .productCard {
-        width: 100%;
-        max-width: 300px;
+    .pageTitle {
+        font-size: 1.8rem;
     }
 
     .pointBalance {
-        margin-left: 0;
-        text-align: center;
+        font-size: 1.1rem;
+    }
+
+    .productList {
+        padding-left: 1rem;
+        padding-right: 1rem;
+        justify-content: center;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 1.5rem 1.5rem;
+    }
+
+    .productCard {
+        max-width: 150px;
+        aspect-ratio: 1 / 1;
+        padding: 0.8rem;
+    }
+
+    .productImage {
+        height: 60%;
+        margin-bottom: 0.6rem;
+    }
+
+    .productName {
+        font-size: 1rem;
+        min-height: 1.8rem;
+        margin-bottom: 0.3rem;
+    }
+
+    .productPrice {
+        font-size: 0.9rem;
     }
 }

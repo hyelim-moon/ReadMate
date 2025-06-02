@@ -18,6 +18,7 @@ import RecordEdit from './components/RecordEdit';
 import RecordButton from "./components/RecordButton";
 import CommunityDetail from "./components/CommunityDetail";
 import PointShop from "./components/PointShop";
+import ProductDetail from './components/ProductDetail';
 
 function App() {
     const [hello, setHello] = useState('');
@@ -71,6 +72,7 @@ function App() {
                     <Route path="/community/:id" element={<CommunityDetail />} />
                     <Route path="/record/:id" element={<RecordDetail />} />
                     <Route path="/pointshop" element={<PointShop/>} />
+                    <Route path="/pointshop/:id" element={<ProductDetail />} />
                 </Routes>
             </div>
         </BrowserRouter>

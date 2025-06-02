@@ -20,7 +20,7 @@ function PointShop({ userId }) {
                     setPointBalance(0);
                 }
 
-                const resProducts = await fetch('http://localhost:8080/api/points/products');
+                const resProducts = await fetch('http://localhost:8080/api/products'); // 기존 '/api/points/products'에서 변경 가능
                 if (!resProducts.ok) throw new Error('상품 목록 불러오기 실패');
                 const dataProducts = await resProducts.json();
                 setProducts(dataProducts);
@@ -33,24 +33,21 @@ function PointShop({ userId }) {
         fetchData();
     }, [userId]);
 
-    const handleBuyClick = (productId) => {
-        if (!userId) {
-            const confirmLogin = window.confirm('구매하려면 로그인이 필요합니다. 로그인하시겠습니까?');
-            if (confirmLogin) navigate('/login');
-            return;
-        }
-
-        alert(`상품 ${productId} 구매 기능은 아직 구현 중입니다.`);
+    const handleCardClick = (productId) => {
+        navigate(`/pointshop/${productId}`);
     };
 
-    if (error) return <p style={{ color: 'red' }}>{error}</p>;
+    if (error) return <p style={{ color: 'red', padding: '1rem' }}>{error}</p>;
 
     return (
         <main className={styles.pointShopPage}>
-            <h2 className={styles.pageTitle}>포인트 샵</h2>
-            <div className={styles.pointBalance}>
-                현재 포인트: <strong>{pointBalance} P</strong>
+            <div className={styles.headerContainer}>
+                <h2 className={styles.pageTitle}>포인트 샵</h2>
+                <div className={styles.pointBalance}>
+                    현재 포인트: <strong>{pointBalance} P</strong>
+                </div>
             </div>
+
             <div className={styles.productList}>
                 {products.length === 0 ? (
                     <div className={styles.nothing}>
@@ -58,7 +55,14 @@ function PointShop({ userId }) {
                     </div>
                 ) : (
                     products.map(product => (
-                        <div key={product.id} className={styles.productCard}>
+                        <div
+                            key={product.id}
+                            className={styles.productCard}
+                            onClick={() => handleCardClick(product.id)}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => { if(e.key === 'Enter') handleCardClick(product.id); }}
+                        >
                             <img
                                 src={`http://localhost:8080${product.image}`}
                                 alt={product.name}
@@ -66,12 +70,6 @@ function PointShop({ userId }) {
                             />
                             <h3 className={styles.productName}>{product.name}</h3>
                             <p className={styles.productPrice}>{product.price} P</p>
-                            <button
-                                className={styles.buyButton}
-                                onClick={() => handleBuyClick(product.id)}
-                            >
-                                구매하기
-                            </button>
                         </div>
                     ))
                 )}
