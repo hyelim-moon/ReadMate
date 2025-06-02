@@ -1,0 +1,147 @@
+.detailPage {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+    animation: fadeInUp 0.4s ease forwards;
+    background-color: #f8f8f8;
+    box-sizing: border-box;
+}
+
+.detailContainer {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    background-color: #fff;
+    padding: 2rem;
+    box-sizing: border-box;
+}
+
+
+.detailHeader {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.detailHeader button {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: #00753C;
+    cursor: pointer;
+    padding: 0;
+    font-weight: bold;
+}
+
+.detailHeader button:hover {
+    color: #004225;
+}
+
+.detailTitle {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #222;
+    border-bottom: 2px solid #00753C;
+    padding-bottom: 0.4rem;
+    margin: 1rem 0;
+}
+
+.detailImage {
+    width: 720px;
+    height: 720px;
+    max-width: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+}
+
+
+.detailInfo {
+    font-size: 1.1rem;
+    color: #444;
+    margin-bottom: 0.8rem;
+}
+
+.detailReview {
+    font-size: 1rem;
+    color: #666;
+    line-height: 1.6;
+    margin-top: 1rem;
+}
+
+/* Animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.buttonGroup {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: nowrap; /* 줄바꿈 없애서 한 줄에 딱 맞게 */
+}
+
+/* 찜하기 버튼 */
+.wishlistBtn {
+    padding: 0.6rem 1rem;
+    background-color: transparent;
+    border: 2px solid #b79240;
+    color: #b79240;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    text-align: center;
+    user-select: none;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 1.1rem;
+    min-width: 0; /* min-width 제거 */
+}
+
+/* 구매하기 버튼 */
+.purchaseBtn {
+    flex: 1 1 50%;  /* 1:1 비율 */
+    padding: 0.6rem 1rem;
+    background-color: #00753C;
+    color: white;
+    font-weight: 700;
+    border: 2px solid #00753C;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+    text-align: center;
+    user-select: none;
+    font-size: 1.2rem;
+    min-width: 0; /* min-width 제거 */
+}
+
+/* 반응형 */
+@media (max-width: 480px) {
+    .buttonGroup {
+        flex-direction: column;
+    }
+    .wishlistBtn,
+    .purchaseBtn {
+        flex: none;
+        width: 100%;
+    }
+}
+
+
+
+
+
