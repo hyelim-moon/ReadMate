@@ -74,7 +74,11 @@ function MyPage() {
             <div className={styles.content}>
                 <div className={styles.greeting}>
                     <p><strong>{profile.nickname}</strong>님, 안녕하세요!</p>
-                    <button className={styles.logoutBtn} onClick={handleLogout}>
+                    <button
+                        className={styles.logoutBtn}
+                        onClick={handleLogout}
+                        title="로그아웃"
+                    >
                         <FiLogOut className={styles.logoutIcon} />
                     </button>
                 </div>
