@@ -52,8 +52,8 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/api/**").permitAll()
-                        .requestMatchers("/api/auth/**", "/api/users/ranking", "/api/books/**", "/api/products/**").permitAll()  // products도 인증 없이 접근 가능
-                        .requestMatchers("/api/users/me").authenticated()
+                        .requestMatchers("/api/auth/**", "/api/users/ranking", "/api/books/**", "/api/gemini/**", "/api/records/**", "/uploads/**", "/api/products/**").permitAll()
+                        .requestMatchers("/api/users/me").authenticated()  // 추가된 부분
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class);
