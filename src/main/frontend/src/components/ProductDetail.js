@@ -149,7 +149,7 @@ function ProductDetail({ userId, isLoggedIn }) {
                             className={styles.detailImage}
                         />
                         <p className={styles.detailInfo}>
-                            가격: {Number(product.price).toLocaleString()} P
+                            가격: {(Number(product.price) * 2).toLocaleString()} P
                         </p>
                         <p className={styles.detailReview}>
                             {'상품 상세 설명이 없습니다.'}
