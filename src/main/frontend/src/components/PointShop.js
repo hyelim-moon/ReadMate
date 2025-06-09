@@ -1,18 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import styles from '../assets/styles/PointShop.module.css';
 
 function PointShop({ userId }) {
     const [pointBalance, setPointBalance] = useState(0);
+    const [kyoboProducts, setKyoboProducts] = useState([]);
     const [products, setProducts] = useState([]);
     const [error, setError] = useState('');
-    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 if (userId) {
-                    const resPoint = await fetch(`http://localhost:8080/api/users/${userId}/points`);
+                    // 포인트 불러오기
+                    const resPoint = await fetch(`http://localhost:8080/api/users/${userId}/points`, {
+                        credentials: 'include',
+                    });
                     if (!resPoint.ok) throw new Error('포인트 잔액 불러오기 실패');
                     const dataPoint = await resPoint.json();
                     setPointBalance(dataPoint.points);
@@ -20,10 +22,13 @@ function PointShop({ userId }) {
                     setPointBalance(0);
                 }
 
-                const resProducts = await fetch('http://localhost:8080/api/products'); // 기존 '/api/points/products'에서 변경 가능
-                if (!resProducts.ok) throw new Error('상품 목록 불러오기 실패');
-                const dataProducts = await resProducts.json();
-                setProducts(dataProducts);
+                // 교보문고 기프트카드
+                const resKyobo = await fetch('http://localhost:8080/api/products/kyobogiftcards', {
+                    credentials: 'include',
+                });
+                if (!resKyobo.ok) throw new Error('교보문고 상품 목록 불러오기 실패');
+                const dataKyobo = await resKyobo.json();
+                setProducts(dataKyobo);  // 여기 products에 넣기
 
             } catch (e) {
                 setError(e.message);
@@ -32,10 +37,6 @@ function PointShop({ userId }) {
 
         fetchData();
     }, [userId]);
-
-    const handleCardClick = (productId) => {
-        navigate(`/pointshop/${productId}`);
-    };
 
     if (error) return <p style={{ color: 'red', padding: '1rem' }}>{error}</p>;
 
@@ -54,22 +55,22 @@ function PointShop({ userId }) {
                         <p className={styles.emptyMessage}>상품이 없습니다.</p>
                     </div>
                 ) : (
-                    products.map(product => (
+                    products.map((product, index) => (
                         <div
-                            key={product.id}
+                            key={product.name + index}
                             className={styles.productCard}
-                            onClick={() => handleCardClick(product.id)}
                             role="button"
                             tabIndex={0}
-                            onKeyDown={(e) => { if(e.key === 'Enter') handleCardClick(product.id); }}
+                            onKeyDown={(e) => { if(e.key === 'Enter') alert(`선택한 상품: ${product.name}`); }}
+                            onClick={() => alert(`선택한 상품: ${product.name}`)}
                         >
                             <img
-                                src={`http://localhost:8080${product.image}`}
+                                src={product.image}
                                 alt={product.name}
                                 className={styles.productImage}
                             />
                             <h3 className={styles.productName}>{product.name}</h3>
-                            <p className={styles.productPrice}>{product.price} P</p>
+                            <p className={styles.productPrice}>{Number(product.price) * 2} P</p>
                         </div>
                     ))
                 )}

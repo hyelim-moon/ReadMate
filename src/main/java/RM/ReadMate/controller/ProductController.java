@@ -5,7 +5,9 @@ import RM.ReadMate.service.ProductService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/products")  // 상품 관련 API 경로
@@ -33,4 +35,15 @@ public class ProductController {
         }
     }
 
+    // 크롤링한 교보문고 기프트카드 목록 반환 API
+    @GetMapping("/kyobogiftcards")
+    public ResponseEntity<?> getGiftCards() {
+        try {
+            var giftCards = productService.kyoboGiftCards();
+            return ResponseEntity.ok(giftCards);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("교보 크롤링 중 오류 발생");
+        }
+    }
 }
