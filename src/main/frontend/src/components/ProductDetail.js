@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import styles from '../assets/styles/ProductDetail.module.css';
 
 function HeartIcon({ filled }) {
+    console.log("ProductDetail 컴포넌트 렌더링됨");
     return (
         <svg
             width="24"
@@ -21,42 +22,76 @@ function HeartIcon({ filled }) {
     );
 }
 
-function ProductDetail() {
-    const { id } = useParams();
+function ProductDetail({ userId, isLoggedIn }) {
+    const { id } = useParams(); // URL param으로 상품 ID(인덱스) 받음
     const navigate = useNavigate();
+
     const [product, setProduct] = useState(null);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(true);
     const [isWishlisted, setIsWishlisted] = useState(false);
 
-    // 로그인 상태 (임시)
-    const [isLoggedIn, setIsLoggedIn] = useState(false); // 실제 로그인 상태에 따라 변경 필요
-
     const isAbsoluteURL = (url) => /^https?:\/\//.test(url);
 
+    // 컴포넌트 렌더링과 id 변경 시마다 데이터 fetch
     useEffect(() => {
+        console.log("ProductDetail 컴포넌트 렌더링, 요청할 상품 ID:", id);
         setLoading(true);
         setError('');
-        fetch(`http://localhost:8080/api/products/${id}`)
+        setProduct(null);
+
+        fetch(`http://localhost:8080/api/products/kyobogiftcards/${id}`)
             .then(res => {
                 if (!res.ok) throw new Error('상품을 불러올 수 없습니다.');
                 return res.json();
             })
-            .then(data => setProduct(data))
-            .catch(err => setError(err.message))
+            .then(data => {
+                console.log('상품 데이터:', data);
+                setProduct(data);
+            })
+            .catch(err => {
+                console.error('상품 데이터 로드 오류:', err);
+                setError(err.message);
+            })
             .finally(() => setLoading(false));
     }, [id]);
 
-    const imageUrl = product?.image && isAbsoluteURL(product.image)
-        ? product.image
-        : 'https://picsum.photos/600/600';
+    const imageUrl =
+        product?.image && isAbsoluteURL(product.image)
+            ? product.image
+            : 'https://picsum.photos/600/600';
 
-    const toggleWishlist = () => {
-        setIsWishlisted(prev => !prev);
-        // API 호출 위치
+    const toggleWishlist = async () => {
+        if (!isLoggedIn) {
+            alert("찜 기능은 로그인 후 이용 가능합니다.");
+            return;
+        }
+
+        try {
+            const productId = parseInt(id, 10);
+            const url = isWishlisted
+                ? `http://localhost:8080/api/wishlist/remove`
+                : `http://localhost:8080/api/wishlist/add`;
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId, productId }),
+            });
+
+            if (!response.ok) {
+                const msg = await response.text();
+                alert(`찜 처리 실패: ${msg}`);
+                return;
+            }
+
+            setIsWishlisted(prev => !prev);
+        } catch (error) {
+            alert(`찜 처리 중 오류 발생: ${error.message}`);
+        }
     };
 
-    const handlePurchase = () => {
+    const handlePurchase = async () => {
         if (!isLoggedIn) {
             const confirmLogin = window.confirm(
                 "회원 전용 서비스입니다.\n로그인이 필요합니다.\n지금 로그인하시겠습니까?"
@@ -64,17 +99,42 @@ function ProductDetail() {
             if (confirmLogin) {
                 navigate('/login');
             }
-            return; // 취소 시 아무 일도 안 일어남
+            return;
         }
-        alert(`${product.name} 상품을 구매하시겠습니까?`);
-        // 구매 처리 로직 추가
+
+        const productId = parseInt(id, 10);
+        if (isNaN(productId)) {
+            alert('상품 정보가 올바르지 않습니다.');
+            return;
+        }
+
+        try {
+            const response = await fetch(
+                `http://localhost:8080/api/points/purchase?userId=${userId}&productId=${productId}`,
+                {
+                    method: 'POST',
+                    credentials: 'include',
+                }
+            );
+
+            if (!response.ok) {
+                const errorMsg = await response.text();
+                alert(`구매 실패: ${errorMsg}`);
+                return;
+            }
+
+            alert(`${product.name} 상품 구매가 완료되었습니다!`);
+            // TODO: 포인트 업데이트 등 후속 처리
+        } catch (error) {
+            alert(`구매 중 오류가 발생했습니다: ${error.message}`);
+        }
     };
 
     return (
         <div className={styles.detailPage}>
             <div className={styles.detailContainer}>
                 <div className={styles.detailHeader}>
-                    <button onClick={() => navigate(-1)}>←</button>
+                    <button onClick={() => navigate(-1)}>← 뒤로가기</button>
                 </div>
 
                 {loading && <p>로딩 중...</p>}
@@ -88,9 +148,11 @@ function ProductDetail() {
                             alt={product.name}
                             className={styles.detailImage}
                         />
-                        <p className={styles.detailInfo}>가격: {product.price} P</p>
+                        <p className={styles.detailInfo}>
+                            가격: {Number(product.price).toLocaleString()} P
+                        </p>
                         <p className={styles.detailReview}>
-                            {product.description || '상품 상세 설명이 없습니다.'}
+                            {'상품 상세 설명이 없습니다.'}
                         </p>
 
                         <div className={styles.buttonGroup}>

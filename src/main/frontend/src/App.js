@@ -23,8 +23,8 @@ import ProductDetail from './components/ProductDetail';
 import MyPage from "./components/MyPage";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// AppContent 컴포넌트를 따로 분리해서, BrowserRouter 안에서 useLocation을 쓸 수 있도록 함
-function AppContent() {
+// userId를 props로 받도록 변경
+function AppContent({ userId }) {
     const location = useLocation();
 
     // 로그인/회원가입/비밀번호 찾기 경로일 때 헤더·네비 숨김
@@ -32,7 +32,6 @@ function AppContent() {
 
     return (
         <div className="App">
-            {/* ① 로그인·회원가입 등 화면에선 보이지 않게 */}
             {!hideGlobalHeader && <Header />}
             {!hideGlobalHeader && <Navbar />}
 
@@ -49,11 +48,15 @@ function AppContent() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/forgot" element={<Forgot />} />
                 <Route path="/signup" element={<SignUp />} />
-                <Route path="/mypage" element={<MyPage/>} />
+                <Route path="/mypage" element={<MyPage />} />
                 <Route path="/chat" element={<ChatBot />} />
                 <Route path="/recordlist" element={<RecordList />} />
-                <Route path="/pointshop" element={<PointShop/>} />
-                <Route path="/pointshop/:id" element={<ProductDetail />} />
+                {/* "/" 경로 중복 문제로 "/pointshop"으로 변경하고 userId 넘김 */}
+                <Route path="/pointshop" element={<PointShop userId={userId} />} />
+                <Route
+                    path="/products/:id"
+                    element={<ProductDetail userId={userId} isLoggedIn={!!userId} />}
+                />
                 <Route path="/record" element={<Record />} />
                 <Route path="/community" element={<Community />} />
                 <Route path="/community/write" element={<CommunityWrite />} />
@@ -83,10 +86,10 @@ function App() {
             .catch((err) => console.error(err));
     }, []);
 
-    // BrowserRouter 안에 AppContent를 렌더링
     return (
         <BrowserRouter>
-            <AppContent />
+            {/* userInfo가 없으면 null, 있으면 userInfo.id를 넘겨줌 */}
+            <AppContent userId={userInfo ? userInfo.id : null} />
         </BrowserRouter>
     );
 }

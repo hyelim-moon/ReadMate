@@ -17,7 +17,6 @@
     box-sizing: border-box;
 }
 
-
 .detailHeader {
     display: flex;
     justify-content: flex-start;
@@ -48,16 +47,19 @@
     margin: 1rem 0;
 }
 
+/* 이미지 크기 조절 */
 .detailImage {
-    width: 720px;
-    height: 720px;
-    max-width: 100%;
-    object-fit: cover;
+    width: 100%;          /* 부모 컨테이너 너비에 맞게 꽉 채우기 */
+    max-width: 720px;     /* 최대 너비 제한 */
+    height: auto;         /* 비율 유지 */
+    object-fit: contain;  /* 이미지 비율 유지하며 박스 내에 맞춤 */
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     margin-bottom: 1.5rem;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
-
 
 .detailInfo {
     font-size: 1.1rem;
@@ -88,10 +90,9 @@
     margin-top: 1.5rem;
     display: flex;
     gap: 1rem;
-    flex-wrap: nowrap; /* 줄바꿈 없애서 한 줄에 딱 맞게 */
+    flex-wrap: nowrap;
 }
 
-/* 찜하기 버튼 */
 .wishlistBtn {
     padding: 0.6rem 1rem;
     background-color: transparent;
@@ -109,12 +110,11 @@
     justify-content: center;
     gap: 0.5rem;
     font-size: 1.1rem;
-    min-width: 0; /* min-width 제거 */
+    min-width: 0;
 }
 
-/* 구매하기 버튼 */
 .purchaseBtn {
-    flex: 1 1 50%;  /* 1:1 비율 */
+    flex: 1 1 50%;
     padding: 0.6rem 1rem;
     background-color: #00753C;
     color: white;
@@ -126,10 +126,9 @@
     text-align: center;
     user-select: none;
     font-size: 1.2rem;
-    min-width: 0; /* min-width 제거 */
+    min-width: 0;
 }
 
-/* 반응형 */
 @media (max-width: 480px) {
     .buttonGroup {
         flex-direction: column;
@@ -140,8 +139,3 @@
         width: 100%;
     }
 }
-
-
-
-
-
