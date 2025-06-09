@@ -15,10 +15,10 @@ spring:
       path: /h2-console          # H2 콘솔 접속 경로 설정
 
   datasource:
-    url: jdbc:h2:mem:testdb      # 메모리 기반 H2 데이터베이스 사용
-    driver-class-name: org.h2.Driver
-    username: sa                 # 기본 사용자
-    password:                    # 비밀번호 없음
+    url: jdbc:mysql://127.0.0.1:3306/readmate?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root   # MySQL 실제 계정으로 변경
+    password: 1234   # MySQL 실제 비밀번호로 변경
 
   jpa:
     hibernate:
@@ -30,11 +30,20 @@ spring:
 
   sql:
     init:
-      mode: never                          # 서버 시작 시 SQL 스크립트 실행 안 함
+      mode: always                         # 서버 시작 시 SQL 스크립트 실행 모드
       encoding: UTF-8                      # SQL 파일 인코딩
-      data-locations: classpath:schema.sql # 초기 스키마 파일 위치
       defer-datasource-initialization: false # 데이터베이스 초기화 지연하지 않음
 
   web:
     resources:
-      static-locations: file:./uploads/
+      static-locations: file:./uploads/     # 업로드된 파일을 정적 리소스로 서빙
+
+# ======== JWT 설정 ========
+jwt:
+  secret: ThisIsASecretKeyForJWTGeneration_ChangeThisToYourOwnSecret
+  expiration: 86400000   # 1일(밀리초 단위)
+
+# ======== 로깅 설정 ========
+logging:
+  level:
+    org.springframework.security: DEBUG

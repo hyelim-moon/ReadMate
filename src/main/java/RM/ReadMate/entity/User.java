@@ -14,6 +14,27 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, unique = true)
+    private String userid;
+
+    @Column(nullable = false)
+    private String password;
+
+    @Column(nullable = false)
+    private String name;
+
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Column(nullable = false, unique = true)
+    private String phone;
+
+    @Column
+    private String gender;  // 남자/여자 혹은 M/F 등 원하는 형식
+
+    @Column
+    private String birthdate;  // "YYYY-MM-DD" 형식 문자열
+
     @Column
     private String nickname;
 

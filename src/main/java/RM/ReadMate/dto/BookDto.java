@@ -12,7 +12,6 @@ public class BookDto {
     private String isbn;
     private String bookName;
     private String bookImage;
-    private String bookDescription;
     private String genre;
     private String publisher;
 }

@@ -4,6 +4,9 @@ import RM.ReadMate.dto.UserRankingDTO;
 import RM.ReadMate.entity.User;
 import RM.ReadMate.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -44,5 +47,27 @@ public class UserController {
         Optional<User> userOpt = userRepository.findById(userId);
         int points = userOpt.map(User::getPoints).orElse(0);
         return Map.of("points", points);
+    }
+
+    // 추가된 메서드: 현재 로그인된 사용자의 정보 반환
+    @GetMapping("/me")
+    public ResponseEntity<?> getMyProfile(Authentication authentication) {
+        String userid = authentication.getName();
+        Optional<User> userOpt = userRepository.findByUserid(userid);
+
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        User user = userOpt.get();
+        Map<String, Object> profile = Map.of(
+                "nickname", user.getNickname(),
+                "coupons", 0,       // 향후 로직 추가
+                "mileage", user.getPoints(),
+                "wishlist", List.of(), // 향후 로직 추가
+                "recent", List.of()    // 향후 로직 추가
+        );
+
+        return ResponseEntity.ok(profile);
     }
 }

@@ -26,11 +26,9 @@ public class Book {
     private String bookImage;  // 이미지 URL 저장이라면 이대로 OK
 
     @Column
-    private String bookDescription;
-
-    @Column
     private String genre;
 
     @Column
     private String publisher;
+
 }

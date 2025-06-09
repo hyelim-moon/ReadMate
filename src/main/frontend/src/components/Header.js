@@ -1,8 +1,9 @@
+// src/components/Header.jsx
 import React, { useState, useEffect } from 'react';
 import styles from '../assets/styles/Header.module.css';
 import logoImg from '../assets/images/logo.png';
 import userImg from '../assets/images/userImg.png';
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom';
 
 function Header() {
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -12,6 +13,9 @@ function Header() {
     const [rankingLoading, setRankingLoading] = useState(true);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [slideClass, setSlideClass] = useState(styles.slideInDown);
+
+    // **추가: 로그인 상태 관리**
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     const categories = ['전체', '제목', '저자', '장르', '출판사'];
 
@@ -35,6 +39,11 @@ function Header() {
     };
 
     useEffect(() => {
+        // **추가: 로컬스토리지에 ACCESS_TOKEN이 있으면 로그인된 상태로 설정**
+        const token = localStorage.getItem('ACCESS_TOKEN');
+        setIsLoggedIn(!!token);
+
+        // 랭킹 데이터 로드
         fetch('http://localhost:8080/api/users/ranking')
             .then(res => {
                 if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
@@ -84,7 +93,7 @@ function Header() {
 
             <div className={styles.mainHeaderContent}>
                 <div className={styles.logo}>
-                    <Link to={"/"}>
+                    <Link to="/">
                         <img src={logoImg} alt="ReadMate Logo" />
                     </Link>
                 </div>
@@ -109,7 +118,8 @@ function Header() {
                 </div>
 
                 <div className={styles.userInfo}>
-                    <Link to={"/login"}>
+                    {/* 로그인 상태에 따라 /login 또는 /mypage로 이동 */}
+                    <Link to={isLoggedIn ? '/mypage' : '/login'}>
                         <img src={userImg} alt="userImg" />
                     </Link>
                 </div>

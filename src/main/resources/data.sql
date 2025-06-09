@@ -1,11 +1,22 @@
-INSERT INTO users (nickname, points) VALUES ('Alice', 120);
-INSERT INTO users (nickname, points) VALUES ('Bob', 150);
-INSERT INTO users (nickname, points) VALUES ('Charlie', 90);
-INSERT INTO users (nickname, points) VALUES ('Diana', 170);
-INSERT INTO users (nickname, points) VALUES ('Eve', 130);
-INSERT INTO users (nickname, points) VALUES ('Frank', 95);
-INSERT INTO users (nickname, points) VALUES ('Grace', 110);
-INSERT INTO users (nickname, points) VALUES ('Hank', 105);
-INSERT INTO users (nickname, points) VALUES ('Ivy', 125);
-INSERT INTO users (nickname, points) VALUES ('Jack', 85);
-INSERT INTO users (nickname, points) VALUES ('Karen', 100);
+DELETE FROM users;
+INSERT INTO users (userid, password, name, email, phone, gender, birthdate, nickname, points) VALUES
+('kimminsu',   '$2a$10$e0NRaJGta0hz5oplhBWwUeXVr0GHTfZXiVYgH6Mfs2zTWU0u9yHyW', '김민수',   'kimminsu@example.com',   '010-1234-0001', 'M', '1990-05-17', '민수',   120),
+('leeyounghee','$2a$10$e0NRaJGta0hz5oplhBWwUeXVr0GHTfZXiVYgH6Mfs2zTWU0u9yHyW', '이영희',   'leeyounghee@example.com','010-1234-0002', 'F', '1992-08-03', '영희',   250),
+('parkjunhyung','$2a$10$e0NRaJGta0hz5oplhBWwUeXVr0GHTfZXiVYgH6Mfs2zTWU0u9yHyW','박준형','parkjunhyung@example.com','010-1234-0003','M','1988-12-25','준형',95),
+('choisujin',   '$2a$10$e0NRaJGta0hz5oplhBWwUeXVr0GHTfZXiVYgH6Mfs2zTWU0u9yHyW','최수진','choisujin@example.com','010-1234-0004','F','1991-03-14','수진',180),
+('jeongdaeun', '$2a$10$e0NRaJGta0hz5oplhBWwUeXVr0GHTfZXiVYgH6Mfs2zTWU0u9yHyW','정다은','jeongdaeun@example.com','010-1234-0005','F','1993-07-09','다은',75),
+('johyunwoo',  '$2a$10$e0NRaJGta0hz5oplhBWwUeXVr0GHTfZXiVYgH6Mfs2zTWU0u9yHyW','조현우','johyunwoo@example.com','010-1234-0006','M','1987-11-30','현우',210),
+('hanjimin',    '$2a$10$e0NRaJGta0hz5oplhBWwUeXVr0GHTfZXiVYgH6Mfs2zTWU0u9yHyW','한지민','hanjimin@example.com','010-1234-0007','F','1994-02-21','지민',135),
+('ominseok',    '$2a$10$e0NRaJGta0hz5oplhBWwUeXVr0GHTfZXiVYgH6Mfs2zTWU0u9yHyW','오민석','ominseok@example.com','010-1234-0008','M','1990-09-12','민석',160),
+('leeseoyeon', '$2a$10$e0NRaJGta0hz5oplhBWwUeXVr0GHTfZXiVYgH6Mfs2zTWU0u9yHyW','이서연','leeseoyeon@example.com','010-1234-0009','F','1992-06-18','서연',88),
+('parkjihun',   '$2a$10$e0NRaJGta0hz5oplhBWwUeXVr0GHTfZXiVYgH6Mfs2zTWU0u9yHyW','박지훈','parkjihun@example.com','010-1234-0010','M','1989-04-05','지훈',145),
+('kimhaneul',   '$2a$10$e0NRaJGta0hz5oplhBWwUeXVr0GHTfZXiVYgH6Mfs2zTWU0u9yHyW','김하늘','kimhaneul@example.com','010-1234-0011','F','1991-10-27','하늘',200),
+('sinjihye',    '$2a$10$e0NRaJGta0hz5oplhBWwUeXVr0GHTfZXiVYgH6Mfs2zTWU0u9yHyW','신지혜','sinjihye@example.com','010-1234-0012','F','1993-01-15','지혜',110),
+('yujawon',     '$2a$10$e0NRaJGta0hz5oplhBWwUeXVr0GHTfZXiVYgH6Mfs2zTWU0u9yHyW','유재원','yujawon@example.com','010-1234-0013','M','1990-12-02','재원',155),
+('kangminjun',  '$2a$10$e0NRaJGta0hz5oplhBWwUeXVr0GHTfZXiVYgH6Mfs2zTWU0u9yHyW','강민준','kangminjun@example.com','010-1234-0014','M','1988-08-08','민준',130),
+('leejia',      '$2a$10$e0NRaJGta0hz5oplhBWwUeXVr0GHTfZXiVYgH6Mfs2zTWU0u9yHyW','이지아','leejia@example.com','010-1234-0015','F','1994-05-23','지아',170),
+('ohhayoung',   '$2a$10$e0NRaJGta0hz5oplhBWwUeXVr0GHTfZXiVYgH6Mfs2zTWU0u9yHyW','오하영','ohhayoung@example.com','010-1234-0016','F','1992-11-11','하영',90),
+('seoyeajin',   '$2a$10$e0NRaJGta0hz5oplhBWwUeXVr0GHTfZXiVYgH6Mfs2zTWU0u9yHyW','서예진','seoyeajin@example.com','010-1234-0017','F','1991-03-30','예진',115),
+('yoonjiho',    '$2a$10$e0NRaJGta0hz5oplhBWwUeXVr0GHTfZXiVYgH6Mfs2zTWU0u9yHyW','윤지호','yoonjiho@example.com','010-1234-0018','M','1989-07-19','지호',140),
+('imsubin',     '$2a$10$e0NRaJGta0hz5oplhBWwUeXVr0GHTfZXiVYgH6Mfs2zTWU0u9yHyW','임수빈','imsubin@example.com','010-1234-0019','F','1993-09-05','수빈',105),
+('hwangminwoo', '$2a$10$e0NRaJGta0hz5oplhBWwUeXVr0GHTfZXiVYgH6Mfs2zTWU0u9yHyW','황민우','hwangminwoo@example.com','010-1234-0020','M','1990-02-14','민우',195);

@@ -3,9 +3,9 @@ import BookSlider from "./BookSlider";
 function Banner({ type }) {
     let apiUrl = "";
     if (type === "bestseller") {
-        apiUrl = "http://localhost:8080/books/bestseller";
+        apiUrl = "http://localhost:8080/api/books/bestseller";
     } else if (type === "picks") {
-        apiUrl = "http://localhost:8080/books/picks";
+        apiUrl = "http://localhost:8080/api/books/picks";
     }
 
     return (
