@@ -52,7 +52,7 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/api/**").permitAll()
-                        .requestMatchers("/api/auth/**", "/api/users/ranking", "/api/books/**", "/api/gemini/**").permitAll()
+                        .requestMatchers("/api/auth/**", "/api/users/ranking", "/api/books/**", "/api/gemini/**", "/api/records/**", "/uploads/**").permitAll()
                         .requestMatchers("/api/users/me").authenticated()  // 추가된 부분
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter,

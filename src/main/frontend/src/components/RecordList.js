@@ -12,6 +12,7 @@ function RecordList() {
             try {
                 const response = await fetch('http://localhost:8080/api/records');
                 const data = await response.json();
+                console.log(data);
                 setRecords(data);
             } catch (error) {
                 console.error('데이터 로딩 실패:', error);
