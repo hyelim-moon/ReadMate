@@ -62,6 +62,7 @@ function AppContent({ userId }) {
                 <Route path="/community/write" element={<CommunityWrite />} />
                 <Route path="/community/:id" element={<CommunityDetail />} />
                 <Route path="/record/:id" element={<RecordDetail />} />
+                <Route path="/record/edit/:id" element={<RecordEdit />} />
             </Routes>
         </div>
     );
