@@ -24,7 +24,7 @@ import MyPage from "./components/MyPage";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // userId를 props로 받도록 변경
-function AppContent({ userId }) {
+function AppContent({ userId, onLoginSuccess }) {
     const location = useLocation();
 
     // 로그인/회원가입/비밀번호 찾기 경로일 때 헤더·네비 숨김
@@ -45,7 +45,7 @@ function AppContent({ userId }) {
                         </>
                     }
                 />
-                <Route path="/login" element={<Login />} />
+                <Route path="/login" element={<Login onLoginSuccess={onLoginSuccess} />} />
                 <Route path="/forgot" element={<Forgot />} />
                 <Route path="/signup" element={<SignUp />} />
                 <Route path="/mypage" element={<MyPage />} />
@@ -90,7 +90,8 @@ function App() {
     return (
         <BrowserRouter>
             {/* userInfo가 없으면 null, 있으면 userInfo.id를 넘겨줌 */}
-            <AppContent userId={userInfo ? userInfo.id : null} />
+            <AppContent userId={userInfo ? userInfo.id : null}
+                        onLoginSuccess={(user) => setUserInfo(user)}/>
         </BrowserRouter>
     );
 }

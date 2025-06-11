@@ -92,6 +92,7 @@ function ProductDetail({ userId, isLoggedIn }) {
     };
 
     const handlePurchase = async () => {
+        console.log('로그인 상태:', isLoggedIn);
         if (!isLoggedIn) {
             const confirmLogin = window.confirm(
                 "회원 전용 서비스입니다.\n로그인이 필요합니다.\n지금 로그인하시겠습니까?"

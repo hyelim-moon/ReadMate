@@ -5,7 +5,7 @@ import logoImg from "../assets/images/logo.png";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
-function Login() {
+function Login({ onLoginSuccess }) {
     const navigate = useNavigate();
     const [userid, setUserid] = useState("");
     const [password, setPassword] = useState("");
@@ -18,8 +18,11 @@ function Login() {
                 userId: userid,        // email → userid로 변경
                 password
             });
-            const { token } = response.data;
+            const { token, user } = response.data;
             localStorage.setItem("ACCESS_TOKEN", token);
+            if (onLoginSuccess) {
+                onLoginSuccess(user);  // ← user 정보 전달
+            }
             navigate("/");
         } catch (err) {
             if (err.response && err.response.data) {
