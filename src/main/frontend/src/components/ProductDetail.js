@@ -94,13 +94,8 @@ function ProductDetail({ userid, isLoggedIn }) {
     };
 
     const handlePurchase = async () => {
-        console.log('로그인 상태:', isLoggedIn);
-        console.log("userid:", userid);
         if (!isLoggedIn) {
-            const confirmLogin = window.confirm(
-                "회원 전용 서비스입니다.\n로그인이 필요합니다.\n지금 로그인하시겠습니까?"
-            );
-            if (confirmLogin) {
+            if (window.confirm("회원 전용 서비스입니다.\n로그인이 필요합니다.\n지금 로그인하시겠습니까?")) {
                 navigate('/login');
             }
             return;
@@ -113,15 +108,29 @@ function ProductDetail({ userid, isLoggedIn }) {
         }
 
         try {
+            const token = localStorage.getItem("ACCESS_TOKEN");
+            console.log("JWT 토큰:", token);
+            if (!token) {
+                alert("로그인 정보가 없습니다. 다시 로그인해주세요.");
+                navigate('/login');
+                return;
+            }
+
             const response = await fetch(
-                `http://localhost:8080/api/points/purchase?userid=${userid}&productId=${productId}`,
+                `http://localhost:8080/api/points/purchase?productId=${productId}`,  // userid 제거
                 {
                     method: 'POST',
-                    credentials: 'include',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
                 }
             );
 
+            console.log("구매 API 응답 상태:", response.status);
+
             if (!response.ok) {
+                console.log("JWT 토큰:", token);
                 const errorMsg = await response.text();
                 alert(`구매 실패: ${errorMsg}`);
                 return;
@@ -133,6 +142,8 @@ function ProductDetail({ userid, isLoggedIn }) {
             alert(`구매 중 오류가 발생했습니다: ${error.message}`);
         }
     };
+
+
 
     return (
         <div className={styles.detailPage}>

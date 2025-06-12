@@ -37,25 +37,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             String token = parseJwt(request);
             if (token != null && jwtTokenProvider.validateToken(token)) {
-                // ① 토큰에서 userid 추출
                 String userid = jwtTokenProvider.getUseridFromToken(token);
-                // ② UserDetails 로드
                 UserDetails userDetails = userDetailsService.loadUserByUsername(userid);
-                // ③ Authentication 생성
                 UsernamePasswordAuthenticationToken auth =
                         new UsernamePasswordAuthenticationToken(
-                                userDetails,
-                                null,
-                                userDetails.getAuthorities()
-                        );
+                                userDetails, null, userDetails.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(auth);
+                logger.info("JWT 인증 성공, userid: " + userid);
+            } else {
+                logger.info("JWT 토큰 없음 또는 유효하지 않음");
             }
         } catch (Exception e) {
-            // 토큰이 없거나 잘못되어도 예외를 던지지 않고 계속 진행
-            logger.debug("JWT 인증 실패 – 공개 API라면 무시하고 proceed 합니다.", e);
+            logger.error("JWT 인증 중 예외 발생", e);
         }
         filterChain.doFilter(request, response);
     }
+
 
     private String parseJwt(HttpServletRequest request) {
         String headerAuth = request.getHeader("Authorization");

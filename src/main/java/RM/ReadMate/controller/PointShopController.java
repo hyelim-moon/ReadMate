@@ -2,6 +2,7 @@ package RM.ReadMate.controller;
 
 import RM.ReadMate.service.PointShopService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,14 +17,24 @@ public class PointShopController {
     }
 
     @PostMapping("/purchase")
-    public ResponseEntity<?> purchaseProduct(@RequestParam Long userId, @RequestParam Long productId) {
+    public ResponseEntity<?> purchaseProduct(@RequestParam Long productId, Authentication authentication) {
+        System.out.println("Authentication 객체: " + authentication);
+        if (authentication == null || !authentication.isAuthenticated()) {
+            System.out.println("인증 정보 없음 또는 인증 실패");
+            return ResponseEntity.status(403).body("권한이 없습니다");
+        }
+
         try {
+            String userId = authentication.getName();
+            System.out.println("인증된 사용자 ID: " + userId);
             pointShopService.purchaseProduct(userId, productId);
             return ResponseEntity.ok("구매 완료");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.internalServerError().body("구매 중 오류 발생: " + e.getMessage());
         }
     }
+
+
 }

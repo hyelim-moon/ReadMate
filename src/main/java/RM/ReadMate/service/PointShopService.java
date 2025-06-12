@@ -19,13 +19,13 @@ public class PointShopService {
     }
 
     @Transactional
-    public void purchaseProduct(Long userId, Long productId) {
-        User user = userRepository.findById(userId)
+    public void purchaseProduct(String userId, Long productId) {
+        User user = userRepository.findByUserid(userId)
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."));
 
-        if(user.getPoints() < product.getPrice()){
+        if (user.getPoints() < product.getPrice()) {
             throw new IllegalArgumentException("포인트가 부족합니다.");
         }
 
@@ -35,4 +35,5 @@ public class PointShopService {
 
         // TODO: 구매 내역 저장 등 추가 작업
     }
+
 }
