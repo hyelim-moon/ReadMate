@@ -1,4 +1,18 @@
-DELETE FROM users;
+DROP TABLE IF EXISTS users;
+
+CREATE TABLE users (
+  id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  userid VARCHAR(255) NOT NULL UNIQUE,
+  password VARCHAR(255) NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  phone VARCHAR(255) NOT NULL UNIQUE,
+  gender VARCHAR(10),
+  birthdate VARCHAR(10),
+  nickname VARCHAR(255),
+  points INT
+);
+
 INSERT INTO users (userid, password, name, email, phone, gender, birthdate, nickname, points) VALUES
 ('kimminsu',   '$2a$10$e0NRaJGta0hz5oplhBWwUeXVr0GHTfZXiVYgH6Mfs2zTWU0u9yHyW', '김민수',   'kimminsu@example.com',   '010-1234-0001', 'M', '1990-05-17', '민수',   120),
 ('leeyounghee','$2a$10$e0NRaJGta0hz5oplhBWwUeXVr0GHTfZXiVYgH6Mfs2zTWU0u9yHyW', '이영희',   'leeyounghee@example.com','010-1234-0002', 'F', '1992-08-03', '영희',   250),

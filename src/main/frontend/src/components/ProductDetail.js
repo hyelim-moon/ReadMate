@@ -35,7 +35,6 @@ function ProductDetail({ userid, isLoggedIn }) {
 
     const isAbsoluteURL = (url) => /^https?:\/\//.test(url);
 
-    // 컴포넌트 렌더링과 id 변경 시마다 데이터 fetch
     useEffect(() => {
         console.log("ProductDetail 컴포넌트 렌더링, 요청할 상품 ID:", id);
         setLoading(true);
@@ -117,20 +116,20 @@ function ProductDetail({ userid, isLoggedIn }) {
             }
 
             const response = await fetch(
-                `http://localhost:8080/api/points/purchase?productId=${productId}`,  // userid 제거
+                `http://localhost:8080/api/points/purchase`,
                 {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
-                    }
+                    },
+                    body: JSON.stringify({ productId })  // body에 productId 포함
                 }
             );
 
             console.log("구매 API 응답 상태:", response.status);
 
             if (!response.ok) {
-                console.log("JWT 토큰:", token);
                 const errorMsg = await response.text();
                 alert(`구매 실패: ${errorMsg}`);
                 return;
@@ -142,8 +141,6 @@ function ProductDetail({ userid, isLoggedIn }) {
             alert(`구매 중 오류가 발생했습니다: ${error.message}`);
         }
     };
-
-
 
     return (
         <div className={styles.detailPage}>
