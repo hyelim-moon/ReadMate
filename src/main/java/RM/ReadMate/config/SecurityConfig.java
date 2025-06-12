@@ -51,6 +51,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**", "/api/users/ranking", "/api/books/**", "/api/gemini/**", "/api/records/**", "/uploads/**", "/api/products/**").permitAll()
                         .requestMatchers("/api/users/me").authenticated()
                         .requestMatchers("/api/points/**").authenticated()
+                        .requestMatchers("/api/points/purchase").authenticated()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

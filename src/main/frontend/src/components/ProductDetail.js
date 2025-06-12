@@ -41,7 +41,7 @@ function ProductDetail({ userid, isLoggedIn }) {
         setError('');
         setProduct(null);
 
-        fetch(`http://localhost:8080/api/products/kyobogiftcards/${id}`)
+        fetch(`http://localhost:8080/api/products/${id}`)
             .then(res => {
                 if (!res.ok) throw new Error('상품을 불러올 수 없습니다.');
                 return res.json();
@@ -116,16 +116,16 @@ function ProductDetail({ userid, isLoggedIn }) {
             }
 
             const response = await fetch(
-                `http://localhost:8080/api/points/purchase`,
-                {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ productId })  // body에 productId 포함
-                }
+              `http://localhost:8080/api/points/purchase?productId=${productId}`,  // 쿼리파라미터로 보냄
+              {
+                method: 'POST',
+                headers: {
+                  'Authorization': `Bearer ${token}`,
+                  // Content-Type은 body 없으면 안 넣어도 됨
+                },
+              }
             );
+
 
             console.log("구매 API 응답 상태:", response.status);
 

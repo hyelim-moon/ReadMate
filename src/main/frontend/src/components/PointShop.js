@@ -11,6 +11,7 @@ function PointShop({ userId }) {
     useEffect(() => {
         const fetchData = async () => {
             try {
+
                 if (userId) {
                     const resPoint = await fetch(`http://localhost:8080/api/users/${userId}/points`, {
                         credentials: 'include',
@@ -22,12 +23,15 @@ function PointShop({ userId }) {
                     setPointBalance(0);
                 }
 
-                const resKyobo = await fetch('http://localhost:8080/api/products/kyobogiftcards', {
+                // 크롤링 API 대신 DB 기반 상품 조회 API 호출
+                const resProducts = await fetch('http://localhost:8080/api/products', {
                     credentials: 'include',
                 });
-                if (!resKyobo.ok) throw new Error('교보문고 상품 목록 불러오기 실패');
-                const dataKyobo = await resKyobo.json();
-                setProducts(dataKyobo);
+                if (!resProducts.ok) throw new Error('상품 목록 불러오기 실패');
+                const dataProducts = await resProducts.json();
+
+                console.log('products:', dataProducts);
+                setProducts(dataProducts);
             } catch (e) {
                 setError(e.message);
             }
@@ -53,33 +57,30 @@ function PointShop({ userId }) {
                         <p className={styles.emptyMessage}>상품이 없습니다.</p>
                     </div>
                 ) : (
-                    products.map((product, index) => {
-                        const productId = index;  // 여기서 index를 id로 사용
-                        return (
-                            <div
-                                key={productId}
-                                className={styles.productCard}
-                                role="button"
-                                tabIndex={0}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter') {
-                                        navigate(`/products/${productId}`);
-                                    }
-                                }}
-                                onClick={() => {
-                                    navigate(`/products/${productId}`);
-                                }}
-                            >
-                                <img
-                                    src={product.image}
-                                    alt={product.name}
-                                    className={styles.productImage}
-                                />
-                                <h3 className={styles.productName}>{product.name}</h3>
-                                <p className={styles.productPrice}>{Number(product.price) * 2} P</p>
-                            </div>
-                        );
-                    })
+                    products.map((product) => (
+                        <div
+                            key={product.id}
+                            className={styles.productCard}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    navigate(`/products/${product.id}`);
+                                }
+                            }}
+                            onClick={() => {
+                                navigate(`/products/${product.id}`);
+                            }}
+                        >
+                            <img
+                                src={product.image}
+                                alt={product.name}
+                                className={styles.productImage}
+                            />
+                            <h3 className={styles.productName}>{product.name}</h3>
+                            <p className={styles.productPrice}>{Number(product.price) * 2} P</p>
+                        </div>
+                    ))
                 )}
             </div>
         </main>
