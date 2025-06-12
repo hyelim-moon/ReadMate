@@ -66,14 +66,7 @@ public class AuthController {
         String jwt = tokenProvider.createToken(loginRequest.getUserId());
 
         // 5) 응답으로 토큰과 필요한 사용자 정보 반환
-        LoginResponse response = new LoginResponse(
-                jwt,
-                user.getUserid(),
-                user.getName(),
-                user.getEmail(),
-                user.getPhone(),
-                user.getPoints()
-        );
+        LoginResponse response = new LoginResponse(jwt, user);
         return ResponseEntity.ok(response);
     }
 

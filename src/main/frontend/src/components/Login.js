@@ -21,7 +21,8 @@ function Login({ onLoginSuccess }) {
             const { token, user } = response.data;
             localStorage.setItem("ACCESS_TOKEN", token);
             if (onLoginSuccess) {
-                onLoginSuccess(user);  // ← user 정보 전달
+                console.log("로그인 응답 user 객체:", user); // 먼저 콘솔에 출력
+                onLoginSuccess(user); // 그 다음 전달
             }
             navigate("/");
         } catch (err) {

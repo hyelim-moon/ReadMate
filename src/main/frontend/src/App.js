@@ -24,7 +24,7 @@ import MyPage from "./components/MyPage";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // userId를 props로 받도록 변경
-function AppContent({ userId, onLoginSuccess }) {
+function AppContent({ userid, onLoginSuccess, isLoggedIn }) {
     const location = useLocation();
 
     // 로그인/회원가입/비밀번호 찾기 경로일 때 헤더·네비 숨김
@@ -52,10 +52,10 @@ function AppContent({ userId, onLoginSuccess }) {
                 <Route path="/chat" element={<ChatBot />} />
                 <Route path="/recordlist" element={<RecordList />} />
                 {/* "/" 경로 중복 문제로 "/pointshop"으로 변경하고 userId 넘김 */}
-                <Route path="/pointshop" element={<PointShop userId={userId} />} />
+                <Route path="/pointshop" element={<PointShop userid={userid} />} />
                 <Route
                     path="/products/:id"
-                    element={<ProductDetail userId={userId} isLoggedIn={!!userId} />}
+                    element={<ProductDetail userid={userid} isLoggedIn={isLoggedIn} />}  // userId랑 isLoggedIn 둘 다 넘김
                 />
                 <Route path="/record" element={<Record />} />
                 <Route path="/community" element={<Community />} />
@@ -90,8 +90,11 @@ function App() {
     return (
         <BrowserRouter>
             {/* userInfo가 없으면 null, 있으면 userInfo.id를 넘겨줌 */}
-            <AppContent userId={userInfo ? userInfo.id : null}
-                        onLoginSuccess={(user) => setUserInfo(user)}/>
+            <AppContent
+                userid={userInfo ? userInfo.userid : null}
+                isLoggedIn={!!userInfo}
+                onLoginSuccess={(user) => setUserInfo(user)}
+            />
         </BrowserRouter>
     );
 }
