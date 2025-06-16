@@ -47,6 +47,12 @@ public class RecordController {
         }
     }
 
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Record>> getRecordsByUserId(@PathVariable Long userId) {
+        List<Record> records = recordService.getRecordsByUserId(userId);
+        return ResponseEntity.ok(records);
+    }
+
     // 모든 독서 기록 가져오기
     @GetMapping
     public ResponseEntity<List<Record>> getAllRecords() {
@@ -98,4 +104,6 @@ public class RecordController {
             return ResponseEntity.internalServerError().body("삭제 중 오류 발생: " + e.getMessage());
         }
     }
+
+
 }

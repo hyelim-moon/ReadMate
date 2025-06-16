@@ -21,6 +21,8 @@ import Forgot from "./components/Forgot";
 import PointShop from "./components/PointShop";
 import ProductDetail from './components/ProductDetail';
 import MyPage from "./components/MyPage";
+import MyLibrary from "./components/MyLibrary";
+import ProfileEdit from "./components/ProfileEdit";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // userId를 props로 받도록 변경
@@ -63,6 +65,8 @@ function AppContent({ userid, onLoginSuccess, isLoggedIn }) {
                 <Route path="/community/:id" element={<CommunityDetail />} />
                 <Route path="/record/:id" element={<RecordDetail />} />
                 <Route path="/record/edit/:id" element={<RecordEdit />} />
+                <Route path="/mylibrary" element={<MyLibrary />} />
+                <Route path="/profile-edit" element={<ProfileEdit />} />
             </Routes>
         </div>
     );

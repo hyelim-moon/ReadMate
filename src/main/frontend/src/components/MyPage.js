@@ -61,12 +61,14 @@ function MyPage() {
                 </div>
                 {menuOpen && (
                     <ul className={styles.menuList}>
-                        <li><Link to="/profile">내 정보 수정</Link></li>
-                        <li><Link to="/cart">독서기록</Link></li>
-                        <li><Link to="/orders">도서리뷰</Link></li>
-                        <li><Link to="/inquiry">포인트 내역</Link></li>
-                        <li><Link to="/wishlist">포인트 사용내역</Link></li>
-                        <li><Link to="/recent">결제내역</Link></li>
+                        <li><Link to="/profile-edit">내 정보 수정</Link></li>
+                        <li><Link to="/mylibrary">내 서재</Link></li>
+                        <li><Link to="/recordlist">독서기록</Link></li>
+                        <li><Link to="/myreview">도서리뷰</Link></li>
+                        <li><Link to="/storage">보관함</Link></li>
+                        {/* <li><Link to="/faq">자주 묻는 질문</Link></li> */}
+                        <li><Link to="/purchase-history">구매내역</Link></li>
+                        <li><Link to="/contact">문의하기</Link></li>
                     </ul>
                 )}
             </header>

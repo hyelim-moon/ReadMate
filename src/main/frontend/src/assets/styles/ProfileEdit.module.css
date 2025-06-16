@@ -1,0 +1,126 @@
+/* 기본 컨테이너 */
+.container {
+    max-width: 480px;
+    margin: 3rem auto;
+    padding: 2rem;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* 제목 */
+.title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #004225;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+/* 폼 */
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* 폼 그룹 */
+.formGroup {
+    display: flex;
+    flex-direction: column;
+}
+
+/* 라벨 */
+.inputLabel {
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+    color: #333;
+    font-weight: 500;
+}
+
+/* 입력 필드 */
+.input {
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    transition: border-color 0.2s;
+}
+
+.input:focus {
+    outline: none;
+    border-color: #00753C;
+}
+
+/* 에러 표시 */
+.inputError {
+    border-color: #d9534f;
+}
+
+.errorText {
+    color: #d9534f;
+    font-size: 0.85rem;
+    margin-top: 0.3rem;
+}
+
+/* 전화번호 입력 */
+.phoneRow {
+    display: flex;
+    align-items: center;
+}
+
+.phoneInput {
+    flex: 1;
+    padding: 0.7rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.firstPhoneInput {
+    flex: 0 0 80px;
+}
+
+.dash {
+    margin: 0 0.5rem;
+    font-size: 1.2rem;
+    color: #888;
+}
+
+/* 제출 버튼 */
+.button {
+    padding: 0.9rem;
+    background-color: #00753C;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.button:hover {
+    background-color: #005d2e;
+}
+
+/* 반응형 */
+@media (max-width: 500px) {
+    .container {
+        padding: 1.5rem;
+    }
+
+    .title {
+        font-size: 1.5rem;
+    }
+
+    .input,
+    .phoneInput {
+        font-size: 0.95rem;
+    }
+
+    .button {
+        font-size: 0.95rem;
+    }
+}

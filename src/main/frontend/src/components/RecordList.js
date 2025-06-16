@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import styles from '../assets/styles/RecordList.module.css';
 import RecordButton from '../components/RecordButton';
 import { useNavigate } from 'react-router-dom';
@@ -6,13 +6,35 @@ import { useNavigate } from 'react-router-dom';
 function RecordList() {
     const [records, setRecords] = useState([]);
     const navigate = useNavigate();
+    const hasPrompted = useRef(false); // 확인창 중복 방지
 
     useEffect(() => {
+        const token = localStorage.getItem('ACCESS_TOKEN');
+
+        if (!token || token === 'undefined' || token === '') {
+            if (!hasPrompted.current) {
+                hasPrompted.current = true;
+                const shouldLogin = window.confirm(
+                    '로그인이 필요한 서비스입니다. 로그인 페이지로 이동하시겠습니까?'
+                );
+                if (shouldLogin) {
+                    navigate('/login');
+                }
+            }
+            return;
+        }
+
         const fetchRecords = async () => {
             try {
-                const response = await fetch('http://localhost:8080/api/records');
+                const response = await fetch('http://localhost:8080/api/records', {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                if (!response.ok) {
+                    throw new Error('데이터 불러오기 실패');
+                }
                 const data = await response.json();
-                console.log(data);
                 setRecords(data);
             } catch (error) {
                 console.error('데이터 로딩 실패:', error);
@@ -20,7 +42,7 @@ function RecordList() {
         };
 
         fetchRecords();
-    }, []);
+    }, [navigate]);
 
     const handleCardClick = (id) => {
         navigate(`/record/${id}`);
@@ -58,7 +80,9 @@ function RecordList() {
                                     <p className={styles.recordGenre}><strong>장르:</strong> {record.genre}</p>
                                 </div>
                                 <p className={styles.reviewExcerpt}>
-                                    {record.content.length > 120 ? `${record.review.slice(0, 120)}...` : record.content}
+                                    {record.content.length > 120
+                                        ? `${record.content.slice(0, 120)}...`
+                                        : record.content}
                                 </p>
                             </div>
                         </div>

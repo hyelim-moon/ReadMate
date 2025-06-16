@@ -22,6 +22,11 @@ public class RecordService {
         this.recordRepository = recordRepository;
     }
 
+    public List<Record> getRecordsByUserId(Long userId) {
+        return recordRepository.findByUserId(userId);
+    }
+
+
     // 저장 메서드 (신규)
     public Record saveRecord(Long userId, Record record, MultipartFile photo) {
         try {
@@ -124,4 +129,5 @@ public class RecordService {
         }
         return false;
     }
+
 }
