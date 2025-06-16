@@ -50,6 +50,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/api/**").permitAll()
                         .requestMatchers("/api/auth/**", "/api/users/ranking", "/api/books/**", "/api/gemini/**", "/api/records/**", "/uploads/**", "/api/products/**").permitAll()
                         .requestMatchers("/api/users/me").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/users/me").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/users/me").authenticated()
                         .requestMatchers("/api/points/**").authenticated()
                         .requestMatchers("/api/points/purchase").authenticated()
                         .anyRequest().authenticated())

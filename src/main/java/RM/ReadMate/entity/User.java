@@ -20,25 +20,31 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @Setter  // name 필드에 setter 추가
     @Column(nullable = false)
     private String name;
 
+    @Setter  // email 필드에 setter 추가
     @Column(nullable = false, unique = true)
     private String email;
 
+    @Setter  // phone 필드에 setter 추가
     @Column(nullable = false, unique = true)
     private String phone;
 
+    @Setter  // gender 필드에 setter 추가, 필요하다면
     @Column
-    private String gender;  // 남자/여자 혹은 M/F 등 원하는 형식
+    private String gender;
 
+    @Setter  // birthdate 필드에 setter 추가
     @Column
-    private String birthdate;  // "YYYY-MM-DD" 형식 문자열
+    private String birthdate;
 
+    @Setter  // nickname 필드에 setter 추가
     @Column
     private String nickname;
 
-    @Setter  // points 필드에 setter 추가
+    @Setter  // points 필드에 setter 추가 (이미 있음)
     @Column
     private int points;
 

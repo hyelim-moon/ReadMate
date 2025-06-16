@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from "../api/axiosInstance"; // 새로 만든 axios 인스턴스
 import styles from "../assets/styles/ProfileEdit.module.css";
 
 function ProfileEdit() {
@@ -22,7 +22,14 @@ function ProfileEdit() {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        axios
+        const token = localStorage.getItem("ACCESS_TOKEN");
+        if (!token) {
+            alert("로그인 세션이 없습니다. 로그인해주세요.");
+            navigate("/login");
+            return;
+        }
+
+        axiosInstance
             .get("/users/me")
             .then((response) => {
                 const { phone, ...userData } = response.data;
@@ -57,19 +64,20 @@ function ProfileEdit() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        console.log("handleSubmit 호출됨", form);
         const newErrors = {};
 
-        // 필수 입력 검사 (currentPassword, newPassword, newPasswordConfirm 제외)
-        Object.entries(form).forEach(([key, val]) => {
-            if (
-                !["currentPassword", "newPassword", "newPasswordConfirm"].includes(key) &&
-                !val.trim()
-            ) {
+        // 필수 입력 필드 목록
+        const requiredFields = ["username", "nickname", "name", "email", "phone1", "phone2", "phone3", "birthDate"];
+
+        requiredFields.forEach((key) => {
+            const val = form[key];
+            if (typeof val !== "string" || val.trim() === "") {
                 newErrors[key] = "필수 입력입니다.";
             }
         });
 
-        // 비밀번호 변경 시 유효성 검사
+        // 비밀번호 변경 시 검사
         if (form.newPassword || form.newPasswordConfirm) {
             if (!form.currentPassword) {
                 newErrors.currentPassword = "현재 비밀번호를 입력하세요.";
@@ -80,32 +88,46 @@ function ProfileEdit() {
         }
 
         if (Object.keys(newErrors).length) {
+            console.log("유효성 검사 오류:", newErrors);
             setErrors(newErrors);
             return;
         }
 
+        // 이하 기존 로직 유지
+        const token = localStorage.getItem("ACCESS_TOKEN");
+        if (!token) {
+            alert("로그인 세션이 없습니다. 로그인해주세요.");
+            navigate("/login");
+            return;
+        }
+
         const payload = {
-            ...form,
+            nickname: form.nickname,
+            email: form.email,
             phone: `${form.phone1}-${form.phone2}-${form.phone3}`,
-            passwordUpdate: form.newPassword
-                ? {
+            birthdate: form.birthDate,
+            name: form.name,
+            ...(form.newPassword && {
+                passwordUpdate: {
                     currentPassword: form.currentPassword,
                     newPassword: form.newPassword,
                 }
-                : null,
+            })
         };
 
-        axios
-            .put("/users/me", payload)
-            .then(() => {
-                alert("회원정보가 성공적으로 수정되었습니다.");
-                navigate("/profile");
+        console.log("PUT 요청 보내기 직전, payload:", payload);
+
+        axiosInstance.put("/users/me", payload)
+            .then((response) => {
+                alert("회원정보가 수정되었습니다.");
+                navigate("/profile"); // 필요하면 수정 후 이동 경로 지정
             })
             .catch((error) => {
                 console.error("회원정보 수정 실패:", error);
-                alert("회원정보 수정에 실패했습니다.");
+                alert("회원정보 수정 중 오류가 발생했습니다.");
             });
     };
+
 
     if (isLoading) {
         return <div>로딩 중...</div>;

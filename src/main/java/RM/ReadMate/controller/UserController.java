@@ -1,6 +1,8 @@
 package RM.ReadMate.controller;
 
+import RM.ReadMate.dto.LoginResponse;
 import RM.ReadMate.dto.UserRankingDTO;
+import RM.ReadMate.dto.UserUpdateRequestDTO;
 import RM.ReadMate.entity.User;
 import RM.ReadMate.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Map;
@@ -61,13 +64,40 @@ public class UserController {
 
         User user = userOpt.get();
         Map<String, Object> profile = Map.of(
+                "username", user.getUserid(),
                 "nickname", user.getNickname(),
-                "coupons", 0,       // 향후 로직 추가
+                "name", user.getName(),
+                "email", user.getEmail(),
+                "phone", user.getPhone(),
+                "birthDate", user.getBirthdate(),
+                "coupons", 0,
                 "mileage", user.getPoints(),
-                "wishlist", List.of(), // 향후 로직 추가
-                "recent", List.of()    // 향후 로직 추가
+                "wishlist", List.of(),
+                "recent", List.of()
         );
 
         return ResponseEntity.ok(profile);
     }
+
+
+    @PutMapping("/me")
+    public ResponseEntity<LoginResponse.UserDTO> updateMyProfile(
+            Authentication authentication,
+            @RequestBody UserUpdateRequestDTO updateRequest) {
+
+        String userid = authentication.getName();
+        User user = userRepository.findByUserid(userid)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "사용자 정보 없음"));
+
+        user.setNickname(updateRequest.getNickname());
+        user.setEmail(updateRequest.getEmail());
+        user.setPhone(updateRequest.getPhone());
+        user.setBirthdate(updateRequest.getBirthdate());
+        user.setName(updateRequest.getName());
+
+        userRepository.save(user);
+
+        return ResponseEntity.ok(new LoginResponse.UserDTO(user));
+    }
+
 }
