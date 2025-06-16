@@ -45,7 +45,6 @@ function Record() {
         e.preventDefault();
         const { title, author, content, publisher, genre } = form;
 
-
         if (!title.trim() || !author.trim()) {
             setError('책 제목과 저자는 필수 입력 항목입니다.');
             return;
@@ -74,8 +73,27 @@ function Record() {
 
             if (response.ok) {
                 const data = await response.json();
-                // 백엔드에서 message가 있을 경우 보여줌, 없으면 기본 메시지
-                setPopupMessage(data.message || '저장되었습니다.');
+
+                // 사용자 JWT 토큰을 가져와서 Authorization 헤더에 추가
+                const token = localStorage.getItem('authToken');  // 예시: JWT 토큰을 로컬 스토리지에서 가져옴
+
+                // 포인트 부여 요청
+                const pointsResponse = await fetch('http://localhost:8080/api/users/award-points', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`  // JWT 토큰을 헤더에 추가
+                    },
+                    body: JSON.stringify({ points: 10 }),  // 10 포인트 부여
+                });
+
+                if (pointsResponse.ok) {
+                    // 포인트 부여 성공 시 메시지
+                    setPopupMessage(data.message || '저장되었습니다. 10포인트가 부여되었습니다!');
+                } else {
+                    setPopupMessage('저장되었습니다. 포인트 부여에 실패했습니다.');
+                }
+
                 setShowPopup(true);
                 setForm({
                     title: '',
