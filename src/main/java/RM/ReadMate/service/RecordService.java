@@ -16,16 +16,19 @@ import java.util.List;
 public class RecordService {
 
     private final RecordRepository recordRepository;
+    private final UserService userService;
 
     @Autowired
-    public RecordService(RecordRepository recordRepository) {
+    public RecordService(RecordRepository recordRepository, UserService userService) {
         this.recordRepository = recordRepository;
+        this.userService = userService;
     }
 
     public List<Record> getRecordsByUserId(Long userId) {
-        return recordRepository.findByUserId(userId);
+        // userId로 User 객체를 먼저 찾는 게 더 정확
+        var user = userService.findUserById(userId);
+        return recordRepository.findByUser(user);
     }
-
 
     // 저장 메서드 (신규)
     public Record saveRecord(Long userId, Record record, MultipartFile photo) {
@@ -44,7 +47,20 @@ public class RecordService {
                 record.setPhoto(null);
             }
 
-            return recordRepository.save(record);
+            // 유저 연결은 저장 전에 반드시 해줘야 함
+            if (userId != null) {
+                var user = userService.findUserById(userId);
+                record.setUser(user);
+            }
+
+            Record savedRecord = recordRepository.save(record);
+
+            // 포인트 지급
+            if (userId != null) {
+                userService.addPoints(userId, 10);
+            }
+
+            return savedRecord;
 
         } catch (IOException e) {
             throw new RuntimeException("파일 저장 실패", e);
@@ -102,7 +118,6 @@ public class RecordService {
         }
     }
 
-
     public Record getRecordById(Long id) {
         return recordRepository.findById(id).orElse(null);
     }
@@ -129,5 +144,4 @@ public class RecordService {
         }
         return false;
     }
-
 }

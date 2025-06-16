@@ -45,6 +45,7 @@ function Record() {
         e.preventDefault();
         const { title, author, content, publisher, genre } = form;
 
+
         if (!title.trim() || !author.trim()) {
             setError('책 제목과 저자는 필수 입력 항목입니다.');
             return;
@@ -72,7 +73,9 @@ function Record() {
             });
 
             if (response.ok) {
-                setPopupMessage('저장되었습니다.');
+                const data = await response.json();
+                // 백엔드에서 message가 있을 경우 보여줌, 없으면 기본 메시지
+                setPopupMessage(data.message || '저장되었습니다.');
                 setShowPopup(true);
                 setForm({
                     title: '',

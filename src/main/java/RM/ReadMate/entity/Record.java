@@ -34,6 +34,8 @@ public class Record {
     @Column(nullable = true)
     private String photo; // 사진은 null 가능
 
-    @Column(name = "user_id", nullable = true) // 비회원도 저장 가능
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
 }

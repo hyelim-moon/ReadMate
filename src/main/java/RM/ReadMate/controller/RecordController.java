@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/records")
@@ -41,11 +42,17 @@ public class RecordController {
                     .build();
 
             Record saved = recordService.saveRecord(userId, record, photo);
-            return ResponseEntity.ok(saved);
+
+            // 메시지와 함께 반환 (포인트 지급 완료 메시지 추가)
+            return ResponseEntity.ok(Map.of(
+                    "record", saved,
+                    "message", "포인트 10점이 지급되었습니다."
+            ));
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("저장 중 오류 발생: " + e.getMessage());
         }
     }
+
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Record>> getRecordsByUserId(@PathVariable Long userId) {

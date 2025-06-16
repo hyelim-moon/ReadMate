@@ -120,7 +120,13 @@ function ProfileEdit() {
         axiosInstance.put("/users/me", payload)
             .then((response) => {
                 alert("회원정보가 수정되었습니다.");
-                navigate("/profile"); // 필요하면 수정 후 이동 경로 지정
+                navigate("/profile-edit"); // 필요하면 수정 후 이동 경로 지정
+                setForm((prev) => ({
+                    ...prev,
+                    currentPassword: "",
+                    newPassword: "",
+                    newPasswordConfirm: "",
+                }));
             })
             .catch((error) => {
                 console.error("회원정보 수정 실패:", error);
@@ -135,7 +141,7 @@ function ProfileEdit() {
 
     return (
         <div className={styles.container}>
-            <h2 className={styles.title}>회원정보 수정</h2>
+            <h2 className={styles.title}>내 정보</h2>
             <form className={styles.form} onSubmit={handleSubmit}>
                 {/* 아이디 */}
                 <div className={styles.formGroup}>

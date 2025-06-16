@@ -61,7 +61,7 @@ function MyPage() {
                 </div>
                 {menuOpen && (
                     <ul className={styles.menuList}>
-                        <li><Link to="/profile-edit">내 정보 수정</Link></li>
+                        <li><Link to="/profile-edit">내 정보</Link></li>
                         <li><Link to="/mylibrary">내 서재</Link></li>
                         <li><Link to="/recordlist">독서기록</Link></li>
                         <li><Link to="/myreview">도서리뷰</Link></li>
