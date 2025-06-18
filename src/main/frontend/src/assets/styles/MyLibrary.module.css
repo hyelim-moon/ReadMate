@@ -1,0 +1,355 @@
+.recordPages {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background-color: #fff;
+    position: static;
+    overflow: visible;
+    min-height: 100%;
+}
+
+.pageTitle {
+    font-size: 2.2rem;
+    font-weight: 600;
+    text-align: left;
+    color: #004225;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid #00753C;
+    padding-bottom: 0.5rem;
+    padding-left: 2.5rem;
+    line-height: 1.2;
+}
+
+.recordListContainer {
+    width: 100%;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.recordCard {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 1rem 2rem;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+    gap: 1rem;
+    transition: background-color 0.2s ease;
+    box-sizing: border-box;
+}
+
+.recordCard:hover {
+    background-color: #f7f9f6;
+}
+
+.recordImage {
+    width: 70px;
+    height: 95px;
+    object-fit: cover;
+    border-radius: 6px;
+    flex-shrink: 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.recordContent {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0; /* 텍스트 줄임 방지 */
+}
+
+.recordTitle {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #004225;
+    margin: 0 0 4px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.recordInfo {
+    font-size: 0.85rem;
+    color: #555;
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 6px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+}
+
+.recordInfo span {
+    white-space: nowrap;
+    padding-right: 12px;
+    border-right: 1px solid #ccc;
+}
+
+.recordInfo span:last-child {
+    border-right: none;
+    padding-right: 0;
+}
+
+.reviewExcerpt {
+    font-size: 0.9rem;
+    color: #333;
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    user-select: none;
+}
+
+.emptyMessage {
+    text-align: center;
+    color: #888;
+    font-size: 1.4rem;
+    padding: 5rem 2rem;
+    font-weight: 500;
+}
+
+.nothing {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50vh;
+    text-align: center;
+}
+
+/* 반응형 */
+@media (max-width: 600px) {
+    .recordCard {
+        padding: 0.75rem 1rem;
+        gap: 0.75rem;
+    }
+
+    .recordImage {
+        width: 60px;
+        height: 80px;
+    }
+
+    .recordTitle {
+        font-size: 1.1rem;
+    }
+
+    .recordInfo {
+        font-size: 0.75rem;
+        gap: 0.75rem;
+        overflow-x: auto;
+    }
+
+    .reviewExcerpt {
+        font-size: 0.85rem;
+    }
+}
+
+.readingInfo {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    margin-top: 0.5rem;
+    position: relative;
+}
+
+.progressWrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    max-width: 20%;
+}
+
+.progressBar {
+    flex: 1;
+    height: 8px;
+    background-color: #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progressFill {
+    height: 100%;
+    background-color: #00753C;
+    transition: width 0.3s ease;
+}
+
+.progressText {
+    font-size: 0.8rem;
+    color: #333;
+    white-space: nowrap;
+}
+
+.readingPeriod {
+    font-size: 0.8rem;
+    color: #666;
+    text-align: right;
+    margin-top: 0.3rem;
+}
+
+/* 필터 버튼 컨테이너 */
+.filterContainer {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-start;
+    padding: 1rem 2.5rem;
+    flex-wrap: wrap;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 1rem;
+}
+
+/* 필터 버튼 */
+.filterButton {
+    padding: 0.4rem 1rem;
+    font-size: 0.9rem;
+    color: #004225;
+    background-color: #f0f5f0;
+    border: 1.5px solid #00753C;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.filterButton:hover {
+    background-color: #00753C;
+    color: #fff;
+}
+
+.filterButton.active {
+    background-color: #00753C;
+    color: white;
+    font-weight: 600;
+}
+
+/* 정렬 버튼 컨테이너 */
+.sortContainer {
+    display: flex;
+    justify-content: space-between; /* 좌우 공간 분리 */
+    align-items: center;
+    padding: 0 2.5rem 1rem 2.5rem;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    font-size: 0.9rem;
+    color: #004225;
+}
+
+/* 정렬 라벨 */
+.sortLabel {
+    font-weight: 600;
+}
+
+/* 오른쪽 버튼 그룹 */
+.sortButtonsGroup {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.topControls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 2.5rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.filterButtons {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+}
+
+.filterButton {
+    padding: 0.35rem 0.9rem;
+    background-color: #f7faf7;
+    border: 1px solid #00753C;
+    border-radius: 6px;
+    cursor: pointer;
+    color: #004225;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.filterButton:hover {
+    background-color: #00753C;
+    color: white;
+}
+
+.filterButton.active {
+    background-color: #004225;
+    color: white;
+    font-weight: 600;
+}
+
+.sortLabelContainer {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.95rem;
+    color: #004225;
+    user-select: none;
+}
+
+.sortLabelContainer > span:first-child {
+    margin-right: 8px;
+    font-weight: 600;
+}
+
+.sortLabel {
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    user-select: none;
+}
+
+.sortLabel:hover,
+.sortLabel:focus {
+    color: #003016;
+    outline: none;
+}
+
+.sortLabel.active {
+    border-bottom: 2px solid #003016;
+    font-weight: 700;
+}
+
+.sortOrderToggle {
+    cursor: pointer;
+    padding: 4px 8px;
+    user-select: none;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #00753C;
+    transition: color 0.2s ease;
+}
+
+.sortOrderToggle:hover,
+.sortOrderToggle:focus {
+    color: #004225;
+    outline: none;
+}
+
+
+/* 프로그레스바 가로 길이 조정 */
+.progressWrapper {
+    max-width: 150px; /* 기존 20% 대신 고정 폭으로 줄임 */
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* readingPeriod 위치 오른쪽 아래 정렬 유지 */
+.readingPeriod {
+    font-size: 0.8rem;
+    color: #666;
+    text-align: right;
+    margin-top: 0.3rem;
+}
