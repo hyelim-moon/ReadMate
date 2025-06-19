@@ -36,7 +36,7 @@ function MyLibrary() {
                 publisher: '비룡소',
                 genre: '판타지',
                 content: '시간을 도둑맞은 사람들에게 시간을 되돌려주는 소녀의 이야기.',
-                photo: '/images/momo.jpg',
+                photo: '/momo.jpg',
                 startedAt: '2024-11-01',
                 finishedAt: '2024-11-20',
                 progress: 100,
@@ -50,14 +50,71 @@ function MyLibrary() {
                 publisher: '열린책들',
                 genre: '우화',
                 content: '어른이 되어버린 이들을 위한 순수한 마음의 이야기.',
-                photo: '/images/little_prince.jpg',
+                photo: '/little_prince.jpg',
                 startedAt: '2025-01-15',
                 finishedAt: null,
                 progress: 40,
                 savedAt: '2025-05-10',
                 pageCount: 120,
             },
+            {
+                id: 3,
+                title: '데미안',
+                author: '헤르만 헤세',
+                publisher: '민음사',
+                genre: '소설',
+                content: '자아를 찾아가는 청년의 성장 이야기.',
+                photo: '/demian.jpg',
+                startedAt: '2025-04-01',
+                finishedAt: null,
+                progress: 70,
+                savedAt: '2025-06-10',
+                pageCount: 180,
+            },
+            {
+                id: 4,
+                title: '해리포터와 마법사의 돌',
+                author: 'J.K. 롤링',
+                publisher: '문학수첩',
+                genre: '판타지',
+                content: '마법사 학교에서 펼쳐지는 신비한 모험.',
+                photo: '/harry_potter1.jpg',
+                startedAt: '2025-03-05',
+                finishedAt: '2025-04-20',
+                progress: 100,
+                savedAt: '2025-05-25',
+                pageCount: 320,
+            },
+            {
+                id: 5,
+                title: '폭풍의 언덕',
+                author: '에밀리 브론테',
+                publisher: '문학동네',
+                genre: '고전 소설',
+                content: '요크셔의 황량한 고원에서 펼쳐지는 히스클리프와 캐서린의 격렬하고 비극적인 사랑과 복수 이야기.',
+                photo: '/wuthering_heights.jpg',
+                startedAt: '2025-05-01',
+                finishedAt: '2025-05-30',
+                progress: 100,
+                savedAt: '2025-06-18',
+                pageCount: 400,
+            },
+            {
+                id: 6,
+                title: '제인 에어',
+                author: '샬롯 브론테',
+                publisher: '문학동네',
+                genre: '고전 소설',
+                content: '어려운 유년 시절을 극복하고 자신만의 삶과 사랑을 찾아가는 강인한 여성 제인 에어의 이야기.',
+                photo: '/jane_eyre.jpg',
+                startedAt: null,
+                finishedAt: null,
+                progress: 0,
+                savedAt: null,
+                pageCount: 500,
+            }
         ];
+
         setSavedBooks(dummyBooks);
 
         // 실제 API 호출 부분 (필요시 활성화)
@@ -113,7 +170,7 @@ function MyLibrary() {
     };
 
     const handleCardClick = (id) => {
-        navigate(`/book/${id}`);
+        navigate(`/mybook/${id}`);
     };
 
     return (
@@ -183,7 +240,7 @@ function MyLibrary() {
                             >
                                 {book.photo && (
                                     <img
-                                        src={`http://localhost:8080${book.photo}`}
+                                        src={book.photo}
                                         alt={`${book.title} 책 이미지`}
                                         className={styles.recordImage}
                                     />
