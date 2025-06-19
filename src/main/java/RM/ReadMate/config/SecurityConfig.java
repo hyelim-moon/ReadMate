@@ -55,6 +55,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/me").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/users/me").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/users/me").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/points/purchase").authenticated()
+                        .requestMatchers("/api/users/purchases").authenticated()
                         .requestMatchers("/api/points/**").authenticated()
                         .requestMatchers("/api/points/purchase").authenticated()
                         .anyRequest().authenticated())

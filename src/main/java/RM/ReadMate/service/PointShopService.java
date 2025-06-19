@@ -1,8 +1,10 @@
 package RM.ReadMate.service;
 
 import RM.ReadMate.entity.Product;
+import RM.ReadMate.entity.Purchase;
 import RM.ReadMate.entity.User;
 import RM.ReadMate.repository.ProductRepository;
+import RM.ReadMate.repository.PurchaseRepository;
 import RM.ReadMate.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,10 +14,12 @@ public class PointShopService {
 
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
+    private final PurchaseRepository purchaseRepository;
 
-    public PointShopService(UserRepository userRepository, ProductRepository productRepository) {
+    public PointShopService(UserRepository userRepository, ProductRepository productRepository, PurchaseRepository purchaseRepository) {
         this.userRepository = userRepository;
         this.productRepository = productRepository;
+        this.purchaseRepository = purchaseRepository;
     }
 
     @Transactional
@@ -33,7 +37,14 @@ public class PointShopService {
         user.setPoints(user.getPoints() - product.getPrice());
         userRepository.save(user);
 
-        // TODO: 구매 내역 저장 등 추가 작업
+        Purchase purchase = new Purchase();
+        purchase.setUser(user);
+        purchase.setProductName(product.getName());
+        purchase.setPrice(product.getPrice());
+        purchase.setPointsUsed(product.getPrice());
+        purchase.setPurchaseDate(new java.util.Date());
+        purchase.setStatus("구매 완료");
+        purchaseRepository.save(purchase);
     }
 
     public int getUserPoints(String userId) {

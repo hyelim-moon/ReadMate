@@ -24,6 +24,7 @@ import MyPage from "./components/MyPage";
 import MyLibrary from "./components/MyLibrary";
 import ProfileEdit from "./components/ProfileEdit";
 import PurchaseHistory from "./components/PurchaseHistory";
+import Storage from "./components/Storage";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // userId를 props로 받도록 변경
@@ -69,6 +70,7 @@ function AppContent({ userid, onLoginSuccess, isLoggedIn }) {
                 <Route path="/mylibrary" element={<MyLibrary />} />
                 <Route path="/profile-edit" element={<ProfileEdit />} />
                 <Route path="/purchase-history" element={<PurchaseHistory />} />
+                <Route path="/storage" element={<Storage />} />
             </Routes>
         </div>
     );

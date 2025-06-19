@@ -1,10 +1,12 @@
 package RM.ReadMate.controller;
 
 import RM.ReadMate.dto.LoginResponse;
+import RM.ReadMate.dto.PurchaseDTO;
 import RM.ReadMate.dto.UserRankingDTO;
 import RM.ReadMate.dto.UserUpdateRequestDTO;
 import RM.ReadMate.entity.User;
 import RM.ReadMate.repository.UserRepository;
+import RM.ReadMate.service.PurchaseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +26,7 @@ import java.util.stream.IntStream;
 public class UserController {
 
     private final UserRepository userRepository;
+    private final PurchaseService purchaseService;
 
     // 사용자 기본 정보 반환
     @GetMapping("/info")
@@ -99,5 +102,15 @@ public class UserController {
 
         return ResponseEntity.ok(new LoginResponse.UserDTO(user));
     }
+
+    /*@GetMapping("/purchases")
+    public ResponseEntity<?> getUserPurchases(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(403).body("로그인이 필요합니다");
+        }
+        String userid = authentication.getName();
+        List<PurchaseDTO> purchases = purchaseService.getPurchasesByUserId(userid);
+        return ResponseEntity.ok(purchases);
+    }*/
 
 }
