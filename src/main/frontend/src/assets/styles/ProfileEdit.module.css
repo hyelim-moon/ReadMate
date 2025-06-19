@@ -1,3 +1,8 @@
+.customBackground {
+  background-color: #FCFBF2;
+  min-height: 100vh; /* 화면 전체 높이 확보 */
+  padding: 2rem 0; /* 위아래 여백 */
+}
 /* 기본 컨테이너 */
 .container {
     max-width: 480px;
@@ -6,6 +11,7 @@
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e0e5e2;
 }
 
 /* 제목 */

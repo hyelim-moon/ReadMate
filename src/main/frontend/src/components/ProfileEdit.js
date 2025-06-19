@@ -140,6 +140,7 @@ function ProfileEdit() {
     }
 
     return (
+    <main className={`${styles.page} ${styles.customBackground}`}>
         <div className={styles.container}>
             <h2 className={styles.title}>내 정보</h2>
             <form className={styles.form} onSubmit={handleSubmit}>
@@ -303,7 +304,9 @@ function ProfileEdit() {
                 </button>
             </form>
         </div>
+        </main>
     );
+
 }
 
 export default ProfileEdit;
