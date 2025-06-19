@@ -1,0 +1,113 @@
+.storage {
+  max-width: 100%;
+  margin: 50px auto;
+  padding: 0 20px;
+  color: #1b1b1b;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.storage h2 {
+  font-weight: 800;
+  font-size: 2.6rem;
+  color: #003016;
+  margin-bottom: 48px;
+  border-bottom: 3px solid #003016;
+  padding-bottom: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.storage .toggle {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 36px;
+}
+
+.storage .toggleButton {
+  flex: 1;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: #555;
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding: 12px 0;
+  cursor: pointer;
+  transition: color 0.3s ease, border-bottom-color 0.3s ease;
+  user-select: none;
+}
+
+.storage .toggleButton:hover {
+  color: #003016;
+  border-bottom-color: #003016;
+}
+
+.storage .active {
+  color: #003016;
+  border-bottom: 3px solid #003016;
+  font-weight: 700;
+}
+
+.storage .cardContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 32px;
+}
+
+.storage .card {
+  background: white;
+  border: 1.5px solid #003016;
+  border-radius: 16px;
+  padding: 28px 24px;
+  box-shadow: 0 8px 20px rgba(0, 48, 22, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+/*.storage .card:hover {
+  box-shadow: 0 12px 32px rgba(0, 48, 22, 0.25);
+  transform: translateY(-6px);
+}*/
+
+.storage .card h3 {
+  font-weight: 900;
+  font-size: 1.3rem;
+  margin-bottom: 18px;
+  color: #003016;
+  line-height: 1.3;
+  letter-spacing: 0.03em;
+}
+
+.storage .card p {
+  font-size: 1rem;
+  color: #3a3a3a;
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+.storage .card .status {
+  font-weight: 700;
+  margin-top: 16px;
+  padding: 6px 12px;
+  width: fit-content;
+  border-radius: 14px;
+  font-size: 0.95rem;
+  user-select: none;
+  box-shadow: 0 2px 8px rgba(0, 48, 22, 0.15);
+}
+
+.storage .card .status.used {
+  color: #888888;
+  background-color: #f0f0f0;
+  border: 1.5px solid #cccccc;
+  box-shadow: none;
+}
+
+.storage .card .status.available {
+  color: #0b480b;
+  background-color: #d8efd8;
+  border: 1.5px solid #0b480b;
+}

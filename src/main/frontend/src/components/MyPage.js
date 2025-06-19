@@ -68,7 +68,7 @@ function MyPage() {
                         <li><Link to="/storage">보관함</Link></li>
                         {/* <li><Link to="/faq">자주 묻는 질문</Link></li> */}
                         <li><Link to="/purchase-history">구매내역</Link></li>
-                        <li><Link to="/contact">문의하기</Link></li>
+                        <li><Link to="/contactlist">문의하기</Link></li>
                     </ul>
                 )}
             </header>
