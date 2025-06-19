@@ -25,13 +25,15 @@ CREATE TABLE products (
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 INSERT INTO users (userid, password, name, email, phone, gender, birthdate, nickname, points) VALUES
-('kimminsu',   '$2a$10$e0NRaJGta0hz5oplhBWwUeXVr0GHTfZXiVYgH6Mfs2zTWU0u9yHyW', '김민수',   'kimminsu@example.com',   '010-1234-0001', 'M', '1990-05-17', '민수',   120),
+('kimminsu',   '$2a$10$3mXhPB5hyTnpuUMzMk5WFOEjZ1j8.jpxshcYPZsjIq3xq.EyRMF5e', '김민수',   'kimminsu@example.com',   '010-1234-0001', 'M', '1990-05-17', '민수',   120),
 ('leeyounghee','$2a$10$e0NRaJGta0hz5oplhBWwUeXVr0GHTfZXiVYgH6Mfs2zTWU0u9yHyW', '이영희',   'leeyounghee@example.com','010-1234-0002', 'F', '1992-08-03', '영희',   250),
 ('parkjunhyung','$2a$10$e0NRaJGta0hz5oplhBWwUeXVr0GHTfZXiVYgH6Mfs2zTWU0u9yHyW','박준형','parkjunhyung@example.com','010-1234-0003','M','1988-12-25','준형',95),
 ('choisujin',   '$2a$10$e0NRaJGta0hz5oplhBWwUeXVr0GHTfZXiVYgH6Mfs2zTWU0u9yHyW','최수진','choisujin@example.com','010-1234-0004','F','1991-03-14','수진',180),
 ('jeongdaeun', '$2a$10$e0NRaJGta0hz5oplhBWwUeXVr0GHTfZXiVYgH6Mfs2zTWU0u9yHyW','정다은','jeongdaeun@example.com','010-1234-0005','F','1993-07-09','다은',75),
 ('johyunwoo',  '$2a$10$e0NRaJGta0hz5oplhBWwUeXVr0GHTfZXiVYgH6Mfs2zTWU0u9yHyW','조현우','johyunwoo@example.com','010-1234-0006','M','1987-11-30','현우',210),
-('hanjimin',    '$2a$10$e0NRaJGta0hz5oplhBWwUeXVr0GHTfZXiVYgH6Mfs2zTWU0u9yHyW','한지민','hanjimin@example.com','010-1234-0007','F','1994-02-21','지민',135);
+('hanjimin',    '$2a$10$e0NRaJGta0hz5oplhBWwUeXVr0GHTfZXiVYgH6Mfs2zTWU0u9yHyW','한지민','hanjimin@example.com','010-1234-0007','F','1994-02-21','지민',135),
+('1', '$2a$10$ljNDlVSkwfXV1wLpG.MBy.Yb./whr5V0S7p/5aT.2PVw1GQMgA9Q2', 'yyy', 'yyy@example.com', '010-1234-0008', 'F', '1994-02-21', 'yyy', 100000); --1
+
 
 INSERT INTO products (name, price, image, description) VALUES
 ('교보문고 기프티콘 1만원권', 10000, 'https://contents.kyobobook.co.kr/sih/fit-in/458x0/pdt/3000000000021.jpg', '교보문고 오프라인 매장 및 온라인에서 사용 가능한 1만원권 기프티콘입니다.'),

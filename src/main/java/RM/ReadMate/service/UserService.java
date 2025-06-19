@@ -16,6 +16,11 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
+    public User findByUserid(String userid) {
+        return userRepository.findByUserid(userid)
+                .orElseThrow(() -> new RuntimeException("User not found with userid: " + userid));
+    }
+
     // 기존 랭킹 조회 메서드
     public UserRankingDTO getUserRanking(Long userId) {
         // 포인트 기준으로 상위 10명 가져오기

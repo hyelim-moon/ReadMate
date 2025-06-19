@@ -1,6 +1,7 @@
 package RM.ReadMate.service;
 
 import RM.ReadMate.entity.Record;
+import RM.ReadMate.entity.User;
 import RM.ReadMate.repository.RecordRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,12 @@ public class RecordService {
     public List<Record> getRecordsByUserId(Long userId) {
         // userId로 User 객체를 먼저 찾는 게 더 정확
         var user = userService.findUserById(userId);
+        return recordRepository.findByUser(user);
+    }
+
+    // userid(String)로 Records 조회
+    public List<Record> getRecordsByUserid(String userid) {
+        User user = userService.findByUserid(userid);
         return recordRepository.findByUser(user);
     }
 

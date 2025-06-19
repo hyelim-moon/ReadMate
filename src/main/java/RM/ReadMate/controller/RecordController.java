@@ -1,8 +1,13 @@
 package RM.ReadMate.controller;
 
 import RM.ReadMate.entity.Record;
+import RM.ReadMate.entity.User;
+import RM.ReadMate.security.JwtTokenProvider;
 import RM.ReadMate.service.RecordService;
+import RM.ReadMate.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,15 +21,39 @@ import java.util.Map;
 public class RecordController {
 
     private final RecordService recordService;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final UserService userService;
 
     @Autowired
-    public RecordController(RecordService recordService) {
+    public RecordController(RecordService recordService, JwtTokenProvider jwtTokenProvider, UserService userService) {
         this.recordService = recordService;
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.userService = userService;
+    }
+
+    // 로그인한 사용자의 기록만 반환
+    @GetMapping
+    public ResponseEntity<?> getMyRecords(@RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) {
+        try {
+            String token = authHeader.replace("Bearer ", "").trim();
+
+            if (!jwtTokenProvider.validateToken(token)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("유효하지 않은 토큰입니다.");
+            }
+
+            String userid = jwtTokenProvider.getUseridFromToken(token);
+
+            List<Record> records = recordService.getRecordsByUserid(userid);
+            return ResponseEntity.ok(records);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("기록 조회 중 오류 발생: " + e.getMessage());
+        }
     }
 
     @PostMapping(consumes = {"multipart/form-data"})
     public ResponseEntity<?> createRecord(
-            @RequestParam(value = "userId", required = false) Long userId,
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader,
             @RequestParam("title") String title,
             @RequestParam("author") String author,
             @RequestParam(value = "publisher", required = false) String publisher,
@@ -33,6 +62,15 @@ public class RecordController {
             @RequestParam(value = "photo", required = false) MultipartFile photo) {
 
         try {
+            String token = authHeader.replace("Bearer ", "").trim();
+
+            if (!jwtTokenProvider.validateToken(token)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("유효하지 않은 토큰입니다.");
+            }
+
+            String userid = jwtTokenProvider.getUseridFromToken(token);
+            User user = userService.findByUserid(userid);
+
             Record record = Record.builder()
                     .title(title)
                     .author(author)
@@ -41,9 +79,8 @@ public class RecordController {
                     .content(content)
                     .build();
 
-            Record saved = recordService.saveRecord(userId, record, photo);
+            Record saved = recordService.saveRecord(user.getId(), record, photo);
 
-            // 메시지와 함께 반환 (포인트 지급 완료 메시지 추가)
             return ResponseEntity.ok(Map.of(
                     "record", saved,
                     "message", "포인트 10점이 지급되었습니다."
@@ -60,21 +97,39 @@ public class RecordController {
         return ResponseEntity.ok(records);
     }
 
-    // 모든 독서 기록 가져오기
-    @GetMapping
-    public ResponseEntity<List<Record>> getAllRecords() {
-        return ResponseEntity.ok(recordService.getAllRecords());
-    }
-
     // 특정 독서 기록 불러오기
     @GetMapping("/{id}")
-    public ResponseEntity<Record> getRecordById(@PathVariable Long id) {
-        Record record = recordService.getRecordById(id);
-        if (record == null) {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<?> getRecordById(
+            @PathVariable Long id,
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) {
+
+        try {
+            String token = authHeader.replace("Bearer ", "").trim();
+
+            if (!jwtTokenProvider.validateToken(token)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("유효하지 않은 토큰입니다.");
+            }
+
+            String userid = jwtTokenProvider.getUseridFromToken(token);
+            Record record = recordService.getRecordById(id);
+
+            if (record == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            // 권한 체크: record.getUser()가 null일 수 있으니 null 체크도 하세요
+            if (record.getUser() == null || !record.getUser().getUserid().equals(userid)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한이 없습니다.");
+            }
+
+            return ResponseEntity.ok(record);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("오류 발생: " + e.getMessage());
         }
-        return ResponseEntity.ok(record);
     }
+
+
 
     // 독서 기록 수정 (이미지 삭제 기능 포함)
     @PutMapping(value = "/{id}", consumes = {"multipart/form-data"})

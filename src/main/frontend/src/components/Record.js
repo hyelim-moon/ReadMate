@@ -66,8 +66,15 @@ function Record() {
         formData.append('deletePhoto', deletePhoto);
 
         try {
+            const token = localStorage.getItem('ACCESS_TOKEN');
+            const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+            console.log('Token:', token);
+            console.log('Headers:', headers);
+
             const response = await fetch('http://localhost:8080/api/records', {
                 method: 'POST',
+                headers, // Content-Type 생략!
                 body: formData,
             });
 
