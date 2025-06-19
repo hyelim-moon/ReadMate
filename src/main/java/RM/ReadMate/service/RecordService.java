@@ -126,11 +126,7 @@ public class RecordService {
     }
 
     public Record getRecordById(Long id) {
-        return recordRepository.findById(id).orElse(null);
-    }
-
-    public List<Record> getAllRecords() {
-        return recordRepository.findAll();
+        return recordRepository.findByIdWithUser(id);
     }
 
     public boolean deleteRecord(Long id) {

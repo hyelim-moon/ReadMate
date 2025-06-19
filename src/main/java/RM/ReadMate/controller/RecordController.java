@@ -135,15 +135,32 @@ public class RecordController {
     @PutMapping(value = "/{id}", consumes = {"multipart/form-data"})
     public ResponseEntity<?> updateRecord(
             @PathVariable Long id,
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader,
             @RequestParam("title") String title,
             @RequestParam("author") String author,
             @RequestParam(value = "publisher", required = false) String publisher,
             @RequestParam(value = "genre", required = false) String genre,
             @RequestParam(value = "content", required = false) String content,
             @RequestParam(value = "photo", required = false) MultipartFile photo,
-            @RequestParam(value = "removePhoto", required = false, defaultValue = "false") boolean removePhoto  // 삭제 플래그 추가
+            @RequestParam(value = "removePhoto", required = false, defaultValue = "false") boolean removePhoto
     ) {
         try {
+            String token = authHeader.replace("Bearer ", "").trim();
+
+            if (!jwtTokenProvider.validateToken(token)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("유효하지 않은 토큰입니다.");
+            }
+
+            String userid = jwtTokenProvider.getUseridFromToken(token);
+            Record record = recordService.getRecordById(id);
+            if (record == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            if (record.getUser() == null || !record.getUser().getUserid().equals(userid)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한이 없습니다.");
+            }
+
             Record updated = recordService.updateRecord(id, title, author, publisher, genre, content, photo, removePhoto);
             return ResponseEntity.ok(updated);
         } catch (IllegalArgumentException e) {
@@ -153,9 +170,28 @@ public class RecordController {
         }
     }
 
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteRecord(@PathVariable Long id) {
+    public ResponseEntity<?> deleteRecord(
+            @PathVariable Long id,
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) {
         try {
+            String token = authHeader.replace("Bearer ", "").trim();
+
+            if (!jwtTokenProvider.validateToken(token)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("유효하지 않은 토큰입니다.");
+            }
+
+            String userid = jwtTokenProvider.getUseridFromToken(token);
+            Record record = recordService.getRecordById(id);
+            if (record == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            if (record.getUser() == null || !record.getUser().getUserid().equals(userid)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한이 없습니다.");
+            }
+
             boolean deleted = recordService.deleteRecord(id);
             if (deleted) {
                 return ResponseEntity.noContent().build(); // 204 No Content
@@ -166,6 +202,7 @@ public class RecordController {
             return ResponseEntity.internalServerError().body("삭제 중 오류 발생: " + e.getMessage());
         }
     }
+
 
 
 }

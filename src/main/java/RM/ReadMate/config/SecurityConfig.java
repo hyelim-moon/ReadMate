@@ -51,6 +51,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**", "/api/users/ranking", "/api/books/**", "/api/gemini/**", "/uploads/**", "/api/products/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/records/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/records/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/records/**").authenticated()
                         .requestMatchers("/api/users/me").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/users/me").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/users/me").authenticated()

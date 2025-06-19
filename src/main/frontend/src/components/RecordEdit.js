@@ -22,7 +22,16 @@ function RecordEdit() {
     useEffect(() => {
         const fetchRecord = async () => {
             try {
-                const res = await fetch(`http://localhost:8080/api/records/${id}`);
+                const token = localStorage.getItem('ACCESS_TOKEN');
+                console.log('ACCESS_TOKEN:', token);
+                console.log('Authorization header:', token ? `Bearer ${token}` : '없음');
+
+                const res = await fetch(`http://localhost:8080/api/records/${id}`, {
+                    headers: {
+                        Authorization: token ? `Bearer ${token}` : '',
+                    },
+                });
+
                 if (!res.ok) throw new Error('데이터를 불러오는 데 실패했습니다.');
                 const data = await res.json();
                 setForm({
@@ -81,16 +90,21 @@ function RecordEdit() {
         formData.append('removePhoto', deletePhoto);  // **서버쪽 변수명에 맞춰서 removePhoto로 보냄**
 
         try {
+            const token = localStorage.getItem('ACCESS_TOKEN');
+            console.log('Token:', token);
             const res = await fetch(`http://localhost:8080/api/records/${id}`, {
-                method: 'PUT',
+            method: 'PUT',
+            headers: {
+                Authorization: token ? `Bearer ${token}` : '',
+            },
                 body: formData,
             });
             if (!res.ok) throw new Error('수정 실패');
-            alert('수정되었습니다.');
-            navigate(`/record/${id}`);
-        } catch (err) {
-            setError(err.message);
-        }
+                alert('수정되었습니다.');
+                navigate(`/record/${id}`);
+            } catch (err) {
+                setError(err.message);
+            }
     };
 
     if (error) return <p style={{ color: 'red' }}>{error}</p>;

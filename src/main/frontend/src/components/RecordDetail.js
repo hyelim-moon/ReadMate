@@ -17,6 +17,8 @@ function RecordDetail() {
 
             try {
               const token = localStorage.getItem('ACCESS_TOKEN');
+              console.log('ACCESS_TOKEN:', token);
+              console.log('Authorization header:', token ? `Bearer ${token}` : '없음');
               const res = await fetch(`http://localhost:8080/api/records/${id}`, {
                 headers: {
                   Authorization: token ? `Bearer ${token}` : '',

@@ -93,14 +93,7 @@ function Record() {
                     },
                     body: JSON.stringify({ points: 10 }),  // 10 포인트 부여
                 });
-
-                if (pointsResponse.ok) {
-                    // 포인트 부여 성공 시 메시지
-                    setPopupMessage(data.message || '저장되었습니다. 10포인트가 부여되었습니다!');
-                } else {
-                    setPopupMessage('저장되었습니다. 포인트 부여에 실패했습니다.');
-                }
-
+                setPopupMessage('저장되었습니다.');
                 setShowPopup(true);
                 setForm({
                     title: '',
