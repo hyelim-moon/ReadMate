@@ -1,0 +1,33 @@
+.container {
+    width: 80%;
+    margin: 2rem auto;
+    background: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+h2 {
+    color: #3B6D41;
+    margin-bottom: 1rem;
+}
+
+.purchaseTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.purchaseTable th, .purchaseTable td {
+    border: 1px solid #ddd;
+    padding: 0.75rem 1rem;
+    text-align: center;
+}
+
+.purchaseTable th {
+    background-color: #3B6D41;
+    color: white;
+}
+
+.purchaseTable tbody tr:hover {
+    background-color: #f5f5f5;
+}

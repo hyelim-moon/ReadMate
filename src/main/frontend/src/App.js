@@ -23,6 +23,7 @@ import ProductDetail from './components/ProductDetail';
 import MyPage from "./components/MyPage";
 import MyLibrary from "./components/MyLibrary";
 import ProfileEdit from "./components/ProfileEdit";
+import PurchaseHistory from "./components/PurchaseHistory";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // userId를 props로 받도록 변경
@@ -67,6 +68,7 @@ function AppContent({ userid, onLoginSuccess, isLoggedIn }) {
                 <Route path="/record/edit/:id" element={<RecordEdit />} />
                 <Route path="/mylibrary" element={<MyLibrary />} />
                 <Route path="/profile-edit" element={<ProfileEdit />} />
+                <Route path="/purchase-history" element={<PurchaseHistory />} />
             </Routes>
         </div>
     );

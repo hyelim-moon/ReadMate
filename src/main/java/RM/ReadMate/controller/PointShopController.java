@@ -36,5 +36,19 @@ public class PointShopController {
         }
     }
 
+    @GetMapping("/my")
+    public ResponseEntity<?> getMyPoints(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(403).body("로그인이 필요합니다");
+        }
+
+        try {
+            String userId = authentication.getName();
+            int points = pointShopService.getUserPoints(userId);
+            return ResponseEntity.ok().body(points);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("포인트 조회 중 오류 발생: " + e.getMessage());
+        }
+    }
 
 }

@@ -36,4 +36,10 @@ public class PointShopService {
         // TODO: 구매 내역 저장 등 추가 작업
     }
 
+    public int getUserPoints(String userId) {
+        User user = userRepository.findByUserid(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        return user.getPoints();
+    }
+
 }
