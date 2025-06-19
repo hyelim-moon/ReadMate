@@ -1,0 +1,128 @@
+.myBookPage {
+  max-width: 100%;
+  margin: 2rem auto;
+  padding: 1rem 2rem;
+  font-family: 'Noto Sans KR', sans-serif;
+  color: #1b3a20;
+  border-radius: 8px;
+}
+
+.backButton {
+  background: none;
+  border: none;
+  color: #003016; /* 대표 포인트 컬러 */
+  font-size: 1.1rem;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  transition: color 0.3s ease;
+}
+
+.backButton:hover {
+  color: #4caf50; /* 생기있는 연두톤 하이라이트 */
+}
+
+.bookHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  border-bottom: 1px solid #d0e3ce;
+  padding-bottom: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.bookImage {
+  width: 160px;
+  height: auto;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0, 48, 22, 0.15);
+  object-fit: cover;
+  background-color: #e8f0e8;
+}
+
+.bookInfo {
+  flex-grow: 1;
+}
+
+.bookTitle {
+  margin: 0 0 0.3rem 0;
+  font-weight: 700;
+  font-size: 1.8rem;
+  color: #003016; /* 대표색 진한 초록 */
+}
+
+.readingStatus {
+  font-weight: 600;
+  color: #4caf50; /* 밝고 산뜻한 초록 */
+  margin-top: 0.3rem;
+}
+
+.ratingArea {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 1.6rem;
+  margin-left: auto;
+  color: #003016;
+}
+
+/* 별점 스타일 */
+.starRating .star {
+  color: #4caf50; /* 산뜻한 초록색 별 */
+}
+
+.starRating .starEmpty {
+  color: #c1d9c1; /* 연한 초록 회색 */
+}
+
+/* 하트 스타일 */
+.heartRating .heart {
+  color: #4caf50; /* 산뜻한 초록 하트 */
+}
+
+.heartRating .heartEmpty {
+  color: #c1d9c1; /* 연한 초록 회색 */
+}
+
+.readingPeriod, .readingProgress, .bookContent {
+  margin-bottom: 1.8rem;
+}
+
+.readingPeriod h2,
+.readingProgress h2,
+.bookContent h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  border-bottom: 2px solid #003016;
+  padding-bottom: 0.3rem;
+  color: #003016;
+}
+
+.progressBar {
+  width: 100%;
+  height: 14px;
+  background-color: #dcedd7; /* 밝은 연두톤 배경 */
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 0.4rem;
+  box-shadow: inset 0 1px 2px rgba(0, 48, 22, 0.15);
+}
+
+.progressFill {
+  height: 100%;
+  /* 그라데이션 색상: 대표 딥그린 → 밝은 연두 */
+  background: linear-gradient(90deg, #003016 0%, #4caf50 100%);
+  transition: width 0.3s ease;
+  border-radius: 8px 0 0 8px;
+}
+
+.readingProgress p {
+  font-size: 0.95rem;
+  color: #2e4d31; /* 중간 톤 텍스트 */
+}
+
+.bookContent p {
+  line-height: 1.5;
+  color: #2e4d31;
+  font-size: 1rem;
+}

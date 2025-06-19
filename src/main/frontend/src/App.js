@@ -22,6 +22,7 @@ import PointShop from "./components/PointShop";
 import ProductDetail from './components/ProductDetail';
 import MyPage from "./components/MyPage";
 import MyLibrary from "./components/MyLibrary";
+import MyBook from "./components/MyBook";
 import ProfileEdit from "./components/ProfileEdit";
 import PurchaseHistory from "./components/PurchaseHistory";
 import Storage from "./components/Storage";
@@ -79,6 +80,7 @@ function AppContent({ userid, onLoginSuccess, isLoggedIn }) {
         <Route path="/record/:id" element={<RecordDetail />} />
         <Route path="/record/edit/:id" element={<RecordEdit />} />
         <Route path="/mylibrary" element={<MyLibrary />} />
+        <Route path="/mybook/:id" element={<MyBook />} />
         <Route path="/profile-edit" element={<ProfileEdit />} />
         <Route path="/purchase-history" element={<PurchaseHistory />} />
         <Route path="/storage" element={<Storage />} />
