@@ -129,6 +129,26 @@
     min-width: 0;
 }
 
+.purchaseNote {
+  margin-top: 3rem;
+  padding: 1rem 1.2rem;
+  background-color: #e6f0e8; /* 아주 연한 연두빛 배경 */
+  border-left: 4px solid #003016; /* 진한 녹색 강조선 */
+  border-radius: 6px;
+  color: #003016; /* 텍스트도 진한 녹색 */
+  font-size: 0.95rem;
+  line-height: 1.5;
+  box-shadow: 0 2px 5px rgba(0, 48, 22, 0.15); /* 연한 녹색 그림자 */
+  user-select: text;
+  font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+}
+
+.purchaseNote p {
+  margin: 0.4rem 0;
+}
+
+
+
 @media (max-width: 480px) {
     .buttonGroup {
         flex-direction: column;

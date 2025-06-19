@@ -164,9 +164,8 @@ function ProductDetail({ userid, isLoggedIn }) {
                             가격: {(Number(product.price) * 2).toLocaleString()} P
                         </p>
                         <p className={styles.detailReview}>
-                            {'상품 상세 설명이 없습니다.'}
+                            {product.description || '상품 상세 설명이 없습니다.'}
                         </p>
-
                         <div className={styles.buttonGroup}>
                             <button
                                 className={`${styles.wishlistBtn} ${isWishlisted ? styles.active : ''}`}
@@ -183,6 +182,12 @@ function ProductDetail({ userid, isLoggedIn }) {
                             >
                                 구매하기
                             </button>
+                        </div>
+                        <div className={styles.purchaseNote}>
+                          <p>구매 시 보유한 포인트가 즉시 차감되며, 포인트로 구매한 상품은 환불 및 교환이 불가합니다.</p>
+                          <p>평균 3~7일 이내에 발송되며, 주말 및 공휴일에는 발송되지 않습니다.</p>
+                          <p>이용 약관을 위반한 경우 구매한 상품은 발송되지 않을 수 있습니다.</p>
+                          <p>문의사항은 고객센터(02-1234-5678) 로 연락해 주시기 바랍니다.</p>
                         </div>
                     </>
                 )}
