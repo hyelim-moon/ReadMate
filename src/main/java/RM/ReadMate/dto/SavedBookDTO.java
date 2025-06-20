@@ -21,6 +21,7 @@ public class SavedBookDTO {
     private LocalDate startedAt; // 읽기 시작 날짜
     private LocalDate finishedAt; // 읽기 완료 날짜
     private LocalDate savedAt;   // 저장 날짜
+    private String content;      // 책 소개
 
     // 생성자에서 필요한 정보를 DTO로 변환
     public SavedBookDTO(SavedBook savedBook) {
@@ -34,5 +35,6 @@ public class SavedBookDTO {
         this.startedAt = savedBook.getStartedAt();
         this.finishedAt = savedBook.getFinishedAt();
         this.savedAt = savedBook.getSavedAt();
+        this.content = savedBook.getBook().getContent();
     }
 }

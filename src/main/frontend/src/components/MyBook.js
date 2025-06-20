@@ -124,81 +124,94 @@ function MyBook() {
     navigate(`/edit-book/${book.id}`);
   };
 
-  const handleDelete = () => {
-    if (window.confirm('정말로 이 책을 삭제하시겠습니까?')) {
-      alert('책이 삭제되었습니다.');
-      navigate('/mylibrary');
-    }
-  };
+  const handleDelete = async () => {
+        if (window.confirm('정말로 이 책을 삭제하시겠습니까?')) {
+            const token = localStorage.getItem('ACCESS_TOKEN');
+            try {
+                const response = await fetch(`http://localhost:8080/api/saved-books/${book.id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+
+                if (response.ok) {
+                    alert('책이 삭제되었습니다.');
+                    navigate('/mylibrary');
+                } else {
+                    throw new Error('삭제 실패');
+                }
+            } catch (error) {
+                alert(`책 삭제 중 오류가 발생했습니다: ${error.message}`);
+            }
+        }
+    };
 
   if (loading) return <p>로딩 중...</p>;
 
   if (!book) return <p>책 정보를 불러오는 데 실패했습니다.</p>;
 
-  return (
-    <main className={styles.myBookPage}>
-      <button className={styles.backButton} onClick={() => navigate(-1)}>← 뒤로가기</button>
+   return (
+      <main className={styles.myBookPage}>
+        <button className={styles.backButton} onClick={() => navigate(-1)}>← 뒤로가기</button>
 
-      <div className={styles.bookHeader}>
-        <div className={styles.bookImageWrapper}>
-          {book.photo && (
-            <img src={book.photo} alt={`${book.title} 책 이미지`} className={styles.bookImage} />
-          )}
-        </div>
+        <div className={styles.bookHeader}>
+          <div className={styles.bookImageWrapper}>
+            {book.bookImage && (
+              <img src={book.bookImage} alt={`${book.bookTitle} 책 이미지`} className={styles.bookImage} />
+            )}
+          </div>
 
-        <div className={styles.bookInfoArea}>
-          <div className={styles.headerTop}>
-            <div className={styles.titleRow}>
-              <h1 className={styles.bookTitle}>{book.title}</h1>
-              <div className={styles.ratingArea}>
-                {book.progress === 0 ? (
-                  <HeartRating score={book.wishScore || 0} />
-                ) : (
-                  <StarRating score={book.score || 0} />
-                )}
+          <div className={styles.bookInfoArea}>
+            <div className={styles.headerTop}>
+              <div className={styles.titleRow}>
+                <h1 className={styles.bookTitle}>{book.bookTitle}</h1>
+                <div className={styles.ratingArea}>
+                  {book.progress === 0 ? (
+                    <HeartRating score={book.wishScore || 0} />
+                  ) : (
+                    <StarRating score={book.score || 0} />
+                  )}
+                </div>
+              </div>
+              <div className={styles.actionButtons}>
+                <button className={styles.editButton} onClick={() => navigate(`/edit-book/${book.id}`)}>수정</button>
+                <button className={styles.deleteButton} onClick={handleDelete}>삭제</button>
               </div>
             </div>
-            <div className={styles.actionButtons}>
-              <button className={styles.editButton} onClick={handleEdit}>수정</button>
-              <button className={styles.deleteButton} onClick={handleDelete}>삭제</button>
+
+            <p><strong>저자:</strong> {book.bookAuthor}</p>
+            <p><strong>출판사:</strong> {book.bookPublisher}</p>
+            <p><strong>장르:</strong> {book.bookGenre}</p>
+            <p className={styles.readingStatus}>{getReadingStatus()}</p>
+          </div>
+        </div>
+
+        <section className={styles.readingPeriod}>
+          <h2>독서 기간</h2>
+          <p>{formatDate(book.startedAt)} ~ {book.finishedAt ? formatDate(book.finishedAt) : '읽는 중'}</p>
+          <p className={styles.readingDaysBox}>
+            총 <span className={styles.squareNumber}>{getReadingDays()}</span>일 동안 읽었습니다
+          </p>
+        </section>
+
+        <section className={styles.readingProgress}>
+          <h2>독서량</h2>
+          <div className={styles.progressBarWrapper}>
+            <div className={styles.progressBar}>
+              <div className={styles.progressFill} style={{ width: `${book.progress}%` }} />
             </div>
+            <div className={styles.progressPercent}>{book.progress}%</div>
           </div>
+          <p>{Math.round(book.pageCount * (book.progress / 100))} / {book.pageCount} 페이지 읽음</p>
+        </section>
 
-          <p><strong>저자:</strong> {book.author}</p>
-          <p><strong>출판사:</strong> {book.publisher}</p>
-          <p><strong>장르:</strong> {book.genre}</p>
-          <p className={styles.readingStatus}>{getReadingStatus()}</p>
-        </div>
-      </div>
-
-      <section className={styles.readingPeriod}>
-        <h2>독서 기간</h2>
-        <p>{formatDate(book.startedAt)} ~ {book.finishedAt ? formatDate(book.finishedAt) : '읽는 중'}</p>
-        <p className={styles.readingDaysBox}>
-          총 <span className={styles.squareNumber}>{getReadingDays()}</span>일 동안 읽었습니다
-        </p>
-      </section>
-
-      <section className={styles.readingProgress}>
-        <h2>독서량</h2>
-        <div className={styles.progressBarWrapper}>
-          <div className={styles.progressBar}>
-            <div
-              className={styles.progressFill}
-              style={{ width: `${book.progress}%` }}
-            />
-          </div>
-          <div className={styles.progressPercent}>{book.progress}%</div>
-        </div>
-        <p>{Math.round(book.pageCount * (book.progress / 100))} / {book.pageCount} 페이지 읽음</p>
-      </section>
-
-      <section className={styles.bookContent}>
-        <h2>책 소개</h2>
-        <p>{book.content}</p>
-      </section>
-    </main>
-  );
+        <section className={styles.bookContent}>
+            <h2>책 소개</h2>
+            <p>{book.content || '책 소개가 없습니다.'}</p>  {/* content가 없을 경우 기본 메시지 추가 */}
+        </section>
+      </main>
+    );
 }
 
 export default MyBook;
