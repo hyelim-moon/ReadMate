@@ -150,6 +150,13 @@ function MyBook() {
   if (loading) return <p>로딩 중...</p>;
 
   if (!book) return <p>책 정보를 불러오는 데 실패했습니다.</p>;
+    // \n을 <br />로 변환
+    const formattedContent = book.content.split('\n').map((line, index) => (
+        <React.Fragment key={index}>
+            {line}
+            <br />
+        </React.Fragment>
+    ));
 
    return (
       <main className={styles.myBookPage}>
@@ -203,12 +210,12 @@ function MyBook() {
             </div>
             <div className={styles.progressPercent}>{book.progress}%</div>
           </div>
-          <p>{Math.round(book.currentPage * (book.progress / 100))} / {book.totalPages} 페이지 읽음</p>
+          <p>{book.currentPage} / {book.totalPages} 페이지 읽음</p>
         </section>
 
         <section className={styles.bookContent}>
             <h2>책 소개</h2>
-            <p>{book.content || '책 소개가 없습니다.'}</p>  {/* content가 없을 경우 기본 메시지 추가 */}
+            <p>{formattedContent || '책 소개가 없습니다.'}</p>
         </section>
       </main>
     );
