@@ -28,6 +28,7 @@ import PurchaseHistory from "./components/PurchaseHistory";
 import Storage from "./components/Storage";
 import ContactList from "./components/ContactList";
 import Contact from "./components/Contact";
+import TodaysRecord from "./components/TodaysRecord";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // userId를 props로 받도록 변경
@@ -66,6 +67,7 @@ function AppContent({ userid, onLoginSuccess, isLoggedIn }) {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/mypage" element={<MyPage />} />
         <Route path="/chat" element={<ChatBot />} />
+        <Route path="/todaysrecord" element={<TodaysRecord />} />
         <Route path="/recordlist" element={<RecordList />} />
         {/* "/" 경로 중복 문제로 "/pointshop"으로 변경하고 userId 넘김 */}
         <Route path="/pointshop" element={<PointShop userid={userid} />} />
