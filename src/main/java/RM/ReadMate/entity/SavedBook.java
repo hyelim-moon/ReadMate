@@ -25,12 +25,10 @@ public class SavedBook {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-
-    private LocalDate startedAt;  // 읽기 시작 날짜
-
+    private int currentPage;     // 현재 읽고 있는 페이지
+    private int totalPages;      // 총 페이지 수
+    private LocalDate startedAt; // 읽기 시작 날짜
     private LocalDate finishedAt; // 읽기 완료 날짜
+    private LocalDate savedAt;   // 저장 날짜
 
-    private int progress; // 읽기 진행률 (예: 0~100)
-
-    private LocalDate savedAt; // 저장 날짜
 }

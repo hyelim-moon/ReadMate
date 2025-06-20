@@ -39,19 +39,20 @@ CREATE TABLE books (
     page_count INT                             -- 페이지 수
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- saved_books 테이블 생성 (유저가 저장한 책 기록)
 CREATE TABLE saved_books (
   id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   user_id BIGINT NOT NULL,
   book_id BIGINT NOT NULL,
-  started_at DATE,
-  finished_at DATE,
-  progress INT DEFAULT 0,
-  saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  current_page INT DEFAULT 0,   -- 현재 읽고 있는 페이지
+  total_pages INT DEFAULT 0,    -- 총 페이지 수
+  started_at DATE,             -- 읽기 시작 날짜
+  finished_at DATE,            -- 읽기 완료 날짜
+  saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- 저장 날짜
   CONSTRAINT fk_savedbooks_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   CONSTRAINT fk_savedbooks_book FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE,
   UNIQUE KEY unique_user_book (user_id, book_id)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 
 INSERT INTO users (userid, password, name, email, phone, gender, birthdate, nickname, points) VALUES
 ('kimminsu',   '$2a$10$3mXhPB5hyTnpuUMzMk5WFOEjZ1j8.jpxshcYPZsjIq3xq.EyRMF5e', '김민수',   'kimminsu@example.com',   '010-1234-0001', 'M', '1990-05-17', '민수',   120),
@@ -92,8 +93,14 @@ INSERT INTO books (isbn, book_name, author, publisher, genre, content, book_imag
 ('9788994604363', '기초부터 배우는 SQL', '조원경', '로드맵', '데이터베이스', 'SQL 쿼리의 기초부터 고급 기능까지 설명한 책입니다.', 'https://example.com/sql101.jpg', 300),
 ('9788975600000', '파이썬 웹 개발', '박상길', '한빛미디어', '프로그래밍', '파이썬을 이용한 웹 애플리케이션 개발에 대해 다룬 책입니다.', 'https://example.com/pythonwebdev.jpg', 450);
 
-INSERT INTO saved_books (user_id, book_id, started_at, finished_at, progress, saved_at) VALUES
-(8, 1, '2025-05-01', NULL, 40, '2025-06-01'),  -- 혼자 공부하는 파이썬, 진행중 40%
-(8, 2, '2025-04-15', '2025-05-20', 100, '2025-05-21'),  -- 자바의 정석, 완료
-(8, 3, '2025-06-10', NULL, 10, '2025-06-15');  -- 클린 코드, 시작한 지 얼마 안됨
+-- saved_books 테이블에 더미 데이터 삽입
+INSERT INTO saved_books (user_id, book_id, current_page, total_pages, started_at, finished_at, saved_at)
+VALUES
+  (8, 1, 50, 200, '2023-05-01', '2023-05-10', '2023-05-01'),
+  (8, 2, 120, 300, '2023-06-01', NULL, '2023-06-01'),
+  (8, 3, 80, 250, '2023-07-01', NULL, '2023-07-01'),
+  (8, 4, 150, 400, '2023-08-01', NULL, '2023-08-01'),
+  (8, 5, 0, 400, NULL, NULL, '2023-08-01'),
+  (8, 6, 500, 500, '2024-08-01', '2025-06-20', '2024-08-01');
+
 

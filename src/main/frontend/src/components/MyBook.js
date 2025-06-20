@@ -203,7 +203,7 @@ function MyBook() {
             </div>
             <div className={styles.progressPercent}>{book.progress}%</div>
           </div>
-          <p>{Math.round(book.pageCount * (book.progress / 100))} / {book.pageCount} 페이지 읽음</p>
+          <p>{Math.round(book.currentPage * (book.progress / 100))} / {book.totalPages} 페이지 읽음</p>
         </section>
 
         <section className={styles.bookContent}>
