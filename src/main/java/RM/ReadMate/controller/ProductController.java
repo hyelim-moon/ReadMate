@@ -22,6 +22,7 @@ public class ProductController {
     // DB에 저장된 전체 상품 조회
     @GetMapping
     public List<Product> getProducts() {
+        System.out.println("getProducts API 호출됨");
         return productService.getAllProducts();
     }
 

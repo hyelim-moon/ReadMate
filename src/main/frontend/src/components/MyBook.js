@@ -14,11 +14,11 @@ function StarRating({ score }) {
       {[...Array(emptyStars)].map((_, i) => (
         <span key={`empty-${i}`} className={styles.starEmpty}>&#9733;</span>
       ))}
+      <span className={styles.scoreText}>({score}점)</span>
     </div>
   );
 }
 
-// 하트 점수 컴포넌트 (읽고 싶은 정도 1~5 하트)
 function HeartRating({ score }) {
   const fullHearts = Math.floor(score);
   const emptyHearts = 5 - fullHearts;
@@ -30,6 +30,7 @@ function HeartRating({ score }) {
       {[...Array(emptyHearts)].map((_, i) => (
         <span key={`empty-${i}`} className={styles.heartEmpty}>&#10084;</span>
       ))}
+      <span className={styles.scoreText}>({score}점)</span>
     </div>
   );
 }
@@ -156,6 +157,26 @@ function MyBook() {
     return diffDays;
   };
 
+  const formatDate = (dateStr) => {
+    if (!dateStr) return '-';
+    const date = new Date(dateStr);
+    return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
+  };
+
+
+  const handleEdit = () => {
+    navigate(`/edit-book/${book.id}`);
+  };
+
+  const handleDelete = () => {
+    if (window.confirm('정말로 이 책을 삭제하시겠습니까?')) {
+      // 실제 앱이라면 API 호출 또는 상태 업데이트 필요
+      alert('책이 삭제되었습니다.');
+      navigate('/my-library');
+    }
+  };
+
+
   if (!book) return <p>로딩 중...</p>;
 
   return (
@@ -163,38 +184,56 @@ function MyBook() {
       <button className={styles.backButton} onClick={() => navigate(-1)}>← 뒤로가기</button>
 
       <div className={styles.bookHeader}>
-        {book.photo && <img src={book.photo} alt={`${book.title} 책 이미지`} className={styles.bookImage} />}
-        <div className={styles.bookInfo}>
-          <h1 className={styles.bookTitle}>{book.title}</h1>
+        <div className={styles.bookImageWrapper}>
+          {book.photo && (
+            <img src={book.photo} alt={`${book.title} 책 이미지`} className={styles.bookImage} />
+          )}
+        </div>
+
+        <div className={styles.bookInfoArea}>
+          <div className={styles.headerTop}>
+            <div className={styles.titleRow}>
+              <h1 className={styles.bookTitle}>{book.title}</h1>
+              <div className={styles.ratingArea}>
+                {book.progress === 0 ? (
+                  <HeartRating score={book.wishScore || 0} />
+                ) : (
+                  <StarRating score={book.score || 0} />
+                )}
+              </div>
+            </div>
+            <div className={styles.actionButtons}>
+              <button className={styles.editButton} onClick={handleEdit}>수정</button>
+              <button className={styles.deleteButton} onClick={handleDelete}>삭제</button>
+            </div>
+          </div>
+
           <p><strong>저자:</strong> {book.author}</p>
           <p><strong>출판사:</strong> {book.publisher}</p>
           <p><strong>장르:</strong> {book.genre}</p>
           <p className={styles.readingStatus}>{getReadingStatus()}</p>
         </div>
-
-        {/* 읽은 책은 별점, 읽고 싶은 책은 하트 점수 */}
-        <div className={styles.ratingArea}>
-          {book.progress === 0 ? (
-            <HeartRating score={book.wishScore || 0} />
-          ) : (
-            <StarRating score={book.score || 0} />
-          )}
-        </div>
       </div>
+
 
       <section className={styles.readingPeriod}>
         <h2>독서 기간</h2>
-        <p>{book.startedAt || '-'} ~ {book.finishedAt || '읽는 중'}</p>
-        <p>총 {getReadingDays()}일</p>
+        <p>{formatDate(book.startedAt)} ~ {book.finishedAt ? formatDate(book.finishedAt) : '읽는 중'}</p>
+        <p className={styles.readingDaysBox}>
+          총 <span className={styles.squareNumber}>{getReadingDays()}</span>일 동안 읽었습니다
+        </p>
       </section>
 
       <section className={styles.readingProgress}>
         <h2>독서량</h2>
-        <div className={styles.progressBar}>
-          <div
-            className={styles.progressFill}
-            style={{ width: `${book.progress}%` }}
-          />
+        <div className={styles.progressBarWrapper}>
+          <div className={styles.progressBar}>
+            <div
+              className={styles.progressFill}
+              style={{ width: `${book.progress}%` }}
+            />
+          </div>
+          <div className={styles.progressPercent}>{book.progress}%</div>
         </div>
         <p>{Math.round(book.pageCount * (book.progress / 100))} / {book.pageCount} 페이지 읽음</p>
       </section>

@@ -12,16 +12,21 @@ const todayBook = {
     '용기는 두려움을 극복하는 힘이다.'
   ],
   quiz: [
-    {
-      question: '작은 아씨들에서 네 자매 중 맏이의 이름은 무엇일까요?',
-      options: ['메그', '조', '베스', '에이미'],
-      answer: '메그'
-    },
-    {
-      question: '책의 작가는 누구일까요?',
-      options: ['루이자 메이 올콧', '제인 오스틴', '찰스 디킨스', '마크 트웨인'],
-      answer: '루이자 메이 올콧'
-    }
+      {
+        question: '작은 아씨들에서 네 자매 중 맏이의 이름은 무엇일까요?',
+        options: ['메그', '조', '베스', '에이미'],
+        answer: '메그'
+      },
+      {
+        question: '책의 작가는 누구일까요?',
+        options: ['루이자 메이 올콧', '제인 오스틴', '찰스 디킨스', '마크 트웨인'],
+        answer: '루이자 메이 올콧'
+      },
+      {
+        question: '작은 아씨들에서 조가 쓰는 필명은 무엇일까요?',
+        options: ['루크', '조 바스', '루크 올콧', '존 마치'],
+        answer: '루크 올콧'
+      }
   ]
 };
 
@@ -98,7 +103,10 @@ function TodaysRecord() {
                       return (
                         <label
                           key={option}
-                          className={styles.optionLabel}
+                          className={`${styles.optionLabel}
+                              ${isSelected ? styles.selected : ''}
+                              ${showAnswers && isCorrect ? styles.correct : ''}
+                              ${showAnswers && isSelected && !isCorrect ? styles.incorrect : ''}`}
                           style={{
                             color: showAnswers
                               ? isCorrect
@@ -121,7 +129,7 @@ function TodaysRecord() {
                           />
                           {option}
                           {showAnswers && isCorrect && (
-                            <span style={{ marginLeft: 6, color: '#0a7a0a', fontWeight: '700' }}>✔</span>
+                            <span style={{ marginLeft: 6, color: 'white', fontWeight: '700' }}>✔</span>
                           )}
                         </label>
                       );

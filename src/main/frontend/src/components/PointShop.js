@@ -22,25 +22,25 @@ function PointShop({ userId }) {
       const fetchData = async () => {
         try {
           const token = localStorage.getItem("ACCESS_TOKEN");
+
           if (!token) {
             setPointBalance(0);
-            return;
+          } else {
+            // 토큰 있을 때만 포인트 API 호출
+            const resPoint = await fetch('http://localhost:8080/api/points/my', {
+              headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+              },
+            });
+            if (!resPoint.ok) throw new Error('포인트 잔액 불러오기 실패');
+            const dataPoint = await resPoint.json();
+            setPointBalance(dataPoint);
           }
 
-          const resPoint = await fetch('http://localhost:8080/api/points/my', {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            },
-          });
-          if (!resPoint.ok) throw new Error('포인트 잔액 불러오기 실패');
-          const dataPoint = await resPoint.json();
-          console.log('포인트 API 응답:', dataPoint);
-          setPointBalance(dataPoint);
 
           const resProducts = await fetch('http://localhost:8080/api/products', {
             headers: {
-              'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json',
             },
           });

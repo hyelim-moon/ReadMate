@@ -46,7 +46,7 @@
 }
 
 .link:hover {
-  color: #003016;
+  color: #b79240;
 }
 
 .sentences {
@@ -55,7 +55,7 @@
   margin: 14px 0;
   padding-left: 18px;
   border-left: 4px solid #0a7a0a;
-  color: #275b3a;
+  color: #b79240;
 }
 
 .citation {
@@ -77,10 +77,10 @@
 
 .quizSlide {
   display: flex;
-  gap: 12px; /* 문제들 사이 여백 */
+  gap: 12px;
   transition: transform 0.4s ease-in-out;
   will-change: transform;
-  padding-right: 12px; /* 전체 오른쪽 여백 */
+  padding-right: 12px;
 }
 
 /* 퀴즈 질문 스타일 */
@@ -101,13 +101,48 @@
   font-weight: 500;
   font-size: 1rem;
   user-select: none;
-  transition: color 0.3s ease, font-weight 0.3s ease;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background-color: #fffff;
+  border: 1px solid #e0c36e;
+  transition: background-color 0.3s ease, color 0.3s ease, font-weight 0.3s ease;
 }
 
+.optionLabel.selected {
+  /*background-color: #003016;*/
+  /*color: #e3f1df;*/
+  font-weight: 700;
+  border: 2px solid #003016;
+}
+
+.optionLabel.correct {
+    background-color: #70a96d;
+    color: white !important;
+    font-weight: 700;
+    border: 1px solid #70a96d;
+}
+
+.optionLabel.incorrect {
+  background-color: #d85c5c;
+  color: white !important;
+  font-weight: 700;
+  border: 1px solid #d85c5c;
+}
+
+.optionLabel:hover:not(.correct):not(.incorrect) {
+
+  border: 2px solid #003016;
+}
+
+
+/*.optionLabel:hover {
+  color: white !important;
+  background-color: #003016;
+  border: 1px solid #003016;
+}*/
+
 .optionLabel input[type='radio'] {
-  transform: scale(1.1);
-  margin-right: 10px;
-  cursor: pointer;
+  display: none;
 }
 
 /* 버튼 스타일 */
@@ -129,7 +164,7 @@
 
 .submitButton:hover,
 .navButton:hover {
-  background-color: #0a7a0a;
+  background-color: #b79240;
 }
 
 .submitButton:disabled,
