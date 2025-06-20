@@ -28,12 +28,15 @@ CREATE TABLE products (
 
 -- books 테이블 생성
 CREATE TABLE books (
-  id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  isbn VARCHAR(13) UNIQUE,
-  book_name VARCHAR(255) NOT NULL,
-  book_image VARCHAR(255),
-  genre VARCHAR(100),
-  publisher VARCHAR(255)
+    id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    isbn VARCHAR(13) UNIQUE NOT NULL,          -- ISBN 번호 (13자리 고유 값)
+    book_name VARCHAR(255) NOT NULL,           -- 책 제목
+    author VARCHAR(255) NOT NULL,              -- 저자
+    publisher VARCHAR(255) NOT NULL,           -- 출판사
+    genre VARCHAR(100),                        -- 장르
+    content TEXT,                              -- 책 요약
+    book_image VARCHAR(255),                   -- 책 이미지 URL
+    page_count INT                             -- 페이지 수
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- saved_books 테이블 생성 (유저가 저장한 책 기록)
@@ -77,11 +80,17 @@ INSERT INTO products (name, price, image, description) VALUES
 ('밀리의 서재 6개월 구독권', 71400, 'https://shop-phinf.pstatic.net/20231116_118/1700120931143nloMT_JPEG/14056612100722305_1486623850.jpg?type=m510', '국내 최대 전자책 구독 서비스, 밀리의 서재 6개월 무료이용권입니다..'),
 ('밀리의 서재 12개월 구독권', 119000, 'https://shop-phinf.pstatic.net/20231106_106/1699260261290erhYV_JPEG/13588366126106949_2030879393.jpg?type=m510', '국내 최대 전자책 구독 서비스, 밀리의 서재 12개월 무료이용권입니다.');
 
--- books 더미 데이터 삽입
-INSERT INTO books (isbn, book_name, book_image, genre, publisher) VALUES
-('9788956603474', '혼자 공부하는 파이썬', 'https://example.com/python.jpg', '프로그래밍', '한빛미디어'),
-('9788966269760', '자바의 정석', 'https://example.com/java.jpg', '프로그래밍', '도우출판'),
-('9788931568123', '클린 코드', 'https://example.com/cleancode.jpg', '소프트웨어 공학', '인사이트');
+INSERT INTO books (isbn, book_name, author, publisher, genre, content, book_image, page_count) VALUES
+('9788956603474', '혼자 공부하는 파이썬', '미하엘 엔데', '한빛미디어', '프로그래밍', '파이썬을 혼자서 공부하는 방법을 다룬 책입니다.', 'https://example.com/python.jpg', 500),
+('9788966269760', '자바의 정석', '도우출판', '김철수', '프로그래밍', '자바 언어의 핵심적인 내용을 다룬 정석적인 교재입니다.', 'https://example.com/java.jpg', 600),
+('9788931568123', '클린 코드', '로버트 C. 마틴', '인사이트', '소프트웨어 공학', '효율적이고 깔끔한 코드를 작성하는 방법에 대해 설명하는 책입니다.', 'https://example.com/cleancode.jpg', 450),
+('9788956749213', '데이터베이스 101', '김영철', '한빛미디어', 'IT', '데이터베이스 설계와 운영에 대한 기초부터 실무까지 설명한 책입니다.', 'https://example.com/database101.jpg', 350),
+('9788973057394', '알고리즘 개론', '존스 홉킨스', '제이펍', '알고리즘', '알고리즘의 기초부터 고급까지를 폭넓게 다룬 교재입니다.', 'https://example.com/algorithms.jpg', 550),
+('9788992943309', '실전 자바 프로그래밍', '최기범', '위키북스', '프로그래밍', '자바의 실전 활용 예제를 다룬 책입니다.', 'https://example.com/realjava.jpg', 400),
+('9788972140407', '웹 개발의 정석', '박철우', '에이콘출판', '웹 개발', '웹 애플리케이션 개발에 필요한 기술을 종합적으로 다룬 책입니다.', 'https://example.com/webdev.jpg', 600),
+('9788928620543', '리액트 프로젝트', '김효성', '인사이트', '프로그래밍', '리액트와 Redux를 활용한 프로젝트 기반 웹 개발 서적입니다.', 'https://example.com/reactproject.jpg', 400),
+('9788994604363', '기초부터 배우는 SQL', '조원경', '로드맵', '데이터베이스', 'SQL 쿼리의 기초부터 고급 기능까지 설명한 책입니다.', 'https://example.com/sql101.jpg', 300),
+('9788975600000', '파이썬 웹 개발', '박상길', '한빛미디어', '프로그래밍', '파이썬을 이용한 웹 애플리케이션 개발에 대해 다룬 책입니다.', 'https://example.com/pythonwebdev.jpg', 450);
 
 INSERT INTO saved_books (user_id, book_id, started_at, finished_at, progress, saved_at) VALUES
 (8, 1, '2025-05-01', NULL, 40, '2025-06-01'),  -- 혼자 공부하는 파이썬, 진행중 40%

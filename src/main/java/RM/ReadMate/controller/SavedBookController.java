@@ -19,10 +19,10 @@ public class SavedBookController {
         this.savedBookService = savedBookService;
     }
 
-    // 사용자별 저장된 책 목록 조회 (DTO 반환)
-    @GetMapping("/by-user/{userId}")
-    public List<SavedBookDTO> getSavedBooksByUser(@PathVariable Long userId) {
-        return savedBookService.getSavedBooksByUser(userId);
+    // 사용자별 저장된 책 목록 조회 (userid로 찾은 후)
+    @GetMapping("/by-user/{userid}")
+    public List<SavedBookDTO> getSavedBooksByUser(@PathVariable String userid) {
+        return savedBookService.getSavedBooksByUser(userid);
     }
 
     // 책 저장
@@ -39,3 +39,4 @@ public class SavedBookController {
         savedBookService.deleteSavedBook(savedBookId);
     }
 }
+

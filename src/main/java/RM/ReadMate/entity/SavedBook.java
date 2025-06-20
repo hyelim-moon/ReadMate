@@ -17,15 +17,14 @@ public class SavedBook {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 저장한 사용자
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "book_id", nullable = false)
+    private Book book;
+
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    // 저장된 책
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "book_id", nullable = false)
-    private Book book;
 
     private LocalDate startedAt;  // 읽기 시작 날짜
 

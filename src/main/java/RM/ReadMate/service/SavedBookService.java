@@ -23,11 +23,16 @@ public class SavedBookService {
         this.userRepository = userRepository;
     }
 
-    // 사용자의 저장된 책 조회 (SavedBookDTO 반환)
-    public List<SavedBookDTO> getSavedBooksByUser(Long userId) {
-        List<SavedBook> savedBooks = savedBookRepository.findByUserId(userId);
+    // 사용자별 저장된 책 목록 조회 (userid로 찾은 후)
+    public List<SavedBookDTO> getSavedBooksByUser(String userid) {
+        // 1. userid로 User를 찾음
+        User user = userRepository.findByUserid(userid)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
-        // SavedBook 엔티티 리스트를 SavedBookDTO 리스트로 변환하여 반환
+        // 2. user.id로 SavedBook 리스트 조회
+        List<SavedBook> savedBooks = savedBookRepository.findByUserId(user.getId());
+
+        // 3. SavedBook 엔티티 리스트를 SavedBookDTO 리스트로 변환하여 반환
         return savedBooks.stream()
                 .map(SavedBookDTO::new) // SavedBook을 SavedBookDTO로 변환
                 .collect(Collectors.toList());
