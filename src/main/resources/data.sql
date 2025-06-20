@@ -1,6 +1,8 @@
 SET FOREIGN_KEY_CHECKS=0;
 DROP TABLE IF EXISTS products;
 DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS saved_books;
+DROP TABLE IF EXISTS books;
 SET FOREIGN_KEY_CHECKS=1;
 
 CREATE TABLE users (
@@ -22,6 +24,30 @@ CREATE TABLE products (
     price INT NOT NULL,
     image VARCHAR(255),
     description TEXT
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- books 테이블 생성
+CREATE TABLE books (
+  id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  isbn VARCHAR(13) UNIQUE,
+  book_name VARCHAR(255) NOT NULL,
+  book_image VARCHAR(255),
+  genre VARCHAR(100),
+  publisher VARCHAR(255)
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- saved_books 테이블 생성 (유저가 저장한 책 기록)
+CREATE TABLE saved_books (
+  id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  user_id BIGINT NOT NULL,
+  book_id BIGINT NOT NULL,
+  started_at DATE,
+  finished_at DATE,
+  progress INT DEFAULT 0,
+  saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_savedbooks_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  CONSTRAINT fk_savedbooks_book FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE,
+  UNIQUE KEY unique_user_book (user_id, book_id)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 INSERT INTO users (userid, password, name, email, phone, gender, birthdate, nickname, points) VALUES
@@ -51,11 +77,14 @@ INSERT INTO products (name, price, image, description) VALUES
 ('밀리의 서재 6개월 구독권', 71400, 'https://shop-phinf.pstatic.net/20231116_118/1700120931143nloMT_JPEG/14056612100722305_1486623850.jpg?type=m510', '국내 최대 전자책 구독 서비스, 밀리의 서재 6개월 무료이용권입니다..'),
 ('밀리의 서재 12개월 구독권', 119000, 'https://shop-phinf.pstatic.net/20231106_106/1699260261290erhYV_JPEG/13588366126106949_2030879393.jpg?type=m510', '국내 최대 전자책 구독 서비스, 밀리의 서재 12개월 무료이용권입니다.');
 
---('ominseok',    '$2a$10$e0NRaJGta0hz5oplhBWwUeXVr0GHTfZXiVYgH6Mfs2zTWU0u9yHyW','오민석','ominseok@example.com','010-1234-0008','M','1990-09-12','민석',160),
---('leeseoyeon', '$2a$10$e0NRaJGta0hz5oplhBWwUeXVr0GHTfZXiVYgH6Mfs2zTWU0u9yHyW','이서연','leeseoyeon@example.com','010-1234-0009','F','1992-06-18','서연',88),
+-- books 더미 데이터 삽입
+INSERT INTO books (isbn, book_name, book_image, genre, publisher) VALUES
+('9788956603474', '혼자 공부하는 파이썬', 'https://example.com/python.jpg', '프로그래밍', '한빛미디어'),
+('9788966269760', '자바의 정석', 'https://example.com/java.jpg', '프로그래밍', '도우출판'),
+('9788931568123', '클린 코드', 'https://example.com/cleancode.jpg', '소프트웨어 공학', '인사이트');
 
---('ohhayoung',   '$2a$10$e0NRaJGta0hz5oplhBWwUeXVr0GHTfZXiVYgH6Mfs2zTWU0u9yHyW','오하영','ohhayoung@example.com','010-1234-0016','F','1992-11-11','하영',90),
---('seoyeajin',   '$2a$10$e0NRaJGta0hz5oplhBWwUeXVr0GHTfZXiVYgH6Mfs2zTWU0u9yHyW','서예진','seoyeajin@example.com','010-1234-0017','F','1991-03-30','예진',115),
---('yoonjiho',    '$2a$10$e0NRaJGta0hz5oplhBWwUeXVr0GHTfZXiVYgH6Mfs2zTWU0u9yHyW','윤지호','yoonjiho@example.com','010-1234-0018','M','1989-07-19','지호',140),
---('imsubin',     '$2a$10$e0NRaJGta0hz5oplhBWwUeXVr0GHTfZXiVYgH6Mfs2zTWU0u9yHyW','임수빈','imsubin@example.com','010-1234-0019','F','1993-09-05','수빈',105),
---('hwangminwoo', '$2a$10$e0NRaJGta0hz5oplhBWwUeXVr0GHTfZXiVYgH6Mfs2zTWU0u9yHyW','황민우','hwangminwoo@example.com','010-1234-0020','M','1990-02-14','민우',195);
+INSERT INTO saved_books (user_id, book_id, started_at, finished_at, progress, saved_at) VALUES
+(8, 1, '2025-05-01', NULL, 40, '2025-06-01'),  -- 혼자 공부하는 파이썬, 진행중 40%
+(8, 2, '2025-04-15', '2025-05-20', 100, '2025-05-21'),  -- 자바의 정석, 완료
+(8, 3, '2025-06-10', NULL, 10, '2025-06-15');  -- 클린 코드, 시작한 지 얼마 안됨
+

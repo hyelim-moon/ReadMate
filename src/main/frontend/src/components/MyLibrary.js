@@ -13,6 +13,10 @@ function MyLibrary() {
 
     useEffect(() => {
         const token = localStorage.getItem('ACCESS_TOKEN');
+        const userId = localStorage.getItem('USER_ID');
+
+        console.log('Token:', token);
+        console.log('UserId:', userId);
 
         if (!token || token === 'undefined' || token === '') {
             if (!hasPrompted.current) {
@@ -27,7 +31,32 @@ function MyLibrary() {
             return;
         }
 
-        // 더미 데이터에 savedAt, pageCount 필드 추가 (정렬용)
+        if (!userId) return;
+
+        const fetchSavedBooks = async () => {
+            try {
+                const response = await fetch(`http://localhost:8080/api/saved-books/by-user?userId=${userId}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                if (!response.ok){
+                    console.error('응답 실패:', response.status, response.statusText);
+                    throw new Error('저장한 책 데이터를 불러오지 못했습니다.');
+                }
+                const data = await response.json();
+                console.log(data);
+                setSavedBooks(data);
+            } catch (error) {
+                console.error('내 서재 데이터 오류:', error);
+            }
+        };
+
+        fetchSavedBooks();
+    }, [navigate]);
+
+
+        /*// 더미 데이터에 savedAt, pageCount 필드 추가 (정렬용)
         const dummyBooks = [
             {
                 id: 1,
@@ -115,45 +144,25 @@ function MyLibrary() {
             }
         ];
 
-        setSavedBooks(dummyBooks);
+        setSavedBooks(dummyBooks);*/
 
-        // 실제 API 호출 부분 (필요시 활성화)
-        /*
-        const fetchSavedBooks = async () => {
-            try {
-                const response = await fetch('http://localhost:8080/api/users/me/saved-books', {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-                if (!response.ok) throw new Error('저장한 책 데이터를 불러오지 못했습니다.');
-                const data = await response.json();
-                setSavedBooks(data);
-            } catch (error) {
-                console.error('내 서재 데이터 오류:', error);
-            }
-        };
-        fetchSavedBooks();
-        */
-    }, [navigate]);
-
-    // 필터 적용
-    const filteredBooks = savedBooks.filter((book) => {
-        if (filter === 'finished') return book.progress === 100;
-        if (filter === 'reading') return book.progress > 0 && book.progress < 100;
-        if (filter === 'wishlist') return book.progress === 0;
+    // 필터
+    const filteredBooks = savedBooks.filter((saved) => {
+        if (filter === 'finished') return saved.progress === 100;
+        if (filter === 'reading') return saved.progress > 0 && saved.progress < 100;
+        if (filter === 'wishlist') return saved.progress === 0;
         return true;
     });
 
-    // 정렬 적용
+    // 정렬
     const sortedBooks = [...filteredBooks].sort((a, b) => {
         let valA, valB;
         if (sortKey === 'title') {
-            valA = a.title.toLowerCase();
-            valB = b.title.toLowerCase();
+            valA = a.book.title.toLowerCase();
+            valB = b.book.title.toLowerCase();
         } else if (sortKey === 'pageCount') {
-            valA = a.pageCount;
-            valB = b.pageCount;
+            valA = a.book.pageCount;
+            valB = b.book.pageCount;
         } else if (sortKey === 'savedAt') {
             valA = new Date(a.savedAt);
             valB = new Date(b.savedAt);
@@ -173,114 +182,108 @@ function MyLibrary() {
         navigate(`/mybook/${id}`);
     };
 
-    return (
-        <main className={styles.recordListPage}>
-            <h2 className={styles.pageTitle}>내 서재</h2>
+   return (
+       <main className={styles.recordListPage}>
+           <h2 className={styles.pageTitle}>내 서재</h2>
 
-            {/* 필터 버튼 */}
-            <div className={styles.topControls}>
-                {/* 필터 토글 버튼들 */}
-                <div className={styles.filterButtons}>
-                    {['all', 'finished', 'reading', 'wishlist'].map((f) => (
-                        <button
-                            key={f}
-                            onClick={() => setFilter(f)}
-                            className={`${styles.filterButton} ${filter === f ? styles.active : ''}`}
-                        >
-                            {f === 'all' && '전체'}
-                            {f === 'finished' && '읽은 책'}
-                            {f === 'reading' && '읽고 있는 책'}
-                            {f === 'wishlist' && '읽고 싶은 책'}
-                        </button>
-                    ))}
-                </div>
-                <div className={styles.sortLabelContainer}>
-                    {['savedAt', 'title', 'pageCount'].map((key) => (
-                        <span
-                            key={key}
-                            className={`${styles.sortLabel} ${sortKey === key ? styles.active : ''}`}
-                            onClick={() => setSortKey(key)}
-                            role="button"
-                            tabIndex={0}
-                            onKeyDown={(e) => { if (e.key === 'Enter') setSortKey(key); }}
-                            aria-pressed={sortKey === key}
-                        >
-                            {key === 'savedAt' && '최신 저장일순'}
-                            {key === 'title' && '제목순'}
-                            {key === 'pageCount' && '쪽수순'}
-                         </span>
-                    ))}
+           {/* 필터 + 정렬 */}
+           <div className={styles.topControls}>
+               <div className={styles.filterButtons}>
+                   {['all', 'finished', 'reading', 'wishlist'].map((f) => (
+                       <button
+                           key={f}
+                           onClick={() => setFilter(f)}
+                           className={`${styles.filterButton} ${filter === f ? styles.active : ''}`}
+                       >
+                           {f === 'all' && '전체'}
+                           {f === 'finished' && '읽은 책'}
+                           {f === 'reading' && '읽고 있는 책'}
+                           {f === 'wishlist' && '읽고 싶은 책'}
+                       </button>
+                   ))}
+               </div>
+               <div className={styles.sortLabelContainer}>
+                   {['savedAt', 'title', 'pageCount'].map((key) => (
+                       <span
+                           key={key}
+                           className={`${styles.sortLabel} ${sortKey === key ? styles.active : ''}`}
+                           onClick={() => setSortKey(key)}
+                           role="button"
+                           tabIndex={0}
+                           onKeyDown={(e) => { if (e.key === 'Enter') setSortKey(key); }}
+                           aria-pressed={sortKey === key}
+                       >
+                           {key === 'savedAt' && '최신 저장일순'}
+                           {key === 'title' && '제목순'}
+                           {key === 'pageCount' && '쪽수순'}
+                       </span>
+                   ))}
+                   <span
+                       className={styles.sortOrderToggle}
+                       onClick={toggleSortOrder}
+                       role="button"
+                       tabIndex={0}
+                       onKeyDown={(e) => { if (e.key === 'Enter') toggleSortOrder(); }}
+                       aria-label={`정렬 순서 ${sortOrder === 'asc' ? '오름차순' : '내림차순'} 토글`}
+                   >
+                       {sortOrder === 'asc' ? '▲' : '▼'}
+                   </span>
+               </div>
+           </div>
 
-                    {/* 오름차순/내림차순 토글 */}
-                    <span
-                        className={styles.sortOrderToggle}
-                        onClick={toggleSortOrder}
-                        role="button"
-                        tabIndex={0}
-                        onKeyDown={(e) => { if (e.key === 'Enter') toggleSortOrder(); }}
-                        aria-label={`정렬 순서 ${sortOrder === 'asc' ? '오름차순' : '내림차순'} 토글`}
-                    >
-                        {sortOrder === 'asc' ? '▲' : '▼'}
-                    </span>
-                </div>
-
-
-                <div className={styles.recordListContainer}>
-                    {sortedBooks.length === 0 ? (
-                        <div className={styles.nothing}>
-                            <p className={styles.emptyMessage}>저장한 책이 없습니다.</p>
-                        </div>
-                    ) : (
-                        sortedBooks.map((book) => (
-                            <div
-                                key={book.id}
-                                className={styles.recordCard}
-                                onClick={() => handleCardClick(book.id)}
-                                style={{ cursor: 'pointer' }}
-                            >
-                                {book.photo && (
-                                    <img
-                                        src={book.photo}
-                                        alt={`${book.title} 책 이미지`}
-                                        className={styles.recordImage}
-                                    />
-                                )}
-                                <div className={styles.recordContent}>
-                                    <h3 className={styles.recordTitle}>{book.title}</h3>
-                                    <div className={styles.recordInfo}>
-                                        <p className={styles.recordAuthor}>
-                                            <strong>저자:</strong> {book.author}
-                                        </p>
-                                        <p className={styles.recordPublisher}>
-                                            <strong>출판사:</strong> {book.publisher}
-                                        </p>
-                                        <p className={styles.recordGenre}>
-                                            <strong>장르:</strong> {book.genre}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                    <div className={styles.readingInfo}>
-                                        <div className={styles.progressWrapper}>
-                                            <div className={styles.progressBar}>
-                                                <div
-                                                    className={styles.progressFill}
-                                                    style={{ width: `${book.progress}%` }}
-                                                />
-                                            </div>
-                                            <span className={styles.progressText}>{book.progress}% 읽음</span>
-                                        </div>
-                                        <p className={styles.readingPeriod}>
-                                            {book.startedAt} ~ {book.finishedAt || '읽는 중'}
-                                        </p>
-                                    </div>
-                            </div>
-                        ))
-                    )}
-                </div>
-            </div>
-        </main>
-    );
+           {/* 책 목록 */}
+           <div className={styles.recordListContainer}>
+               {sortedBooks.length === 0 ? (
+                   <div className={styles.nothing}>
+                       <p className={styles.emptyMessage}>저장한 책이 없습니다.</p>
+                   </div>
+               ) : (
+                   sortedBooks.map((saved) => {
+                       const book = saved.book;
+                       return (
+                           <div
+                               key={saved.id}
+                               className={styles.recordCard}
+                               onClick={() => handleCardClick(book.id)}
+                           >
+                               {book.photo && (
+                                   <img
+                                      src={book.photo || '/default-book-image.jpg'}
+                                      alt={`${book.title} 책 이미지`}
+                                      className={styles.recordImage}
+                                   />
+                               )}
+                               <div className={styles.recordContent}>
+                                   <h3 className={styles.recordTitle}>{book.title}</h3>
+                                   <div className={styles.recordInfo}>
+                                       <p><strong>저자:</strong> {book.author}</p>
+                                       <p><strong>출판사:</strong> {book.publisher}</p>
+                                       <p><strong>장르:</strong> {book.genre}</p>
+                                   </div>
+                               </div>
+                               <div className={styles.readingInfo}>
+                                   <div className={styles.progressWrapper}>
+                                       <div className={styles.progressBar}>
+                                           <div
+                                               className={styles.progressFill}
+                                               style={{ width: `${saved.progress}%` }}
+                                           />
+                                       </div>
+                                       <span className={styles.progressText}>
+                                          {saved.progress !== undefined ? `${saved.progress}% 읽음` : '진행 없음'}
+                                       </span>
+                                   </div>
+                                   <p className={styles.readingPeriod}>
+                                       {saved.startedAt || '-'} ~ {saved.finishedAt || '읽는 중'}
+                                   </p>
+                               </div>
+                           </div>
+                       );
+                   })
+               )}
+           </div>
+       </main>
+   );
 }
 
 export default MyLibrary;

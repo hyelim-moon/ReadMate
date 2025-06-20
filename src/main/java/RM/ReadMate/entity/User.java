@@ -3,6 +3,9 @@ package RM.ReadMate.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "users")
 @Getter
@@ -47,6 +50,10 @@ public class User {
     @Setter  // points 필드에 setter 추가 (이미 있음)
     @Column
     private int points;
+
+    @OneToMany(mappedBy = "user")
+    private List<SavedBook> savedBooks = new ArrayList<>();
+
 
     public User(String nickname, int points) {
         this.nickname = nickname;

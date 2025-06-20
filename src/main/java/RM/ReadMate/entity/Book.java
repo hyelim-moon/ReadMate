@@ -6,7 +6,6 @@ import lombok.*;
 @Entity
 @Table(name = "books")
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -14,21 +13,22 @@ public class Book {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;  // 내부 DB용 PK
+    private Long id;
 
-    @Column(unique = true)
-    private String isbn;  // 실제 ISBN (13자리 문자열)
+    @Column(nullable = false, unique = true)
+    private String isbn;           // ISBN 번호
 
     @Column(nullable = false)
-    private String bookName;
+    private String bookName;           // 책 제목
 
-    @Column
-    private String bookImage;  // 이미지 URL 저장이라면 이대로 OK
+    @Column(nullable = false)
+    private String author;          // 저자
 
-    @Column
-    private String genre;
+    @Column(nullable = false)
+    private String publisher;       // 출판사
 
-    @Column
-    private String publisher;
-
+    private String genre;           // 장르
+    private String content;         // 책 요약
+    private String bookImage;           // 책 이미지 URL
+    private int pageCount;          // 페이지 수
 }
