@@ -2,7 +2,7 @@
   display: flex;
   gap: 3rem;
   max-width: 100%;
-  margin: 3rem auto 2.5rem;
+  margin: 1rem auto 2.5rem;
   padding: 0 2rem;
   box-sizing: border-box;
   font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
@@ -23,7 +23,7 @@
   background-color: #ffffff;
   border-radius: 16px;
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
-  padding: 2rem 2.2rem;
+  padding: 1rem 2rem;
   border-left: 4px solid #003016;
   user-select: none;
   width: 280px;
@@ -39,7 +39,7 @@
   margin-bottom: 1.2rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  font-size: 1.1rem;
+  font-size: 1.5rem;
 }
 
 .categoryItem {
@@ -70,14 +70,13 @@
 
 .pageTitle {
   position: relative;
-  font-size: 2.4rem;
+  font-size: 2.3rem;
   font-weight: 800;
   color: #003016;
-  margin-bottom: 2rem;
-  padding: 0.7rem 1.2rem;
+  /*padding: 0.7rem 1.2rem;
   border-left: 8px solid #003016;
   border-radius: 6px;
-  box-shadow: 0 3px 12px rgba(0, 48, 22, 0.12);
+  box-shadow: 0 3px 12px rgba(0, 48, 22, 0.12);*/
   display: inline-block;
 }
 

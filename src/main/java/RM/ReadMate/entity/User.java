@@ -1,5 +1,6 @@
 package RM.ReadMate.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,47 +14,58 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Setter
     @Column(nullable = false, unique = true)
     private String userid;
 
     @Column(nullable = false)
     private String password;
 
-    @Setter  // name 필드에 setter 추가
+    @Setter
     @Column(nullable = false)
     private String name;
 
-    @Setter  // email 필드에 setter 추가
+    @Setter
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Setter  // phone 필드에 setter 추가
+    @Setter
     @Column(nullable = false, unique = true)
     private String phone;
 
-    @Setter  // gender 필드에 setter 추가, 필요하다면
+    @Setter
     @Column
     private String gender;
 
-    @Setter  // birthdate 필드에 setter 추가
+    @Setter
     @Column
     private String birthdate;
 
-    @Setter  // nickname 필드에 setter 추가
+    @Setter
     @Column
     private String nickname;
 
-    @Setter  // points 필드에 setter 추가 (이미 있음)
+    @Setter
     @Column
     private int points;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<SavedBook> savedBooks = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<Record> records = new ArrayList<>();
+
+    // ✅ 찜한 책 목록
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<Wishlist> wishlists = new ArrayList<>();
 
     public User(String nickname, int points) {
         this.nickname = nickname;
@@ -63,5 +75,4 @@ public class User {
     public void addPoints(int amount) {
         this.points += amount;
     }
-
 }

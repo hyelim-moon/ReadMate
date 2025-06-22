@@ -1,5 +1,6 @@
 package RM.ReadMate.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -36,6 +37,6 @@ public class Record {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @JsonIgnoreProperties({"records", "savedBooks"}) // 순환 참조 방지
     private User user;
-
 }

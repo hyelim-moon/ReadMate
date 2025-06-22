@@ -1,8 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styles from '../assets/styles/Record.module.css';
 import Popup from './RecordSavePopup';
+import { useLocation } from 'react-router-dom';
+import axios from 'axios';
 
 function Record() {
+    const location = useLocation();
     const [form, setForm] = useState({
         title: '',
         author: '',
@@ -17,6 +20,33 @@ function Record() {
     const [showPopup, setShowPopup] = useState(false);
     const [popupMessage, setPopupMessage] = useState('');
     const [deletePhoto, setDeletePhoto] = useState(false);
+
+    // 🔥 쿼리스트링에서 bookId 추출
+    const params = new URLSearchParams(location.search);
+    const bookId = params.get('bookId');
+
+    // 🔥 bookId 있을 경우 책 정보 불러오기
+    useEffect(() => {
+        if (bookId) {
+            const token = localStorage.getItem('ACCESS_TOKEN');
+            axios.get(`http://localhost:8080/api/books/${bookId}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            })
+                .then(res => {
+                    const book = res.data;
+                    setForm(prev => ({
+                        ...prev,
+                        title: book.bookName || '',
+                        author: book.author || '',
+                        publisher: book.publisher || '',
+                        genre: book.genre || '',
+                    }));
+                })
+                .catch(err => {
+                    console.error("책 정보 불러오기 실패", err);
+                });
+        }
+    }, [bookId]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -69,30 +99,25 @@ function Record() {
             const token = localStorage.getItem('ACCESS_TOKEN');
             const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
-            console.log('Token:', token);
-            console.log('Headers:', headers);
-
             const response = await fetch('http://localhost:8080/api/records', {
                 method: 'POST',
-                headers, // Content-Type 생략!
+                headers,
                 body: formData,
             });
 
             if (response.ok) {
-                const data = await response.json();
+                await response.json();
 
-                // 사용자 JWT 토큰을 가져와서 Authorization 헤더에 추가
-                const token = localStorage.getItem('authToken');  // 예시: JWT 토큰을 로컬 스토리지에서 가져옴
-
-                // 포인트 부여 요청
-                const pointsResponse = await fetch('http://localhost:8080/api/users/award-points', {
+                // 포인트 부여
+                await fetch('http://localhost:8080/api/users/award-points', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`  // JWT 토큰을 헤더에 추가
+                        'Authorization': `Bearer ${token}`,
                     },
-                    body: JSON.stringify({ points: 10 }),  // 10 포인트 부여
+                    body: JSON.stringify({ points: 10 }),
                 });
+
                 setPopupMessage('저장되었습니다.');
                 setShowPopup(true);
                 setForm({
