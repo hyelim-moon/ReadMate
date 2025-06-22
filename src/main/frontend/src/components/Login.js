@@ -1,3 +1,4 @@
+// src/components/Login.jsx (수정 포인트만 표시)
 import React, { useState } from 'react';
 import styles from "../assets/styles/Login.module.css";
 import logoImg from "../assets/images/logo.png";
@@ -14,32 +15,19 @@ function Login({ onLoginSuccess }) {
         e.preventDefault();
         try {
             const response = await axios.post("http://localhost:8080/api/auth/login", {
-                userId: userid,
+                userId: userid,        // email → userid로 변경
                 password
             });
-
-            console.log("로그인 응답:", response.data);
-
             const { token, user } = response.data;
-
-            if (token) {
-                localStorage.setItem("accessToken", token); // 토큰 저장
-                localStorage.setItem("USER_ID", user.userid);
-
-                console.log("저장된 accessToken:", token);
-                console.log("저장된 USER_ID:", user.userid);
-
-                if (onLoginSuccess) {
-                    onLoginSuccess(user);
-                }
-
-                navigate("/");
-            } else {
-                setErrorMsg("서버에서 토큰을 반환하지 않았습니다.");
-                console.warn("⚠️ 서버 응답에 토큰 없음:", response.data);
+            localStorage.setItem("ACCESS_TOKEN", token);
+            console.log("로그인 후 user.id:", user.userid);
+            localStorage.setItem("USER_ID", user.userid);
+            if (onLoginSuccess) {
+                console.log("로그인 응답 user 객체:", user); // 먼저 콘솔에 출력
+                onLoginSuccess(user); // 그 다음 전달
             }
+            navigate("/");
         } catch (err) {
-            console.error("로그인 오류:", err);
             if (err.response && err.response.data) {
                 setErrorMsg(err.response.data.toString());
             } else {
@@ -81,7 +69,9 @@ function Login({ onLoginSuccess }) {
                         <Link to="/forgot" className={styles.link}>비밀번호 찾기</Link>
                     </div>
 
-                    <button type="submit" className={styles.button}>로그인</button>
+                    <button type="submit" className={styles.button}>
+                        로그인
+                    </button>
                 </form>
 
                 <div className={styles.footer}>
