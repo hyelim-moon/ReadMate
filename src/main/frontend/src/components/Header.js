@@ -51,7 +51,7 @@ function Header() {
 
     useEffect(() => {
         // **추가: 로컬스토리지에 ACCESS_TOKEN이 있으면 로그인된 상태로 설정**
-        const token = localStorage.getItem('accessToken');
+        const token = localStorage.getItem('ACCESS_TOKEN');
         setIsLoggedIn(!!token);
 
         // 랭킹 데이터 로드

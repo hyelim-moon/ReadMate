@@ -22,15 +22,22 @@ public class CommunityPostController {
         this.postService = postService;
     }
 
+    // 게시글 작성 (작성자 ID 포함)
     @PostMapping(consumes = {"multipart/form-data"})
     public ResponseEntity<?> createPost(
+            @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam("title") String title,
             @RequestParam("content") String content,
             @RequestParam("tags") String tags,
             @RequestParam(value = "image", required = false) MultipartFile imageFile
     ) {
+        if (userDetails == null) {
+            return ResponseEntity.status(401).body("로그인이 필요합니다.");
+        }
+
         try {
-            CommunityPost saved = postService.savePost(title, content, tags, imageFile);
+            String username = userDetails.getUsername();
+            CommunityPost saved = postService.savePost(title, content, tags, imageFile, username);
             return ResponseEntity.ok(saved);
         } catch (Exception e) {
             e.printStackTrace();
@@ -38,13 +45,14 @@ public class CommunityPostController {
         }
     }
 
+    // 게시글 목록 조회
     @GetMapping
     public ResponseEntity<List<CommunityPostDto>> getAllPosts() {
         List<CommunityPostDto> posts = postService.getAllPosts();
         return ResponseEntity.ok(posts);
     }
 
-    // 상세 조회 시 로그인 사용자 정보 받아 DTO에 좋아요 여부 포함
+    // 게시글 단건 상세 + 좋아요 여부 포함
     @GetMapping("/{id}")
     public ResponseEntity<?> getPostById(@PathVariable Long id,
                                          @AuthenticationPrincipal UserDetails userDetails) {
@@ -58,11 +66,34 @@ public class CommunityPostController {
         }
     }
 
+    // 게시글 삭제 (작성자만 가능)
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deletePost(@PathVariable Long id,
+                                        @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(401).body("로그인이 필요합니다.");
+        }
+
+        String username = userDetails.getUsername();
+        try {
+            boolean deleted = postService.deletePost(id, username);
+            if (deleted) {
+                return ResponseEntity.ok("삭제 성공");
+            } else {
+                return ResponseEntity.status(403).body("삭제 권한이 없습니다.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("삭제 실패: " + e.getMessage());
+        }
+    }
+
+    // 게시글 좋아요 토글
     @PostMapping("/{id}/like")
     public ResponseEntity<?> toggleLike(@PathVariable Long id,
                                         @AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {
-            return ResponseEntity.status(401).body("로그인 필요");
+            return ResponseEntity.status(401).body("로그인이 필요합니다.");
         }
 
         String username = userDetails.getUsername();

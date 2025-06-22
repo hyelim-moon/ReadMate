@@ -31,11 +31,13 @@ function Community() {
         axios.get("http://localhost:8080/api/community")
             .then(res => {
                 console.log("불러온 게시글:", res.data);
-                setPosts(res.data);
-                setFilteredPosts(res.data);
+                // 최신순 내림차순 정렬
+                const sortedByDate = [...res.data].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                setPosts(sortedByDate);
+                setFilteredPosts(sortedByDate);
 
-                const sorted = [...res.data].sort((a, b) => (b.likes || 0) - (a.likes || 0));
-                setBestPosts(sorted.slice(0, 5));
+                const sortedByLikes = [...res.data].sort((a, b) => (b.likes || 0) - (a.likes || 0));
+                setBestPosts(sortedByLikes.slice(0, 5));
             })
             .catch(err => {
                 console.error('게시글 불러오기 실패:', err);
@@ -72,7 +74,10 @@ function Community() {
             return (titleContentMatch || tagMatch) && isAfterStart && isBeforeEnd;
         });
 
-        setFilteredPosts(filtered);
+        // 필터 후 최신순 정렬
+        const sortedFiltered = filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        setFilteredPosts(sortedFiltered);
     };
 
     const handleWriteClick = () => {

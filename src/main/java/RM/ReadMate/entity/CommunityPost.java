@@ -30,6 +30,10 @@ public class CommunityPost {
 
     private Integer likes = 0;  // 초기값 0
 
+    // 여기에 authorId 필드 추가
+    @Column(nullable = false)
+    private String authorId;
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();

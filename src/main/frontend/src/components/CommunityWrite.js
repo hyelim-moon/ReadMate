@@ -54,14 +54,14 @@ function CommunityWrite() {
             return;
         }
 
-        try {
-            const token = localStorage.getItem('ACCESS_TOKEN'); // 키 이름 수정
-            if (!token) {
-                alert('로그인이 필요합니다.');
-                navigate('/login');
-                return;
-            }
+        const token = localStorage.getItem('ACCESS_TOKEN');
+        if (!token) {
+            alert('로그인이 필요합니다.');
+            navigate('/login');
+            return;
+        }
 
+        try {
             const formData = new FormData();
             formData.append('title', title);
             formData.append('content', content);

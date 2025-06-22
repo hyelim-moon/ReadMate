@@ -56,7 +56,7 @@ function Search() {
                     )}
                 </div>
 
-                {/* 독서기록 */}
+                {/* 독서기록
                 <div className={styles.sectionBox}>
                     <div className={styles.sectionHeader}>
                         <h2 className={styles.subTitle}>독서기록</h2>
@@ -74,7 +74,7 @@ function Search() {
                         <p className={styles.emptyMessage}>검색 결과가 없습니다.</p>
                     )}
                 </div>
-
+*/}
                 {/* 커뮤니티 */}
                 <div className={styles.sectionBox}>
                     <div className={styles.sectionHeader}>

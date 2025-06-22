@@ -25,64 +25,131 @@ function CommunityDetail() {
     const [newComment, setNewComment] = useState('');
     const [liked, setLiked] = useState(false);
     const [likesCount, setLikesCount] = useState(0);
+    const [showEditMenu, setShowEditMenu] = useState(null);
+    const [editingCommentId, setEditingCommentId] = useState(null);
+    const [editContent, setEditContent] = useState('');
 
-    const token = localStorage.getItem('accessToken'); // 토큰 키 이름 맞춤
+    const token = localStorage.getItem('ACCESS_TOKEN');
+    const currentUserId = localStorage.getItem('USER_ID');
 
     useEffect(() => {
         if (!id) return;
 
-        console.log("현재 accessToken:", token);
-
-        // 게시글 상세 + 좋아요 여부 포함
-        axios.get(`http://localhost:8080/api/community/${id}`, {
-            headers: token ? { Authorization: `Bearer ${token}` } : {}
-        })
-            .then(res => {
+        axios
+            .get(`http://localhost:8080/api/community/${id}`, {
+                headers: token ? { Authorization: `Bearer ${token}` } : {},
+            })
+            .then((res) => {
                 const data = res.data;
                 setPost(data);
                 setLikesCount(data.likes || 0);
                 setLiked(data.liked || false);
             })
-            .catch(err => console.error('게시글 불러오기 실패:', err));
+            .catch((err) => console.error('게시글 불러오기 실패:', err));
 
-        // 댓글 불러오기
-        axios.get(`http://localhost:8080/api/community/${id}/comments`)
-            .then(res => setComments(res.data))
-            .catch(err => console.error('댓글 불러오기 실패:', err));
+        axios
+            .get(`http://localhost:8080/api/community/${id}/comments`)
+            .then((res) => setComments(res.data))
+            .catch((err) => console.error('댓글 불러오기 실패:', err));
     }, [id, token]);
 
     const handleLikeToggle = () => {
         if (!token) {
-            alert("로그인이 필요합니다.");
+            alert('로그인이 필요합니다.');
+            navigate('/login');
             return;
         }
 
-        axios.post(`http://localhost:8080/api/community/${id}/like`, null, {
-            headers: { Authorization: `Bearer ${token}` }
-        })
-            .then(res => {
-                setLiked(res.data); // 서버가 true/false 반환
-                setLikesCount(prev => res.data ? prev + 1 : prev - 1);
+        axios
+            .post(`http://localhost:8080/api/community/${id}/like`, null, {
+                headers: { Authorization: `Bearer ${token}` },
             })
-            .catch(err => {
+            .then((res) => {
+                setLiked(res.data);
+                setLikesCount((prev) => (res.data ? prev + 1 : prev - 1));
+            })
+            .catch((err) => {
                 console.error('좋아요 상태 업데이트 실패:', err);
                 alert('좋아요 처리 중 오류가 발생했습니다.');
             });
     };
 
     const handleAddComment = () => {
-        if (newComment.trim() === '') return; // 빈 댓글 방지
+        if (!token) {
+            alert('로그인이 필요합니다.');
+            navigate('/login');
+            return;
+        }
+
+        if (newComment.trim() === '') return;
 
         const commentData = { content: newComment };
 
-        axios.post(`http://localhost:8080/api/community/${id}/comments`, commentData, {
-            headers: token ? { Authorization: `Bearer ${token}` } : {}
-        })
-            .then(res => {
-                setComments(prev => [...prev, res.data]); // 새 댓글 추가
-                setNewComment(''); // 입력란 초기화
+        axios
+            .post(`http://localhost:8080/api/community/${id}/comments`, commentData, {
+                headers: { Authorization: `Bearer ${token}` },
             })
-            .catch(err => console.error('댓글 추가 실패:', err));
+            .then((res) => {
+                setComments((prev) => [...prev, res.data]);
+                setNewComment('');
+            })
+            .catch((err) => {
+                console.error('댓글 추가 실패:', err);
+                alert('댓글 등록 중 오류가 발생했습니다.');
+            });
+    };
+
+    const handleDeleteComment = (commentId) => {
+        if (!token) {
+            alert('로그인이 필요합니다.');
+            navigate('/login');
+            return;
+        }
+
+        if (!window.confirm('댓글을 삭제하시겠습니까?')) return;
+
+        axios
+            .delete(`http://localhost:8080/api/community/${id}/comments/${commentId}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            })
+            .then(() => {
+                setComments((prev) => prev.filter((c) => c.id !== commentId));
+                if (editingCommentId === commentId) {
+                    setEditingCommentId(null);
+                    setShowEditMenu(null);
+                }
+            })
+            .catch((err) => {
+                console.error('댓글 삭제 실패:', err);
+                alert('댓글 삭제 중 오류가 발생했습니다.');
+            });
+    };
+
+    const handleUpdateComment = (commentId, updatedContent) => {
+        if (!token) {
+            alert('로그인이 필요합니다.');
+            navigate('/login');
+            return;
+        }
+
+        axios
+            .put(
+                `http://localhost:8080/api/community/${id}/comments/${commentId}`,
+                { content: updatedContent },
+                { headers: { Authorization: `Bearer ${token}` } }
+            )
+            .then((res) => {
+                setComments((prev) =>
+                    prev.map((c) => (c.id === commentId ? res.data : c))
+                );
+                setEditingCommentId(null);
+                setShowEditMenu(null);
+                setEditContent('');
+            })
+            .catch((err) => {
+                console.error('댓글 수정 실패:', err);
+                alert('댓글 수정 중 오류가 발생했습니다.');
+            });
     };
 
     if (!post) return <div className={styles.loading}>게시글을 불러오는 중...</div>;
@@ -135,14 +202,157 @@ function CommunityDetail() {
 
                 {comments.length > 0 ? (
                     <ul className={styles.commentList}>
-                        {comments.map((comment) => (
-                            <li key={comment.id} className={styles.commentItem}>
-                                <div className={styles.commentContent}>{comment.content}</div>
-                                <div className={styles.commentMeta}>
-                                    {timeAgoFromDate(comment.createdAt)} · 익명
-                                </div>
-                            </li>
-                        ))}
+                        {comments.map((comment) => {
+                            const isCommentAuthor = comment.authorId === currentUserId;
+                            const isPostOwner = post.authorId === currentUserId;
+                            const showDeleteButton = isPostOwner || isCommentAuthor;
+                            const isEditing = editingCommentId === comment.id;
+
+                            return (
+                                <li key={comment.id} className={styles.commentItem} style={{ position: 'relative' }}>
+                                    {isCommentAuthor && !isEditing && (
+                                        <button
+                                            onClick={() =>
+                                                setShowEditMenu(showEditMenu === comment.id ? null : comment.id)
+                                            }
+                                            style={{
+                                                position: 'absolute',
+                                                top: 8,
+                                                right: 8,
+                                                background: 'transparent',
+                                                border: 'none',
+                                                fontSize: '20px',
+                                                cursor: 'pointer',
+                                                userSelect: 'none',
+                                            }}
+                                            aria-label="댓글 메뉴 열기"
+                                        >
+                                            ⋮
+                                        </button>
+                                    )}
+
+                                    {showEditMenu === comment.id && (
+                                        <div
+                                            style={{
+                                                position: 'absolute',
+                                                top: 25,
+                                                right: 8,
+                                                background: 'white',
+                                                border: '1px solid #ccc',
+                                                borderRadius: 4,
+                                                boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
+                                                zIndex: 10,
+                                                display: 'inline-flex',
+                                                flexDirection: 'column',
+                                                padding: '2px 0',
+                                                minWidth: 'auto'
+                                            }}
+                                        >
+                                            {comment.authorId === currentUserId && (
+                                                <button
+                                                    onClick={() => {
+                                                        setEditingCommentId(comment.id);
+                                                        setEditContent(comment.content);
+                                                        setShowEditMenu(null);
+                                                    }}
+                                                    style={{
+                                                        border: 'none',
+                                                        background: 'none',
+                                                        padding: '2px 6px',
+                                                        cursor: 'pointer',
+                                                        fontSize: '0.9rem',
+                                                        textAlign: 'left',
+                                                        whiteSpace: 'nowrap'
+                                                    }}
+                                                >
+                                                    수정
+                                                </button>
+                                            )}
+                                            <button
+                                                onClick={() => {
+                                                    setShowEditMenu(null);
+                                                    handleDeleteComment(comment.id);
+                                                }}
+                                                style={{
+                                                    border: 'none',
+                                                    background: 'none',
+                                                    padding: '2px 6px',
+                                                    cursor: 'pointer',
+                                                    fontSize: '0.9rem',
+                                                    color: 'red',
+                                                    textAlign: 'left',
+                                                    whiteSpace: 'nowrap'
+                                                }}
+                                            >
+                                                삭제
+                                            </button>
+                                        </div>
+                                    )}
+
+                                    {isEditing ? (
+                                        <>
+                                            <textarea
+                                                value={editContent}
+                                                onChange={(e) => setEditContent(e.target.value)}
+                                                autoFocus
+                                                className={styles.commentInput}
+                                                style={{ width: '100%', marginTop: '20px' }}
+                                            />
+                                            <div style={{ marginTop: 6 }}>
+                                                <button
+                                                    onClick={() => {
+                                                        if (editContent.trim()) {
+                                                            handleUpdateComment(comment.id, editContent);
+                                                        } else {
+                                                            alert('댓글 내용을 입력해주세요.');
+                                                        }
+                                                    }}
+                                                    style={{ marginRight: 8 }}
+                                                >
+                                                    수정 완료
+                                                </button>
+                                                <button
+                                                    onClick={() => {
+                                                        setEditingCommentId(null);
+                                                        setShowEditMenu(null);
+                                                        setEditContent(comment.content);
+                                                    }}
+                                                >
+                                                    취소
+                                                </button>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div className={styles.commentContent} style={{ marginTop: '20px' }}>
+                                                {comment.content}
+                                            </div>
+                                            <div className={styles.commentMeta}>
+                                                {timeAgoFromDate(comment.createdAt)} · 익명
+                                            </div>
+                                        </>
+                                    )}
+
+                                    {isPostOwner && !isCommentAuthor && (
+                                        <button
+                                            onClick={() => handleDeleteComment(comment.id)}
+                                            style={{
+                                                color: 'red',
+                                                background: 'transparent',
+                                                border: 'none',
+                                                cursor: 'pointer',
+                                                position: 'absolute',
+                                                top: 8,
+                                                left: 8,
+                                            }}
+                                            aria-label="댓글 삭제"
+                                        >
+                                            삭제
+                                        </button>
+                                    )}
+                                </li>
+                            );
+                        })}
                     </ul>
                 ) : (
                     <p>댓글이 없습니다.</p>

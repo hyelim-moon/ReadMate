@@ -30,7 +30,8 @@ public class CommunityPostService {
         this.postLikeRepository = postLikeRepository;
     }
 
-    public CommunityPost savePost(String title, String content, String tags, MultipartFile imageFile) throws Exception {
+    // 작성자 ID(authorId)를 포함한 저장
+    public CommunityPost savePost(String title, String content, String tags, MultipartFile imageFile, String authorId) throws Exception {
         String imagePath = null;
 
         if (imageFile != null && !imageFile.isEmpty()) {
@@ -53,7 +54,8 @@ public class CommunityPostService {
         post.setContent(content);
         post.setTags(tags);
         post.setImagePath(imagePath);
-        post.setLikes(0); // 기본 0 설정 필요
+        post.setLikes(0);
+        post.setAuthorId(authorId);
 
         return postRepository.save(post);
     }
@@ -72,7 +74,7 @@ public class CommunityPostService {
                     post.getTags(),
                     post.getImagePath(),
                     post.getLikes(),
-                    false,  // 전체 목록에서는 liked 정보 없으므로 false 기본값
+                    false,
                     timeAgo,
                     post.getCreatedAt()
             );
@@ -83,7 +85,6 @@ public class CommunityPostService {
         return result;
     }
 
-    // 게시글 상세 조회 + 로그인 사용자 기준 좋아요 여부 반환
     public CommunityPostDto getPostDtoById(Long postId, String username) throws Exception {
         CommunityPost post = postRepository.findById(postId)
                 .orElseThrow(() -> new Exception("게시글이 존재하지 않습니다."));
@@ -109,28 +110,37 @@ public class CommunityPostService {
         );
     }
 
-    // 좋아요 토글 처리 메서드
     public boolean toggleLike(Long postId, String username) throws Exception {
         CommunityPost post = postRepository.findById(postId)
                 .orElseThrow(() -> new Exception("게시글이 존재하지 않습니다."));
 
         PostLikeId likeId = new PostLikeId(postId, username);
-        Optional optionalLike = postLikeRepository.findById(likeId);
+        Optional<PostLike> optionalLike = postLikeRepository.findById(likeId);
 
         if (optionalLike.isPresent()) {
-            // 좋아요 취소
-            postLikeRepository.delete((PostLike) optionalLike.get());
+            postLikeRepository.delete(optionalLike.get());
             post.setLikes(post.getLikes() - 1);
             postRepository.save(post);
             return false;
         } else {
-            // 좋아요 추가
             PostLike newLike = new PostLike(post, username);
             postLikeRepository.save(newLike);
             post.setLikes(post.getLikes() + 1);
             postRepository.save(post);
             return true;
         }
+    }
+
+    public boolean deletePost(Long postId, String username) throws Exception {
+        CommunityPost post = postRepository.findById(postId)
+                .orElseThrow(() -> new Exception("게시글이 존재하지 않습니다."));
+
+        if (!post.getAuthorId().equals(username)) {
+            return false; // 작성자 아님 → 권한 없음
+        }
+
+        postRepository.delete(post);
+        return true;
     }
 
     private String calculateTimeAgo(LocalDateTime createdAt) {
