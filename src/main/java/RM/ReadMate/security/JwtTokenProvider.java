@@ -4,6 +4,7 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
 import javax.crypto.SecretKey;
 import java.util.Date;
 
@@ -17,6 +18,9 @@ public class JwtTokenProvider {
             @Value("${jwt.secret}") String secret,
             @Value("${jwt.expiration}") long expirationInMilliseconds
     ) {
+        if (secret.length() < 32) {
+            throw new IllegalArgumentException("JWT Secret key must be at least 32 characters (for HMAC SHA-256)");
+        }
         this.secretKey = Keys.hmacShaKeyFor(secret.getBytes());
         this.validityInMilliseconds = expirationInMilliseconds;
     }
@@ -34,7 +38,7 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    // 토큰에서 userid 가져오기
+    // 토큰에서 userid 추출
     public String getUseridFromToken(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(secretKey)
@@ -52,9 +56,18 @@ public class JwtTokenProvider {
                     .build()
                     .parseClaimsJws(token);
             return true;
-        } catch (JwtException | IllegalArgumentException e) {
-            // 예: 서명 불일치, 만료, 포맷 에러 등
-            return false;
+        } catch (ExpiredJwtException e) {
+            System.err.println("🔒 JWT 만료됨: " + e.getMessage());
+        } catch (UnsupportedJwtException e) {
+            System.err.println("🔒 지원하지 않는 JWT 형식: " + e.getMessage());
+        } catch (MalformedJwtException e) {
+            System.err.println("🔒 JWT 구조 이상: " + e.getMessage());
+        } catch (SignatureException e) {
+            System.err.println("🔒 JWT 서명 불일치: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            System.err.println("🔒 JWT 파라미터 없음: " + e.getMessage());
         }
+
+        return false;
     }
 }

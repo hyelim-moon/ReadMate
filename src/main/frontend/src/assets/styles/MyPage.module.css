@@ -2,23 +2,22 @@
 .container {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: center;  /* ✅ content, topBar 모두 가운데로 */
     background: #FCFBF2;
     min-height: 100vh;
 }
 
 /* 2) 상단 바: 로고 + 컨트롤 영역 */
 .topBar {
+    position: relative; /* ✅ 추가 */
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
     max-width: 1200px;
     padding: 1rem 2rem;
-    border-radius: 8px;
-    position: relative;
+    box-sizing: border-box;
 }
-
 /* 로고 */
 .logoLink img {
     width: 120px;
@@ -58,12 +57,10 @@
     cursor: pointer;
     transition: background 0.2s, box-shadow 0.2s;
 }
-
-/* 기본에는 숨김 */
 .logoutBtn::after {
     content: "로그아웃";
     position: absolute;
-    bottom: 100%; /* 버튼 바로 위 */
+    bottom: 100%;
     left: 50%;
     transform: translateX(-50%) translateY(-8px);
     background: rgba(0,0,0,0.75);
@@ -75,12 +72,13 @@
     pointer-events: none;
     transition: opacity 0.2s;
 }
-
 .logoutBtn:hover {
     background: #EEF3ED;
     box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
-
+.logoutBtn:hover::after {
+    opacity: 1;
+}
 .logoutIcon {
     font-size: 1.2rem;
     color: #3B6D41;
@@ -89,14 +87,15 @@
 /* 드롭다운 메뉴 */
 .menuList {
     position: absolute;
-    top: 40%;
-    right: -8rem;
+    top: 40%;          /* ✅ 아래로 내려오게 */
+    right:-6rem;           /* ✅ 우측 정렬 */
     background: #3B6D41;
     list-style: none;
     margin: 0;
     padding: 1rem 0;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    z-index: 1000;      /* ✅ 다른 요소 위로 */
 }
 .menuList li + li {
     margin-top: 0.5rem;
@@ -113,11 +112,13 @@
 
 /* 3) 본문 래퍼 */
 .content {
-    width: 78%;
+    width: 100%;
+    max-width: 1200px;
+    padding: 1rem 2rem 2rem;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
     gap: 2rem;
-    padding-bottom: 2rem;
 }
 
 /* 4) 인사말 카드 */
@@ -127,7 +128,7 @@
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     display: flex;
-    justify-content: space-between; /* 오른쪽 끝에 로그아웃 */
+    justify-content: space-between;
     align-items: center;
 }
 
@@ -176,7 +177,7 @@
     color: #888;
 }
 
-/* 8) 아이템 리스트 */
+/* 8) 일반 리스트 (찜목록 등) */
 .itemList {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -193,4 +194,36 @@
 .itemList li:hover {
     transform: translateY(-4px);
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* 9) 독서 기록용 책 이미지 카드 리스트 */
+.bookList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 0;
+    list-style: none;
+}
+.bookItem {
+    width: 120px;
+    text-align: center;
+    cursor: pointer;
+}
+.bookImage {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+.bookTitle {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+    .menuList {
+        top: 3rem;
+        right: 1rem;
+    }
 }

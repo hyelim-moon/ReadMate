@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import styles from '../assets/styles/MyPage.module.css';
 import logoImg from '../assets/images/logo.png';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FiLogOut, FiMenu, FiX } from 'react-icons/fi';
 
 function MyPage() {
@@ -10,25 +10,26 @@ function MyPage() {
         nickname: '',
         coupons: 0,
         mileage: 0,
-        wishlist: [],
-        recent: []
+        wishlist: [], // ✅ 찜한 도서
+        records: []    // ✅ 독서 기록
     });
     const [menuOpen, setMenuOpen] = useState(false);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const token = localStorage.getItem('ACCESS_TOKEN');
+        const headers = { Authorization: `Bearer ${token}` };
+
+        // 사용자 기본 정보
         axios
-            .get('http://localhost:8080/api/users/me', {
-                headers: { Authorization: `Bearer ${token}` }
-            })
+            .get('http://localhost:8080/api/users/me', { headers })
             .then(({ data }) => {
-                setProfile({
+                setProfile(prev => ({
+                    ...prev,
                     nickname: data.nickname,
                     coupons: data.coupons,
-                    mileage: data.mileage,
-                    wishlist: data.wishlist,
-                    recent: data.recent
-                });
+                    mileage: data.mileage
+                }));
             })
             .catch(err => {
                 console.error(err);
@@ -36,6 +37,32 @@ function MyPage() {
                     localStorage.removeItem('ACCESS_TOKEN');
                     window.location.href = '/login';
                 }
+            });
+
+        // 독서 기록
+        axios
+            .get('http://localhost:8080/api/records', { headers })
+            .then(({ data }) => {
+                setProfile(prev => ({
+                    ...prev,
+                    records: data || []
+                }));
+            })
+            .catch(err => {
+                console.error('독서 기록 불러오기 실패:', err);
+            });
+
+        // 찜한 도서
+        axios
+            .get('http://localhost:8080/api/wishlist', { headers })
+            .then(({ data }) => {
+                setProfile(prev => ({
+                    ...prev,
+                    wishlist: data || []
+                }));
+            })
+            .catch(err => {
+                console.error('찜한 도서 불러오기 실패:', err);
             });
     }, []);
 
@@ -66,7 +93,6 @@ function MyPage() {
                         <li><Link to="/recordlist">독서기록</Link></li>
                         <li><Link to="/myreview">도서리뷰</Link></li>
                         <li><Link to="/storage">보관함</Link></li>
-                        {/* <li><Link to="/faq">자주 묻는 질문</Link></li> */}
                         <li><Link to="/purchase-history">구매내역</Link></li>
                         <li><Link to="/contactlist">문의하기</Link></li>
                     </ul>
@@ -96,27 +122,55 @@ function MyPage() {
                     </div>
                 </div>
 
+                {/* 독서 기록 */}
                 <section className={styles.section}>
                     <h3>독서 기록</h3>
-                    {profile.wishlist.length === 0 ? (
+                    {profile.records.length === 0 ? (
                         <div className={styles.emptyBox}>독서 기록이 없습니다.</div>
                     ) : (
-                        <ul className={styles.itemList}>
-                            {profile.wishlist.map(item => (
-                                <li key={item.id}>{item.name}</li>
+                        <ul className={styles.bookList}>
+                            {profile.records.map(item => (
+                                <li
+                                    key={item.id}
+                                    className={styles.bookItem}
+                                    onClick={() => navigate(`/record/${item.id}`)}
+                                >
+                                    {item.photo && (
+                                        <img
+                                            src={`http://localhost:8080${item.photo}`}
+                                            alt={item.title}
+                                            className={styles.bookImage}
+                                        />
+                                    )}
+                                    <p className={styles.bookTitle}>{item.title}</p>
+                                </li>
                             ))}
                         </ul>
                     )}
                 </section>
 
+                {/* 찜한 도서 */}
                 <section className={styles.section}>
                     <h3>찜한 도서</h3>
-                    {profile.recent.length === 0 ? (
+                    {profile.wishlist.length === 0 ? (
                         <div className={styles.emptyBox}>찜한 도서가 없습니다.</div>
                     ) : (
-                        <ul className={styles.itemList}>
-                            {profile.recent.map(item => (
-                                <li key={item.id}>{item.name}</li>
+                        <ul className={styles.bookList}>
+                            {profile.wishlist.map(book => (
+                                <li
+                                    key={book.id}
+                                    className={styles.bookItem}
+                                    onClick={() => navigate(`/books/${book.id}`)}
+                                >
+                                    {book.bookImage && (
+                                        <img
+                                            src={book.bookImage}
+                                            alt={book.bookName}
+                                            className={styles.bookImage}
+                                        />
+                                    )}
+                                    <p className={styles.bookTitle}>{book.bookName}</p>
+                                </li>
                             ))}
                         </ul>
                     )}

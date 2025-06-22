@@ -5,6 +5,7 @@ import RM.ReadMate.dto.PurchaseDTO;
 import RM.ReadMate.dto.UserRankingDTO;
 import RM.ReadMate.dto.UserUpdateRequestDTO;
 import RM.ReadMate.entity.User;
+import RM.ReadMate.repository.RecordRepository;
 import RM.ReadMate.repository.UserRepository;
 import RM.ReadMate.service.PurchaseService;
 import lombok.RequiredArgsConstructor;
@@ -14,9 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.IntStream;
 
 @RestController
@@ -26,6 +25,7 @@ import java.util.stream.IntStream;
 public class UserController {
 
     private final UserRepository userRepository;
+    private final RecordRepository recordRepository;
     private final PurchaseService purchaseService;
 
     // 사용자 기본 정보 반환

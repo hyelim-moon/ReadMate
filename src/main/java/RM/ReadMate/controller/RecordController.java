@@ -2,6 +2,7 @@ package RM.ReadMate.controller;
 
 import RM.ReadMate.entity.Record;
 import RM.ReadMate.entity.User;
+import RM.ReadMate.repository.UserRepository;
 import RM.ReadMate.security.JwtTokenProvider;
 import RM.ReadMate.service.RecordService;
 import RM.ReadMate.service.UserService;
@@ -9,10 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Map;
 
 @RestController
@@ -23,6 +26,9 @@ public class RecordController {
     private final RecordService recordService;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     public RecordController(RecordService recordService, JwtTokenProvider jwtTokenProvider, UserService userService) {
@@ -53,6 +59,7 @@ public class RecordController {
 
     @PostMapping(consumes = {"multipart/form-data"})
     public ResponseEntity<?> createRecord(
+            Authentication authentication,
             @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader,
             @RequestParam("title") String title,
             @RequestParam("author") String author,
@@ -69,7 +76,9 @@ public class RecordController {
             }
 
             String userid = jwtTokenProvider.getUseridFromToken(token);
-            User user = userService.findByUserid(userid);
+            User user = userService.findByUserid(userid); // ✅ String → User
+            Long userId = user.getId(); // ✅ Long 타입 추출
+
 
             Record record = Record.builder()
                     .title(title)
@@ -77,9 +86,12 @@ public class RecordController {
                     .publisher(publisher)
                     .genre(genre)
                     .content(content)
+                    .user(user) // ✅ 여기 핵심!
                     .build();
 
-            Record saved = recordService.saveRecord(user.getId(), record, photo);
+            Record saved = recordService.saveRecord(userId, record, photo);
+
+            userService.addPoints(userId, 10);
 
             return ResponseEntity.ok(Map.of(
                     "record", saved,
@@ -129,8 +141,6 @@ public class RecordController {
         }
     }
 
-
-
     // 독서 기록 수정 (이미지 삭제 기능 포함)
     @PutMapping(value = "/{id}", consumes = {"multipart/form-data"})
     public ResponseEntity<?> updateRecord(
@@ -170,7 +180,6 @@ public class RecordController {
         }
     }
 
-
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteRecord(
             @PathVariable Long id,
@@ -202,7 +211,4 @@ public class RecordController {
             return ResponseEntity.internalServerError().body("삭제 중 오류 발생: " + e.getMessage());
         }
     }
-
-
-
 }

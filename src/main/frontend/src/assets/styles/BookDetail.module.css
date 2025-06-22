@@ -1,0 +1,116 @@
+.container {
+    padding: 4rem;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+.topSection {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.left {
+    flex: 1;
+}
+
+.image {
+    width: 100%;
+    max-width: 300px;
+    border-radius: 10px;
+}
+
+.right {
+    flex: 2;
+    font-size: 1.3rem;
+}
+
+.recordBtn {
+    padding: 0.7rem 1.2rem;
+    background-color: #2d5d39;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.contentSection {
+    margin-top: 2rem;
+}
+
+.contentSection h2 {
+    color: #2d5d39;
+}
+
+.contentSection p {
+    font-size: 1.1rem;
+}
+.descriptionWrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.description {
+    flex: 1;
+    line-height: 1.6;
+    word-break: break-word;
+}
+
+.toggleBtn {
+    white-space: nowrap;
+    height: fit-content;
+    margin-top: 0.2rem;
+    padding: 0.5rem 1rem;
+    background-color: #2d5d39;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.reviewSection {
+    margin-top: 2rem;
+}
+
+.reviewHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem;
+}
+
+.reviewList {
+    background-color: #f9f9f9;
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+.reviewBtn {
+    padding: 0.7rem 1.2rem;
+    background-color: #2d5d39;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.buttonGroup {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-top: 1rem;
+}
+
+.wishBtn {
+    padding: 0.7rem 1rem;
+    background-color: #2d5d39;
+    color: #f44336;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    font-size: 1.2rem;
+}
