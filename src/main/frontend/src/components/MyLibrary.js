@@ -163,9 +163,9 @@ function MyLibrary() {
                                 onClick={() => handleCardClick(saved.id)}
                             >
                                 {/* 책 이미지가 있는 경우 */}
-                                {saved.bookPhoto ? (
+                                {saved.bookImage ? (
                                     <img
-                                        src={saved.bookPhoto || '/default-book-image.jpg'}
+                                        src={saved.bookImage || '/default-book-image.jpg'}
                                         alt={`${saved.bookTitle} 책 이미지`}
                                         className={styles.recordImage}
                                     />

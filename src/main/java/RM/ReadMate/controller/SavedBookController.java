@@ -4,6 +4,8 @@ import RM.ReadMate.dto.SavedBookDTO;
 import RM.ReadMate.entity.SavedBook;
 import RM.ReadMate.service.SavedBookService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,8 +37,14 @@ public class SavedBookController {
 
     // 책 삭제
     @DeleteMapping("/{savedBookId}")
-    public void deleteSavedBook(@PathVariable Long savedBookId) {
-        savedBookService.deleteSavedBook(savedBookId);
+    public ResponseEntity<String> deleteSavedBook(@PathVariable Long savedBookId) {
+        try {
+            savedBookService.deleteSavedBook(savedBookId);
+            return ResponseEntity.ok("책이 성공적으로 삭제되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제 중 오류가 발생했습니다.");
+        }
     }
+
 }
 

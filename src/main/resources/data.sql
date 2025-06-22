@@ -39,19 +39,20 @@ CREATE TABLE books (
     page_count INT                             -- 페이지 수
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- saved_books 테이블 생성 (유저가 저장한 책 기록)
 CREATE TABLE saved_books (
   id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   user_id BIGINT NOT NULL,
   book_id BIGINT NOT NULL,
-  started_at DATE,
-  finished_at DATE,
-  progress INT DEFAULT 0,
-  saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  current_page INT DEFAULT 0,   -- 현재 읽고 있는 페이지
+  total_pages INT DEFAULT 0,    -- 총 페이지 수
+  started_at DATE,             -- 읽기 시작 날짜
+  finished_at DATE,            -- 읽기 완료 날짜
+  saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- 저장 날짜
   CONSTRAINT fk_savedbooks_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   CONSTRAINT fk_savedbooks_book FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE,
   UNIQUE KEY unique_user_book (user_id, book_id)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 
 INSERT INTO users (userid, password, name, email, phone, gender, birthdate, nickname, points) VALUES
 ('kimminsu',   '$2a$10$3mXhPB5hyTnpuUMzMk5WFOEjZ1j8.jpxshcYPZsjIq3xq.EyRMF5e', '김민수',   'kimminsu@example.com',   '010-1234-0001', 'M', '1990-05-17', '민수',   120),
@@ -81,19 +82,20 @@ INSERT INTO products (name, price, image, description) VALUES
 ('밀리의 서재 12개월 구독권', 119000, 'https://shop-phinf.pstatic.net/20231106_106/1699260261290erhYV_JPEG/13588366126106949_2030879393.jpg?type=m510', '국내 최대 전자책 구독 서비스, 밀리의 서재 12개월 무료이용권입니다.');
 
 INSERT INTO books (isbn, book_name, author, publisher, genre, content, book_image, page_count) VALUES
-('9788956603474', '혼자 공부하는 파이썬', '미하엘 엔데', '한빛미디어', '프로그래밍', '파이썬을 혼자서 공부하는 방법을 다룬 책입니다.', 'https://example.com/python.jpg', 500),
-('9788966269760', '자바의 정석', '도우출판', '김철수', '프로그래밍', '자바 언어의 핵심적인 내용을 다룬 정석적인 교재입니다.', 'https://example.com/java.jpg', 600),
-('9788931568123', '클린 코드', '로버트 C. 마틴', '인사이트', '소프트웨어 공학', '효율적이고 깔끔한 코드를 작성하는 방법에 대해 설명하는 책입니다.', 'https://example.com/cleancode.jpg', 450),
-('9788956749213', '데이터베이스 101', '김영철', '한빛미디어', 'IT', '데이터베이스 설계와 운영에 대한 기초부터 실무까지 설명한 책입니다.', 'https://example.com/database101.jpg', 350),
-('9788973057394', '알고리즘 개론', '존스 홉킨스', '제이펍', '알고리즘', '알고리즘의 기초부터 고급까지를 폭넓게 다룬 교재입니다.', 'https://example.com/algorithms.jpg', 550),
-('9788992943309', '실전 자바 프로그래밍', '최기범', '위키북스', '프로그래밍', '자바의 실전 활용 예제를 다룬 책입니다.', 'https://example.com/realjava.jpg', 400),
-('9788972140407', '웹 개발의 정석', '박철우', '에이콘출판', '웹 개발', '웹 애플리케이션 개발에 필요한 기술을 종합적으로 다룬 책입니다.', 'https://example.com/webdev.jpg', 600),
-('9788928620543', '리액트 프로젝트', '김효성', '인사이트', '프로그래밍', '리액트와 Redux를 활용한 프로젝트 기반 웹 개발 서적입니다.', 'https://example.com/reactproject.jpg', 400),
-('9788994604363', '기초부터 배우는 SQL', '조원경', '로드맵', '데이터베이스', 'SQL 쿼리의 기초부터 고급 기능까지 설명한 책입니다.', 'https://example.com/sql101.jpg', 300),
-('9788975600000', '파이썬 웹 개발', '박상길', '한빛미디어', '프로그래밍', '파이썬을 이용한 웹 애플리케이션 개발에 대해 다룬 책입니다.', 'https://example.com/pythonwebdev.jpg', 450);
+('9788954654678', '리지', '에드윈 H. 포터', '교유서가', '서양사', '“아버지가 죽었어!”\n전 세계가 경악한 살인사건, 리지 보든 연대기\n리지 보든이 도끼를 들어,\n엄마를 마흔 번 후려쳤어.\n자기가 한 짓을 본 리지,\n이번에는 아빠를 마흔한 번 후려치지.\n\n이 책은 세계적으로도 유례를 찾아보기 힘든 독특한 소재와 내용인 만큼 리지 보든 사건을 다양한 시각에서 보여주기 위해 책과 신문 기사를 포함한 4편의 논픽션을 엮어 1부와 2부, 부록 2편으로 구성했다.', 'https://contents.kyobobook.co.kr/sih/fit-in/458x0/pdt/9788954654678.jpg', 348),
+('9788937461095', '제인 에어 1', '샬럿 브론테', '민음사', '고전소설', '로맨스 소설의 고전 중의 고전!\n영국 문학 최초로 열정을 다룬 로맨스 소설의 고전 『제인에어』 제1권. 1847년 처음 출간된 이래, 지금까지 사랑받는 고전 중의 고전으로, 출간 당시부터 뜨거운 관심과 호응을 얻었다.\n특히 이 책은 유종호가 번역한 것으로, 19세기 빅토리아 시대 특유의 문체와 분위기를 최대한 살리면서도 독특한 맛과 기품을 간직하고 있다.', 'https://contents.kyobobook.co.kr/sih/fit-in/458x0/pdt/9788937461095.jpg', 448),
+('9788937461187', '폭풍의 언덕', '에밀리 브론테', '민음사', '고전소설', '열정적이면서도 비극적인 에밀리 브론테의 마지막 작품\n서른 살의 나이에 요절한 에밀리 브론테가 죽기 일년 전에 발표한 유일한 소설 작품으로, 황량한 들판 위의 외딴 저택 워더링 하이츠를 무대로 벌어지는 캐서린과 히스클리프의 비극적인 사랑, 에드거와 이사벨을 향한 히스클리프의 잔인한 복수를 그리고 있다.', 'https://contents.kyobobook.co.kr/sih/fit-in/458x0/pdt/9788937461187.jpg', 572),
+('9788956749213', '레베카(출간 80주년 기념판 리커버)', '대프니 듀 모리에', '현대문학', '영미소설', '앨프리드 히치콕의 영화 [레베카]와\n미하엘 쿤체 뮤지컬 [레베카]를 탄생시킨 불멸의 원작\n『레베카』 초판 출간 80주년 기념판\n20세기의 가장 영향력 있는 소설 가운데 하나. 영국 문화라는 직물 위에 아름다운 환상과 불안으로 가득한 꿈을 교차시켜 독특한 무늬를 수놓았다. 놀라우리만큼 매혹적인 작품이다.\n_세라 워터스', 'https://contents.kyobobook.co.kr/sih/fit-in/458x0/pdt/9788972759065.jpg', 600),
+('9788973057394', '종의 기원', '정유정', '은행나무', '한국소설', '26년 동안 숨어 있던 내 안의 또 다른 내가 왔다!\n평범했던 한 청년이 살인자로 태어나는 과정을 그린 ‘악인의 탄생기’라고. 이번 작품에서 작가는 미지의 세계가 아닌 인간, 그 내면 깊숙한 곳으로 독자들을 초대한다. 누구도 온전히 보여주지 못했던 ‘악’의 속살을 보여주고자 한다.', 'https://contents.kyobobook.co.kr/sih/fit-in/458x0/pdt/9788956609959.jpg', 384);
 
-INSERT INTO saved_books (user_id, book_id, started_at, finished_at, progress, saved_at) VALUES
-(8, 1, '2025-05-01', NULL, 40, '2025-06-01'),  -- 혼자 공부하는 파이썬, 진행중 40%
-(8, 2, '2025-04-15', '2025-05-20', 100, '2025-05-21'),  -- 자바의 정석, 완료
-(8, 3, '2025-06-10', NULL, 10, '2025-06-15');  -- 클린 코드, 시작한 지 얼마 안됨
+
+-- saved_books 테이블에 더미 데이터 삽입
+INSERT INTO saved_books (user_id, book_id, current_page, total_pages, started_at, finished_at, saved_at)
+VALUES
+  (8, 1, 50, 348, '2023-05-01', NULL, '2023-05-01'),
+  (8, 2, 120, 448, '2023-06-01', NULL, '2023-06-01'),
+  (8, 3, 80, 572, '2023-07-01', NULL, '2023-07-01'),
+  (8, 4, 0, 600, NULL, NULL, '2023-08-01'),
+  (8, 5, 384, 384, '2024-08-01', '2025-06-20', '2024-08-01');
+
 
