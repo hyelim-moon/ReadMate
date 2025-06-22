@@ -1,0 +1,160 @@
+.container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+    font-family: 'Noto Sans KR', sans-serif;
+    color: #374151;
+}
+
+.titleRow {
+    position: relative;       /* 자식 요소 절대 위치 기준 */
+    display: flex;
+    justify-content: center;  /* 제목 중앙 정렬 */
+    align-items: center;
+    margin-bottom: 20px;      /* 여백 조정 */
+}
+
+.title {
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.backButton {
+    position: absolute;       /* 부모 기준 절대 위치 */
+    left: 0;
+    background-color: #00753C;
+    color: white;
+    border: none;
+    border-radius: 1.2rem;
+    padding: 6px 14px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.backButton:hover {
+    background-color: #005b29;
+}
+
+/* 이하 기존 스타일 유지 */
+.searchRow {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.searchInput {
+    width: 400px;
+    padding: 14px 18px;
+    font-size: 16px;
+    border-radius: 10px;
+    border: 1.5px solid #ccc;
+    transition: border-color 0.3s ease;
+}
+
+.searchInput:focus {
+    outline: none;
+    border-color: #00753C;
+    box-shadow: 0 0 6px rgba(0, 117, 60, 0.4);
+}
+
+.searchButton {
+    background-color: #00753C;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 2rem;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+.searchButton:hover {
+    background-color: #005b29;
+}
+
+.grid {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.sectionBox {
+    flex: 1 1 calc(33.333% - 24px);
+    background-color: #f9fafb;
+    padding: 20px;
+    border-radius: 16px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    display: flex;
+    flex-direction: column;
+    min-width: 300px;
+}
+
+.sectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.subTitle {
+    font-size: 20px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.moreButton {
+    background-color: #e0f2f1;
+    color: #00753C;
+    border: none;
+    border-radius: 1.5rem;
+    padding: 6px 14px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.moreButton:hover {
+    background-color: #c8e6c9;
+}
+
+.itemList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.item {
+    background-color: white;
+    padding: 12px 16px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.item:hover {
+    background-color: #f0fdf4;
+}
+
+.emptyMessage {
+    font-size: 14px;
+    color: #6b7280;
+    text-align: center;
+    padding: 20px 0;
+}
