@@ -17,6 +17,8 @@ import RecordDetail from './components/RecordDetail';
 import RecordEdit from './components/RecordEdit';
 import RecordButton from "./components/RecordButton";
 import CommunityDetail from "./components/CommunityDetail";
+import Search from './components/Search';
+
 import Forgot from "./components/Forgot";
 import PointShop from "./components/PointShop";
 import ProductDetail from './components/ProductDetail';
@@ -79,14 +81,16 @@ function AppContent({ userid, onLoginSuccess, isLoggedIn }) {
         <Route path="/community" element={<Community />} />
         <Route path="/community/write" element={<CommunityWrite />} />
         <Route path="/community/:id" element={<CommunityDetail />} />
+        <Route path="/search" element={<Search />} />
         <Route path="/record/:id" element={<RecordDetail />} />
         <Route path="/record/edit/:id" element={<RecordEdit />} />
         <Route path="/mylibrary" element={<MyLibrary />} />
         <Route path="/mybook/:id" element={<MyBook />} />
         <Route path="/profile-edit" element={<ProfileEdit />} />
         <Route path="/purchase-history" element={<PurchaseHistory />} />
-        <Route path="/storage" element={<Storage />} />
+        <Route path="/storage" element={<Storage />} /><Route path="/search" element={<Search />} />
 
+          
         {/* 문의 리스트 페이지 */}
         <Route
           path="/contactlist"

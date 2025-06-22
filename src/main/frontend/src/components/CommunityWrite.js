@@ -12,7 +12,6 @@ function CommunityWrite() {
     const [imagePreview, setImagePreview] = useState(null);
     const navigate = useNavigate();
 
-    // 태그 입력 처리
     const handleTagInputChange = (e) => {
         setTagInput(e.target.value);
     };
@@ -32,7 +31,6 @@ function CommunityWrite() {
         setTags(tags.filter(tag => tag !== tagToRemove));
     };
 
-    // 이미지 선택 및 미리보기
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -57,10 +55,17 @@ function CommunityWrite() {
         }
 
         try {
+            const token = localStorage.getItem('ACCESS_TOKEN'); // 키 이름 수정
+            if (!token) {
+                alert('로그인이 필요합니다.');
+                navigate('/login');
+                return;
+            }
+
             const formData = new FormData();
             formData.append('title', title);
             formData.append('content', content);
-            formData.append('tags', JSON.stringify(tags)); // 서버에서 배열 형식으로 받도록 JSON.stringify
+            formData.append('tags', JSON.stringify(tags));
             if (imageFile) {
                 formData.append('image', imageFile);
             }
@@ -68,6 +73,7 @@ function CommunityWrite() {
             await axios.post('http://localhost:8080/api/community', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
+                    Authorization: `Bearer ${token}`,
                 },
             });
 
@@ -83,7 +89,6 @@ function CommunityWrite() {
         <div className={styles.container}>
             <h1 className={styles.title}>게시글 작성</h1>
             <form onSubmit={handleSubmit} className={styles.form}>
-
                 <label className={styles.label}>
                     제목
                     <input

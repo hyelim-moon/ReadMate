@@ -1,7 +1,7 @@
+// RM/ReadMate/security/JwtAuthenticationFilter.java
 package RM.ReadMate.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -43,16 +43,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         new UsernamePasswordAuthenticationToken(
                                 userDetails, null, userDetails.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(auth);
-                logger.info("JWT 인증 성공, userid: " + userid);
+                logger.info("✅ JWT 인증 성공: userid = " + userid);
             } else {
-                logger.info("JWT 토큰 없음 또는 유효하지 않음");
+                logger.info("❌ JWT 없음 또는 유효하지 않음");
             }
         } catch (Exception e) {
-            logger.error("JWT 인증 중 예외 발생", e);
+            logger.error("JWT 인증 중 오류", e);
         }
         filterChain.doFilter(request, response);
     }
-
 
     private String parseJwt(HttpServletRequest request) {
         String headerAuth = request.getHeader("Authorization");

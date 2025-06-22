@@ -30,20 +30,29 @@ function Community() {
     useEffect(() => {
         axios.get("http://localhost:8080/api/community")
             .then(res => {
+                console.log("불러온 게시글:", res.data);
                 setPosts(res.data);
                 setFilteredPosts(res.data);
+
                 const sorted = [...res.data].sort((a, b) => (b.likes || 0) - (a.likes || 0));
                 setBestPosts(sorted.slice(0, 5));
             })
-            .catch(err => console.error('게시글 불러오기 실패:', err));
+            .catch(err => {
+                console.error('게시글 불러오기 실패:', err);
+                alert('게시글 불러오기에 실패했습니다.');
+            });
     }, []);
 
     const handleSearch = () => {
+        if (!searchTerm && !startDate && !endDate) {
+            setFilteredPosts(posts);
+            return;
+        }
+
         const filtered = posts.filter(post => {
             const postDate = new Date(post.createdAt);
-
             const titleContentMatch = searchTerm
-                ? (post.title.includes(searchTerm) || post.content.includes(searchTerm))
+                ? (post.title?.includes(searchTerm) || post.content?.includes(searchTerm))
                 : true;
 
             let tagsArray = [];
@@ -137,7 +146,7 @@ function Community() {
                                     <div className={styles.postContentBox}>
                                         <h3 className={styles.postTitle}>{post.title}</h3>
                                         <p className={styles.postContent}>
-                                            {post.content.length > 120 ? `${post.content.slice(0, 120)}...` : post.content}
+                                            {post.content?.length > 120 ? `${post.content.slice(0, 120)}...` : post.content}
                                         </p>
                                         <div className={styles.postMeta}>
                                             {timeAgoFromDate(post.createdAt)} · 익명

@@ -3,11 +3,14 @@ import React, { useState, useEffect } from 'react';
 import styles from '../assets/styles/Header.module.css';
 import logoImg from '../assets/images/logo.png';
 import userImg from '../assets/images/userImg.png';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 function Header() {
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState('전체');
+    const [keyword, setKeyword] = useState('');
+    const navigate = useNavigate();
+    const location = useLocation();
 
     const [rankingList, setRankingList] = useState([]);
     const [rankingLoading, setRankingLoading] = useState(true);
@@ -18,6 +21,14 @@ function Header() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     const categories = ['전체', '제목', '저자', '장르', '출판사'];
+
+    // 검색 페이지가 아니게 될 때만 검색어 초기화
+    useEffect(() => {
+        if (!location.pathname.startsWith('/search')) {
+            setKeyword('');
+            setDropdownOpen(false);
+        }
+    }, [location.pathname]);
 
     const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
     const handleSelect = (category) => {
@@ -50,7 +61,6 @@ function Header() {
                 return res.json();
             })
             .then(data => {
-                console.log('✅ 랭킹 API 응답:', data);
                 setRankingList(data);
                 setRankingLoading(false);
             })
@@ -74,9 +84,19 @@ function Header() {
         return () => clearInterval(interval);
     }, [rankingList]);
 
+    const handleSearch = () => {
+        if(keyword.trim() === '') return;
+        navigate(`/search?category=${selectedCategory}&keyword=${encodeURIComponent(keyword.trim())}`);
+    };
+
+    const onKeyPress = (e) => {
+        if(e.key === 'Enter') {
+            handleSearch();
+        }
+    }
+
     return (
         <header className={styles.header}>
-            {/* 슬라이드 랭킹 영역 */}
             <div className={styles.userRanking}>
                 {rankingLoading ? (
                     <p>불러오는 중...</p>
@@ -98,7 +118,6 @@ function Header() {
                     </Link>
                 </div>
 
-                {/* 검색바 영역 */}
                 <div className={styles.search}>
                     <div className={styles.dropdown} onClick={toggleDropdown}>
                         <span>{selectedCategory}</span>
@@ -113,8 +132,14 @@ function Header() {
                             </ul>
                         )}
                     </div>
-                    <input type="text" placeholder="검색어를 입력하세요" />
-                    <button className={styles.searchBtn}>🔍︎ 검색</button>
+                    <input
+                        type="text"
+                        placeholder="검색어를 입력하세요"
+                        value={keyword}
+                        onChange={(e) => setKeyword(e.target.value)}
+                        onKeyPress={onKeyPress}
+                    />
+                    <button className={styles.searchBtn} onClick={handleSearch}>🔍︎ 검색</button>
                 </div>
 
                 <div className={styles.userInfo}>
@@ -127,5 +152,4 @@ function Header() {
         </header>
     );
 }
-
 export default Header;

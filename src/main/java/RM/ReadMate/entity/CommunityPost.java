@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -33,4 +34,8 @@ public class CommunityPost {
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
+
+    // 양방향 매핑 (optional)
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<PostLike> likesUsers;
 }

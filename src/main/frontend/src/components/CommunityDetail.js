@@ -5,7 +5,6 @@ import styles from '../assets/styles/CommunityDetail.module.css';
 
 function timeAgoFromDate(dateString) {
     if (!dateString) return '등록 시간 정보 없음';
-
     const date = new Date(dateString);
     const now = new Date();
     const diffMs = now - date;
@@ -27,51 +26,63 @@ function CommunityDetail() {
     const [liked, setLiked] = useState(false);
     const [likesCount, setLikesCount] = useState(0);
 
+    const token = localStorage.getItem('accessToken'); // 토큰 키 이름 맞춤
+
     useEffect(() => {
-        // 게시글 정보 불러오기
-        axios
-            .get(`http://localhost:8080/api/community/${id}`)
-            .then((res) => {
-                setPost(res.data);
-                setLikesCount(res.data.likes || 0);
-                // TODO: 현재 사용자의 좋아요 여부도 받아 처리 가능
+        if (!id) return;
+
+        console.log("현재 accessToken:", token);
+
+        // 게시글 상세 + 좋아요 여부 포함
+        axios.get(`http://localhost:8080/api/community/${id}`, {
+            headers: token ? { Authorization: `Bearer ${token}` } : {}
+        })
+            .then(res => {
+                const data = res.data;
+                setPost(data);
+                setLikesCount(data.likes || 0);
+                setLiked(data.liked || false);
             })
-            .catch((err) => console.error('게시글 불러오기 실패:', err));
+            .catch(err => console.error('게시글 불러오기 실패:', err));
 
         // 댓글 불러오기
-        axios
-            .get(`http://localhost:8080/api/community/${id}/comments`)
-            .then((res) => {
-                setComments(res.data);
+        axios.get(`http://localhost:8080/api/community/${id}/comments`)
+            .then(res => setComments(res.data))
+            .catch(err => console.error('댓글 불러오기 실패:', err));
+    }, [id, token]);
+
+    const handleLikeToggle = () => {
+        if (!token) {
+            alert("로그인이 필요합니다.");
+            return;
+        }
+
+        axios.post(`http://localhost:8080/api/community/${id}/like`, null, {
+            headers: { Authorization: `Bearer ${token}` }
+        })
+            .then(res => {
+                setLiked(res.data); // 서버가 true/false 반환
+                setLikesCount(prev => res.data ? prev + 1 : prev - 1);
             })
-            .catch((err) => console.error('댓글 불러오기 실패:', err));
-    }, [id]);
+            .catch(err => {
+                console.error('좋아요 상태 업데이트 실패:', err);
+                alert('좋아요 처리 중 오류가 발생했습니다.');
+            });
+    };
 
     const handleAddComment = () => {
-        if (newComment.trim() === '') return; // 빈 댓글 등록 방지
+        if (newComment.trim() === '') return; // 빈 댓글 방지
 
         const commentData = { content: newComment };
 
-        axios
-            .post(`http://localhost:8080/api/community/${id}/comments`, commentData)
-            .then((res) => {
-                setComments((prevComments) => [...prevComments, res.data]); // 새 댓글 추가
+        axios.post(`http://localhost:8080/api/community/${id}/comments`, commentData, {
+            headers: token ? { Authorization: `Bearer ${token}` } : {}
+        })
+            .then(res => {
+                setComments(prev => [...prev, res.data]); // 새 댓글 추가
                 setNewComment(''); // 입력란 초기화
             })
-            .catch((err) => console.error('댓글 추가 실패:', err));
-    };
-
-    const handleLikeToggle = () => {
-        if (liked) {
-            setLikesCount((count) => count - 1);
-        } else {
-            setLikesCount((count) => count + 1);
-        }
-        setLiked((prev) => !prev);
-
-        // TODO: 서버 좋아요 상태 업데이트 API 호출
-        // axios.post(`http://localhost:8080/api/community/${id}/like`, { liked: !liked })
-        //   .catch(err => console.error('좋아요 상태 업데이트 실패:', err));
+            .catch(err => console.error('댓글 추가 실패:', err));
     };
 
     if (!post) return <div className={styles.loading}>게시글을 불러오는 중...</div>;
@@ -111,12 +122,12 @@ function CommunityDetail() {
             <div className={styles.commentsSection}>
                 <h2>댓글</h2>
                 <div className={styles.commentInputBox}>
-          <textarea
-              className={styles.commentInput}
-              placeholder="댓글을 입력하세요."
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-          />
+                    <textarea
+                        className={styles.commentInput}
+                        placeholder="댓글을 입력하세요."
+                        value={newComment}
+                        onChange={(e) => setNewComment(e.target.value)}
+                    />
                     <button className={styles.commentButton} onClick={handleAddComment}>
                         등록
                     </button>
