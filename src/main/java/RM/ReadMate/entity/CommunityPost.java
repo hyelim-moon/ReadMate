@@ -28,9 +28,8 @@ public class CommunityPost {
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    private Integer likes = 0;  // 초기값 0
+    private Integer likes = 0;
 
-    // 여기에 authorId 필드 추가
     @Column(nullable = false)
     private String authorId;
 
@@ -39,7 +38,6 @@ public class CommunityPost {
         this.createdAt = LocalDateTime.now();
     }
 
-    // 양방향 매핑 (optional)
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<PostLike> likesUsers;
 }

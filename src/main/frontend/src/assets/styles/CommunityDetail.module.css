@@ -1,122 +1,193 @@
 .container {
-    max-width: 1000px;
+    max-width: 900px;
     margin: 30px auto;
-    padding: 30px;
+    padding: 30px 40px;
     background-color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    position: relative;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
 }
 
 .backButton {
     background: none;
     border: none;
-    font-size: 1rem;
+    font-size: 1.1rem;
     color: #555;
     cursor: pointer;
-    margin-bottom: 20px;
-    transition: color 0.2s ease-in-out;
+    margin-bottom: 25px;
+    transition: color 0.3s ease;
 }
 .backButton:hover {
-    color: #007bff;
+    color: #00753C;
+}
+
+.ownerButtons {
+    position: absolute;
+    margin-right: 20px;
+    top: 16px;
+    right: 20px;
+    display: flex;
+    gap: 14px;
+    z-index: 10;
+}
+
+.ownerButtons button {
+    padding: 9px 18px;
+    font-size: 0.95rem;
+    border: 1.8px solid #bbb;
+    border-radius: 8px;
+    cursor: pointer;
+    background-color: #fefefe;
+    color: #444;
+    font-weight: 600;
+    transition: background-color 0.25s ease, border-color 0.25s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+}
+.ownerButtons button:hover {
+    background-color: #f0f6ff;
+    border-color: #014d37;
+    color: #014d37;
 }
 
 .title {
-    font-size: 2.2rem;
-    margin-bottom: 20px;
+    font-size: 2.8rem;
+    font-weight: 700;
+    margin-bottom: 30px;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+    color: #1a1a1a;
 }
 
 .postImage {
     width: 100%;
-    max-height: 300px;
+    max-height: 360px;
     object-fit: contain;
-    border-radius: 8px;
-    margin-bottom: 15px;
-    background-color: #f9f9f9;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    background-color: #fafafa;
+    box-shadow: inset 0 0 5px #eee;
+    user-select: none;
 }
 
 .meta {
-    font-size: 0.95rem;
-    color: #888;
-    margin-bottom: 25px;
+    font-size: 0.9rem;
+    color: #777;
+    margin-bottom: 18px;
+    letter-spacing: 0.03em;
 }
 
 .content {
-    font-size: 1.15rem;
-    line-height: 1.8;
+    font-size: 1.3rem;
+    line-height: 1.9;
     margin-bottom: 35px;
+    white-space: pre-wrap;
+    color: #2e2e2e;
+}
+
+.tagsContainer {
+    margin-bottom: 30px;
+}
+
+.tag {
+    display: inline-block;
+    background-color: #e1ecf4;
+    color: #014d37;
+    padding: 5px 12px;
+    border-radius: 20px;
+    margin-right: 10px;
+    font-size: 0.95rem;
+    user-select: none;
+    cursor: default;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+}
+.tag:hover {
+    background-color: #d0e3fb;
 }
 
 .likeSection {
     display: flex;
     align-items: center;
-    margin-bottom: 35px;
+    margin-bottom: 45px;
+    gap: 14px;
 }
 
 .likeButton {
-    padding: 9px 18px;
-    border: 1px solid #888;
-    background-color: white;
-    border-radius: 25px;
+    padding: 10px 24px;
+    border: 1.8px solid #888;
+    background-color: #fff;
+    border-radius: 30px;
     cursor: pointer;
-    font-size: 1rem;
-    transition: all 0.2s ease;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #555;
+    transition: all 0.3s ease;
     user-select: none;
+    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.05);
 }
+.likeButton:hover {
+    border-color: #ff3f5b ;
+}
+
 .liked {
     background-color: #ff6b81;
     color: white;
     border-color: #ff6b81;
+    box-shadow: 0 5px 12px rgba(255, 107, 129, 0.6);
 }
 
 .likesCount {
-    margin-left: 12px;
-    font-size: 1rem;
-    color: #555;
+    font-size: 1.05rem;
+    color: #444;
+    font-weight: 600;
 }
 
 .commentsSection {
-    border-top: 1px solid #eee;
-    padding-top: 25px;
+    border-top: 1px solid #ddd;
+    padding-top: 30px;
 }
 
 .commentInputBox {
     display: flex;
-    margin-bottom: 20px;
-    gap: 10px;
+    margin-bottom: 22px;
+    gap: 12px;
 }
 
 .commentInput {
     flex-grow: 1;
-    padding: 12px;
+    padding: 14px 16px;
     font-size: 1rem;
-    border-radius: 8px;
-    border: 1px solid #ccc;
+    border-radius: 12px;
+    border: 1.5px solid #ccc;
     resize: none;
-    height: 80px;
-    font-family: inherit;
+    min-height: 80px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    transition: border-color 0.25s ease;
 }
-
-.commentInput::placeholder {
-    color: #aaa;
-    font-family: inherit;
+.commentInput:focus {
+    outline: none;
+    border-color: #014d37;
 }
 
 .commentButton {
-    padding: 12px 20px;
-    background-color: #065f46;
+    padding: 14px 28px;
+    background-color: #014d37;
     border: none;
-    border-radius: 8px;
+    border-radius: 12px;
     color: white;
     cursor: pointer;
-    transition: background-color 0.2s ease;
     font-size: 1rem;
+    font-weight: 700;
+    transition: background-color 0.3s ease;
     white-space: nowrap;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 .commentButton:hover {
-    background-color: #064e3b;
+    background-color: #003d2c  ;
 }
 
 .commentList {
@@ -125,39 +196,223 @@
 }
 
 .commentItem {
-    padding: 12px 0;
+    padding: 16px 0;
     border-bottom: 1px solid #eee;
 }
 
 .commentContent {
     font-size: 1rem;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
+    line-height: 1.5;
+    color: #333;
 }
 
 .commentMeta {
     font-size: 0.85rem;
     color: #999;
+    margin-bottom: 10px;
+    user-select: none;
 }
 
-.loading {
-    text-align: center;
+.commentButtons button {
+    margin-right: 10px;
+    padding: 6px 14px;
+    font-size: 0.85rem;
+    border: 1.3px solid #bbb;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.25s ease;
+}
+.commentButtons button:hover {
+    background-color: #e3e7f1;
+}
+
+.input {
+    width: 100%;
+    padding: 14px 16px;
     font-size: 1.3rem;
-    padding: 60px 0;
+    margin-bottom: 16px;
+    border: 1.8px solid #ccc;
+    border-radius: 10px;
+    box-sizing: border-box;
+    font-weight: 600;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    transition: border-color 0.25s ease;
+}
+.input:focus {
+    outline: none;
+    border-color: #014d37 ;
 }
 
-/* 해시태그 스타일 추가 */
-.tagsContainer {
+.textarea {
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 1.1rem;
+    border: 1.8px solid #ccc;
+    border-radius: 12px;
+    resize: vertical;
     margin-bottom: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    transition: border-color 0.25s ease;
+}
+.textarea:focus {
+    outline: none;
+    border-color: #014d37;
 }
 
-.tag {
-    display: inline-block;
-    background-color: #f0f0f0;
-    color: #333;
-    padding: 4px 10px;
-    border-radius: 15px;
-    margin-right: 8px;
+/* 수정 모드에서 내용칸 더 크게 */
+.editTextarea {
+    min-height: 250px;
+    font-size: 1.15rem;
+    line-height: 1.6;
+    color: #222;
+}
+
+/* 해시태그 편집 */
+.tagsEditor {
+    margin-bottom: 25px;
+}
+.tagsEditor label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: #444;
+}
+
+.tagInputWrapper {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+.tagInput {
+    flex-grow: 1;
+    padding: 10px 14px;
+    font-size: 1rem;
+    border: 1.5px solid #bbb;
+    border-radius: 10px;
+    transition: border-color 0.25s ease;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.tagInput:focus {
+    outline: none;
+    border-color: #014d37;
+}
+
+.tagList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.tagList .tag {
+    background-color: #e0f2e9;
+    color: #014d37;
+    padding: 5px 14px;
+    border-radius: 30px;
+    font-weight: 700;
     font-size: 0.9rem;
+    display: flex;
+    align-items: center;
     user-select: none;
     cursor: default;
+    box-shadow: 0 2px 5px rgba(21, 74, 134, 0.2);
+}
+
+.removeTagBtn {
+    background: none;
+    border: none;
+    font-weight: 700;
+    font-size: 1.2rem;
+    line-height: 1;
+    margin-left: 8px;
+    color: #014d37;
+    cursor: pointer;
+    padding: 0;
+    user-select: none;
+}
+.removeTagBtn:hover {
+    color: #014d37;
+}
+
+/* 이미지 업로드 */
+.imageEditor {
+    margin-bottom: 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.imageUploadLabel {
+    cursor: pointer;
+    display: inline-block;
+    border: 2.5px dashed #bbb;
+    border-radius: 14px;
+    width: 100%;
+    max-width: 380px;
+    height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition: border-color 0.25s ease;
+    background-color: #fafafa;
+}
+.imageUploadLabel:hover {
+    border-color: #014d37;
+}
+
+.imageInput {
+    display: none;
+}
+
+.imagePreview {
+    max-width: 100%;
+    max-height: 220px;
+    object-fit: contain;
+    border-radius: 12px;
+    user-select: none;
+}
+
+.imagePlaceholder {
+    font-size: 1.1rem;
+    color: #999;
+    font-weight: 600;
+    user-select: none;
+}
+
+.submitBtn {
+    padding: 6px 14px;
+    margin-right: 5px;
+    background-color: #ccc;
+    color: #555;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: background-color 0.3s ease;
+}
+
+.cancelBtn {
+    padding: 6px 14px;
+    background-color: #ccc;
+    color: #555;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: background-color 0.3s ease;
+}
+.submitBtn:hover{
+    background-color: #999;
+}
+.cancelBtn:hover{
+    background-color: #999;
 }

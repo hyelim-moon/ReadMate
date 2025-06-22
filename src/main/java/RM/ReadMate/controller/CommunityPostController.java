@@ -22,7 +22,6 @@ public class CommunityPostController {
         this.postService = postService;
     }
 
-    // 게시글 작성 (작성자 ID 포함)
     @PostMapping(consumes = {"multipart/form-data"})
     public ResponseEntity<?> createPost(
             @AuthenticationPrincipal UserDetails userDetails,
@@ -45,14 +44,12 @@ public class CommunityPostController {
         }
     }
 
-    // 게시글 목록 조회
     @GetMapping
     public ResponseEntity<List<CommunityPostDto>> getAllPosts() {
         List<CommunityPostDto> posts = postService.getAllPosts();
         return ResponseEntity.ok(posts);
     }
 
-    // 게시글 단건 상세 + 좋아요 여부 포함
     @GetMapping("/{id}")
     public ResponseEntity<?> getPostById(@PathVariable Long id,
                                          @AuthenticationPrincipal UserDetails userDetails) {
@@ -66,7 +63,33 @@ public class CommunityPostController {
         }
     }
 
-    // 게시글 삭제 (작성자만 가능)
+    @PutMapping(value = "/{id}", consumes = {"multipart/form-data"})
+    public ResponseEntity<?> updatePost(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam("title") String title,
+            @RequestParam("content") String content,
+            @RequestParam("tags") String tags,
+            @RequestParam(value = "image", required = false) MultipartFile imageFile
+    ) {
+        if (userDetails == null) {
+            return ResponseEntity.status(401).body("로그인이 필요합니다.");
+        }
+
+        String username = userDetails.getUsername();
+
+        try {
+            CommunityPostDto updatedPost = postService.updatePost(id, title, content, tags, imageFile, username);
+            if (updatedPost == null) {
+                return ResponseEntity.status(403).body("수정 권한이 없습니다.");
+            }
+            return ResponseEntity.ok(updatedPost);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("게시글 수정 실패: " + e.getMessage());
+        }
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deletePost(@PathVariable Long id,
                                         @AuthenticationPrincipal UserDetails userDetails) {
@@ -88,7 +111,6 @@ public class CommunityPostController {
         }
     }
 
-    // 게시글 좋아요 토글
     @PostMapping("/{id}/like")
     public ResponseEntity<?> toggleLike(@PathVariable Long id,
                                         @AuthenticationPrincipal UserDetails userDetails) {
