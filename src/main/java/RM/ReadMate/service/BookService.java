@@ -6,15 +6,9 @@ import RM.ReadMate.entity.User;
 import RM.ReadMate.repository.BookRepository;
 import RM.ReadMate.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,9 +18,15 @@ public class BookService {
 
     private final BookRepository bookRepository;
     private final UserRepository userRepository;
-    private final String GOOGLE_BOOKS_API_KEY = "AIzaSyD8CJbNQX3AialFRwia9TcwPqDY1fWuPjU";
 
-    // ✅ 사용자 정보 포함 저장
+    private final AladinService aladinService;
+    private final GoogleBooksService googleBooksService;
+
+    /* =========================
+       기본 CRUD
+       ========================= */
+
+    @Transactional
     public Book save(Book book, String userid) {
         User user = userRepository.findByUserid(userid)
                 .orElseThrow(() -> new IllegalArgumentException("등록자 정보를 찾을 수 없습니다."));
@@ -34,93 +34,162 @@ public class BookService {
         return bookRepository.save(book);
     }
 
-    public List<Book> findAll() {
-        return bookRepository.findAll();
+    @Transactional(readOnly = true)
+    public List<Book> findAll() { return bookRepository.findAll(); }
+
+    @Transactional(readOnly = true)
+    public Optional<Book> findByIsbn(String isbn) { return bookRepository.findByIsbn(isbn); }
+
+    @Transactional(readOnly = true)
+    public Optional<Book> findById(Long id) { return bookRepository.findById(id); }
+
+    @Transactional
+    public void deleteById(Long id) { bookRepository.deleteById(id); }
+
+    public BookDto convertToDto(Book book) { return new BookDto(book); }
+
+    /* =========================
+       외부 API 수집
+       ========================= */
+
+    /** 베스트셀러 → 보강/업서트 */
+    @Transactional
+    public List<BookDto> fetchBestsellers(Integer limit) {
+        var aladinList = aladinService.getBestsellers(limit == null ? 20 : limit);
+        return aladinList.stream()
+                .map(this::upsertFromAladin)
+                .filter(b -> b != null)          // ISBN 없는 항목 등 안전 필터
+                .map(BookDto::new)
+                .toList();
     }
 
-    public Optional<Book> findByIsbn(String isbn) {
-        return bookRepository.findByIsbn(isbn);
+    /** 에디터 추천(카테고리 미지정 호출; 가능하면 아래 카테고리 버전 사용 권장) → 보강/업서트 */
+    @Transactional
+    public List<BookDto> fetchEditorPicks(Integer limit) {
+        var aladinList = aladinService.getEditorPicks(limit == null ? 20 : limit);
+        return aladinList.stream()
+                .map(this::upsertFromAladin)
+                .filter(b -> b != null)
+                .map(BookDto::new)
+                .toList();
     }
 
-    public Optional<Book> findById(Long id) {
-        return bookRepository.findById(id);
-    }
-
-    public void deleteById(Long id) {
-        bookRepository.deleteById(id);
-    }
-
-    // ✅ API로부터 책 정보 가져오기 및 저장
-    public BookDto fetchBookFromApis(String title) {
-        // 1. DB에 제목 기준 조회
-        Optional<Book> existingBook = bookRepository.findByBookName(title);
-        if (existingBook.isPresent()) {
-            System.out.println("✅ DB에서 조회된 책 데이터: " + existingBook.get());
-            return new BookDto(existingBook.get());
+    /** ✅ 에디터 추천(카테고리 지정) → 보강/업서트 */
+    @Transactional
+    public List<BookDto> fetchEditorPicksByCategory(Integer categoryId, Integer limit) {
+        if (categoryId == null || categoryId <= 0) {
+            // 카테고리가 필수인 호출이면 빈 리스트 반환(또는 IllegalArgumentException 던져도 됨)
+            return List.of();
         }
+        var aladinList = aladinService.getEditorPicksByCategory(categoryId, limit == null ? 20 : limit);
+        return aladinList.stream()
+                .map(this::upsertFromAladin)
+                .filter(b -> b != null)
+                .map(BookDto::new)
+                .toList();
+    }
 
-        try {
-            // 2. Google API에서 책 정보 요청
-            BookDto dto = fetchBookByTitleFromGoogleBooks(title);
-
-            // 3. ISBN 중복 확인
-            Optional<Book> existingByIsbn = bookRepository.findByIsbn(dto.getIsbn());
-            if (existingByIsbn.isPresent()) {
-                System.out.println("✅ ISBN 중복으로 저장 생략: " + dto.getIsbn());
-                return new BookDto(existingByIsbn.get());
-            }
-
-            // 4. DB 저장
-            Book bookEntity = dto.toEntity(null); // uploader(user)는 null로 저장
-            bookRepository.save(bookEntity);
-            System.out.println("🔍 API로부터 가져와 DB에 저장한 책 데이터: " + dto);
-
-            return dto;
-
-        } catch (Exception e) {
-            System.err.println("❌ 데이터 불러오는 중 오류 발생: " + e.getMessage());
+    /** 알라딘 1권 → (구글 보강 후) DB 업서트, Book 반환 */
+    @Transactional
+    private Book upsertFromAladin(AladinService.AladinBook a) {
+        if (a == null || a.isbn13() == null || a.isbn13().isBlank()) {
+            // ISBN 없으면 스킵
             return null;
         }
-    }
 
-    // ✅ Google Books API로부터 책 데이터 가져오기
-    private BookDto fetchBookByTitleFromGoogleBooks(String title) throws Exception {
-        String apiUrl = "https://www.googleapis.com/books/v1/volumes?q=" + URLEncoder.encode(title, "UTF-8")
-                + "&key=" + GOOGLE_BOOKS_API_KEY;
+        Optional<Book> exist = bookRepository.findByIsbn(a.isbn13());
+        if (exist.isPresent()) return exist.get();
 
-        HttpURLConnection conn = (HttpURLConnection) new URL(apiUrl).openConnection();
-        conn.setRequestMethod("GET");
+        // 구글북스로 보강 (ISBN 우선)
+        BookDto enriched = googleBooksService.enrichByIsbn(a.isbn13());
 
-        BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        StringBuilder response = new StringBuilder();
-        String inputLine;
-        while ((inputLine = in.readLine()) != null) {
-            response.append(inputLine);
+        String mergedIsbn = firstNonEmpty(enriched != null ? enriched.getIsbn() : null, a.isbn13(), "");
+        if (mergedIsbn.isBlank()) return null; // 안전 가드
+
+        // 썸네일(https 정규화)
+        String mergedImage = firstNonEmpty(
+                enriched != null ? enriched.getBookImage() : null,
+                a.coverUrl(), ""
+        );
+        if (!mergedImage.isBlank()) {
+            mergedImage = mergedImage.replaceFirst("^http://", "https://");
         }
-        in.close();
 
-        JSONObject json = new JSONObject(response.toString());
-        JSONArray items = json.getJSONArray("items");
-        JSONObject volumeInfo = items.getJSONObject(0).getJSONObject("volumeInfo");
-
-        return BookDto.builder()
-                .isbn(volumeInfo.has("industryIdentifiers")
-                        ? volumeInfo.getJSONArray("industryIdentifiers").getJSONObject(0).optString("identifier")
-                        : "")
-                .bookName(volumeInfo.optString("title"))
-                .author(volumeInfo.has("authors") ? volumeInfo.getJSONArray("authors").optString(0) : "")
-                .publisher(volumeInfo.optString("publisher", ""))
-                .genre(volumeInfo.has("categories") ? volumeInfo.getJSONArray("categories").optString(0) : "")
-                .content(volumeInfo.optString("description", ""))
-                .bookImage(volumeInfo.has("imageLinks")
-                        ? volumeInfo.getJSONObject("imageLinks").optString("thumbnail")
-                        : "")
-                .pageCount(volumeInfo.optInt("pageCount", 0))
+        Book book = Book.builder()
+                .isbn(mergedIsbn)
+                .bookName(firstNonEmpty(enriched != null ? enriched.getBookName() : null, a.title(), ""))
+                .author(firstNonEmpty(enriched != null ? enriched.getAuthor() : null, a.author(), ""))
+                .publisher(firstNonEmpty(enriched != null ? enriched.getPublisher() : null, a.publisher(), ""))
+                .genre(enriched != null ? enriched.getGenre() : null)
+                .content(firstNonEmpty(enriched != null ? enriched.getContent() : null, a.description(), ""))
+                .bookImage(mergedImage)
+                .pageCount(enriched != null ? enriched.getPageCount() : Math.max(a.pageCount(), 0))
                 .build();
+
+        return bookRepository.save(book);
     }
 
-    // ✅ 필요 시 수동 변환용 메서드 (생성자 대신)
-    public BookDto convertToDto(Book book) {
-        return new BookDto(book);
+    /** 기존 제목 단건 수집 (유지) */
+    @Transactional
+    public BookDto fetchBookFromApis(String title) {
+        if (title == null || title.isBlank()) return null;
+
+        // 같은 제목이 여러 개여도 최근 1개만 사용
+        var existingByTitle = bookRepository.findFirstByBookNameOrderByIdDesc(title);
+        if (existingByTitle.isPresent()) {
+            return new BookDto(existingByTitle.get());
+        }
+
+        BookDto dto = googleBooksService.searchByTitle(title);
+        if (dto == null) return null;
+
+        if (dto.getIsbn() != null && !dto.getIsbn().isBlank()) {
+            var existingByIsbn = bookRepository.findByIsbn(dto.getIsbn());
+            if (existingByIsbn.isPresent()) return new BookDto(existingByIsbn.get());
+        }
+
+        // 썸네일(https 정규화)
+        String img = safe(dto.getBookImage());
+        if (!img.isBlank()) {
+            img = img.replaceFirst("^http://", "https://");
+        }
+
+        Book entity = Book.builder()
+                .isbn(safe(dto.getIsbn()))
+                .bookName(firstNonEmpty(dto.getBookName(), title))
+                .author(safe(dto.getAuthor()))
+                .publisher(safe(dto.getPublisher()))
+                .genre(dto.getGenre())
+                .content(safe(dto.getContent()))
+                .bookImage(img)
+                .pageCount(dto.getPageCount())
+                .build();
+
+        bookRepository.save(entity);
+        return new BookDto(entity);
+    }
+
+    /** (선택) 여러 제목 배치 수집 — 현재 쓰지 않으면 제거해도 무방 */
+    @Transactional
+    public List<BookDto> fetchBooksFromTitles(List<String> titles) {
+        if (titles == null || titles.isEmpty()) return List.of();
+        var out = new java.util.ArrayList<BookDto>(titles.size());
+        for (String t : titles) {
+            if (t == null || t.isBlank()) continue;
+            BookDto dto = fetchBookFromApis(t);
+            if (dto != null) out.add(dto);
+        }
+        return out;
+    }
+
+    /* =========================
+       유틸
+       ========================= */
+
+    private String safe(String s) { return (s == null ? "" : s); }
+
+    private String firstNonEmpty(String... values) {
+        for (String v : values) if (v != null && !v.isBlank()) return v;
+        return "";
     }
 }
