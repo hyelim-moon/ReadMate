@@ -30,7 +30,7 @@ const todayBook = {
   ]
 };
 
-function TodaysRecord() {
+function BookList() {
   const [quizAnswers, setQuizAnswers] = useState({});
   const [showAnswers, setShowAnswers] = useState(false);
   const [currentQuizIndex, setCurrentQuizIndex] = useState(0);
@@ -167,4 +167,4 @@ function TodaysRecord() {
   );
 }
 
-export default TodaysRecord;
+export default BookList;

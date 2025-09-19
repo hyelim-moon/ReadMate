@@ -1,9 +1,9 @@
-// src/components/Header.jsx
 import React, { useState, useEffect } from 'react';
 import styles from '../assets/styles/Header.module.css';
 import logoImg from '../assets/images/logo.png';
 import userImg from '../assets/images/userImg.png';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { FaBook, FaTrophy, FaShoppingCart, FaComments, FaQuestionCircle } from 'react-icons/fa';
 
 function Header() {
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -140,6 +140,16 @@ function Header() {
                         onKeyPress={onKeyPress}
                     />
                     <button className={styles.searchBtn} onClick={handleSearch}>🔍︎ 검색</button>
+                </div>
+
+                <div>
+                    <nav className={styles.navbar}>
+                        <Link to="/booklist"><button><FaBook /> 도서 목록</button></Link>
+                        <Link to="/competition"><button><FaTrophy /> 독서 챌린지</button></Link>
+                        <Link to="/pointShop"><button><FaShoppingCart /> 포인트샵</button></Link>
+                        <Link to="/community"><button><FaComments /> 커뮤니티</button></Link>
+                        <Link to="/"><button><FaQuestionCircle /> 도움말</button></Link>
+                    </nav>
                 </div>
 
                 <div className={styles.userInfo}>
