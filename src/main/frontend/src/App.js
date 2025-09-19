@@ -3,7 +3,6 @@ import axios from "axios";
 import { BrowserRouter, Routes, Route, useLocation, useNavigate } from "react-router-dom";
 
 import Header from './components/Header';
-import Navbar from './components/Navbar';
 import MainContent from './components/MainContent';
 import RecommendButton from './components/RecommendButton';
 import RecordList from './components/RecordList';
@@ -29,8 +28,11 @@ import PurchaseHistory from "./components/PurchaseHistory";
 import Storage from "./components/Storage";
 import ContactList from "./components/ContactList";
 import Contact from "./components/Contact";
-import TodaysRecord from "./components/TodaysRecord";
+import TodaysRecord from "./components/BookList";
 import BookDetail from './components/BookDetail';
+import BookList from './components/BookList';
+// import FAQ from "./components/FAQ";
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // userId를 props로 받도록 변경
@@ -50,71 +52,71 @@ function AppContent({ userid, onLoginSuccess, isLoggedIn }) {
   const hideGlobalHeader = ["/login", "/signup", "/forgot", "/mypage"].includes(location.pathname);
 
   return (
-    <div className="App">
-      {!hideGlobalHeader && <Header />}
-      {!hideGlobalHeader && <Navbar />}
+      <div className="App">
+        {!hideGlobalHeader && <Header />}
 
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <>
-              <MainContent />
-              <RecommendButton />
-            </>
-          }
-        />
-        <Route path="/login" element={<Login onLoginSuccess={onLoginSuccess} />} />
-        <Route path="/forgot" element={<Forgot />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/mypage" element={<MyPage />} />
-        <Route path="/chat" element={<ChatBot />} />
-        <Route path="/todaysrecord" element={<TodaysRecord />} />
-        <Route path="/recordlist" element={<RecordList />} />
-        {/* "/" 경로 중복 문제로 "/pointshop"으로 변경하고 userId 넘김 */}
-        <Route path="/pointshop" element={<PointShop userid={userid} />} />
-        <Route
-          path="/products/:id"
-          element={<ProductDetail userid={userid} isLoggedIn={isLoggedIn} />}
-        />
-        <Route path="/record" element={<Record />} />
-        <Route path="/community" element={<Community />} />
-        <Route path="/community/write" element={<CommunityWrite />} />
-        <Route path="/community/:id" element={<CommunityDetail />} />
-        <Route path="/search" element={<Search />} />
-        <Route path="/record/:id" element={<RecordDetail />} />
-        <Route path="/record/edit/:id" element={<RecordEdit />} />
-        <Route path="/mylibrary" element={<MyLibrary />} />
-        <Route path="/mybook/:id" element={<MyBook />} />
-        <Route path="/profile-edit" element={<ProfileEdit />} />
-        <Route path="/purchase-history" element={<PurchaseHistory />} />
-        <Route path="/storage" element={<Storage />} />
-        <Route path="/books/:id" element={<BookDetail />} />
+        <Routes>
+          <Route
+              path="/"
+              element={
+                <>
+                  <MainContent />
+                  <RecommendButton />
+                </>
+              }
+          />
+          <Route path="/login" element={<Login onLoginSuccess={onLoginSuccess} />} />
+          <Route path="/forgot" element={<Forgot />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/mypage" element={<MyPage />} />
+          <Route path="/chat" element={<ChatBot />} />
+          <Route path="/todaysrecord" element={<TodaysRecord />} />
+          <Route path="/recordlist" element={<RecordList />} />
+          {/* "/" 경로 중복 문제로 "/pointshop"으로 변경하고 userId 넘김 */}
+          <Route path="/pointshop" element={<PointShop userid={userid} />} />
+          <Route
+              path="/products/:id"
+              element={<ProductDetail userid={userid} isLoggedIn={isLoggedIn} />}
+          />
+          <Route path="/record" element={<Record />} />
+          <Route path="/community" element={<Community />} />
+          <Route path="/community/write" element={<CommunityWrite />} />
+          <Route path="/community/:id" element={<CommunityDetail />} />
+          <Route path="/search" element={<Search />} />
+          <Route path="/booklist" element={<BookList />} />
+          <Route path="/record/:id" element={<RecordDetail />} />
+          <Route path="/record/edit/:id" element={<RecordEdit />} />
+          <Route path="/mylibrary" element={<MyLibrary />} />
+          <Route path="/mybook/:id" element={<MyBook />} />
+          <Route path="/profile-edit" element={<ProfileEdit />} />
+          <Route path="/purchase-history" element={<PurchaseHistory />} />
+          <Route path="/storage" element={<Storage />} />
+          <Route path="/books/:id" element={<BookDetail />} />
 
-        {/* 문의 리스트 페이지 */}
-        <Route
-          path="/contactlist"
-          element={
-            <ContactList
-              inquiries={inquiries}
-              onClickContact={() => navigate('/contact')}
-            />
-          }
-        />
-        {/* 문의 작성 페이지 */}
-        <Route
-          path="/contact"
-          element={
-            <Contact
-              onSubmitInquiry={(newInquiry) => {
-                addInquiry(newInquiry);
-                navigate('/contactlist');
-              }}
-            />
-          }
-        />
-      </Routes>
-    </div>
+          {/* 문의 리스트 페이지 */}
+          <Route
+              path="/contactlist"
+              element={
+                <ContactList
+                    inquiries={inquiries}
+                    onClickContact={() => navigate('/contact')}
+                />
+              }
+          />
+          {/* 문의 작성 페이지 */}
+          <Route
+              path="/contact"
+              element={
+                <Contact
+                    onSubmitInquiry={(newInquiry) => {
+                      addInquiry(newInquiry);
+                      navigate('/contactlist');
+                    }}
+                />
+              }
+          />
+        </Routes>
+      </div>
   );
 }
 
@@ -129,23 +131,23 @@ function App() {
 
   useEffect(() => {
     axios.get("http://localhost:8080/api/books/recommend")
-      .then((res) => setBooks(res.data))
-      .catch((err) => console.error(err));
+        .then((res) => setBooks(res.data))
+        .catch((err) => console.error(err));
 
     axios.get("http://localhost:8080/api/recommend")
-      .then((res) => setRandomBook(res.data))
-      .catch((err) => console.error(err));
+        .then((res) => setRandomBook(res.data))
+        .catch((err) => console.error(err));
   }, []);
 
   return (
-    <BrowserRouter>
-      {/* userInfo가 없으면 null, 있으면 userInfo.userid를 넘겨줌 */}
-      <AppContent
-        userid={userInfo ? userInfo.userid : null}
-        isLoggedIn={!!userInfo}
-        onLoginSuccess={(user) => setUserInfo(user)}
-      />
-    </BrowserRouter>
+      <BrowserRouter>
+        {/* userInfo가 없으면 null, 있으면 userInfo.userid를 넘겨줌 */}
+        <AppContent
+            userid={userInfo ? userInfo.userid : null}
+            isLoggedIn={!!userInfo}
+            onLoginSuccess={(user) => setUserInfo(user)}
+        />
+      </BrowserRouter>
   );
 }
 
