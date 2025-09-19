@@ -9,11 +9,15 @@
 }
 
 .title {
-    color: #003016;
+    color: #000;
     font-size: 2rem;
     font-weight: bold;
     padding-left: 1rem;
     margin: 0.5rem 0rem 1rem 0rem;
+}
+
+.icon {
+    color: #005b29;
 }
 
 @media (max-width: 768px) {

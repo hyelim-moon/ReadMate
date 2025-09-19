@@ -3,7 +3,7 @@ import styles from '../assets/styles/Header.module.css';
 import logoImg from '../assets/images/logo.png';
 import userImg from '../assets/images/userImg.png';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { FaBook, FaTrophy, FaShoppingCart, FaComments, FaQuestionCircle } from 'react-icons/fa';
+import { FaBook, FaTrophy, FaShoppingCart, FaComments, FaQuestionCircle, FaSearch } from 'react-icons/fa';
 
 function Header() {
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -139,7 +139,9 @@ function Header() {
                         onChange={(e) => setKeyword(e.target.value)}
                         onKeyPress={onKeyPress}
                     />
-                    <button className={styles.searchBtn} onClick={handleSearch}>🔍︎ 검색</button>
+                    <button className={styles.searchBtn} onClick={handleSearch}>
+                        <FaSearch />
+                    </button>
                 </div>
 
                 <div>
