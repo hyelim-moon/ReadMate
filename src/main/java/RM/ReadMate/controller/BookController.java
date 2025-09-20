@@ -24,7 +24,7 @@ public class BookController {
     @PostMapping
     public ResponseEntity<Book> saveBook(@RequestBody Book book) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String userid = auth.getName(); // JWT에서 추출한 사용자 ID
+        String userid = auth.getName();
         return ResponseEntity.ok(bookService.save(book, userid));
     }
 
@@ -34,7 +34,7 @@ public class BookController {
         return ResponseEntity.ok(bookService.findAll());
     }
 
-    // ✅ ISBN으로 조회 (DB 기준)
+    // ✅ ISBN으로 조회
     @GetMapping("/isbn/{isbn}")
     public ResponseEntity<Book> getBookByIsbn(@PathVariable String isbn) {
         return bookService.findByIsbn(isbn)
@@ -42,18 +42,7 @@ public class BookController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // ✅ 에디터 추천 (알라딘 ItemEditorChoice → GoogleBooks 보강 → DB upsert)
-    //    예: GET /api/books/picks?limit=20
-    @GetMapping("/picks")
-    public ResponseEntity<List<BookDto>> getEditorPicks(
-            @RequestParam(name = "categoryId") Integer categoryId,
-            @RequestParam(name = "limit", required = false) Integer limit
-    ) {
-        return ResponseEntity.ok(bookService.fetchEditorPicksByCategory(categoryId, limit));
-    }
-
-    // ✅ 베스트셀러 (알라딘 Bestseller → GoogleBooks 보강 → DB upsert)
-    //    예: GET /api/books/bestseller?limit=20
+    // ✅ 베스트셀러
     @GetMapping("/bestseller")
     public ResponseEntity<List<BookDto>> getBestsellerBooks(
             @RequestParam(name = "limit", required = false) Integer limit
@@ -61,7 +50,15 @@ public class BookController {
         return ResponseEntity.ok(bookService.fetchBestsellers(limit));
     }
 
-    // ✅ ID로 조회 (Book → BookDto 변환)
+    // ✅ 신간 베스트
+    @GetMapping("/newbest")
+    public ResponseEntity<List<BookDto>> getNewBestBooks(
+            @RequestParam(name = "limit", required = false) Integer limit
+    ) {
+        return ResponseEntity.ok(bookService.fetchNewBest(limit));
+    }
+
+    // ✅ ID로 조회
     @GetMapping("/{id}")
     public ResponseEntity<BookDto> getBookById(@PathVariable Long id) {
         Optional<Book> found = bookService.findById(id);

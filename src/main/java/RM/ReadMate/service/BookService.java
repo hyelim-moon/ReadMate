@@ -58,30 +58,15 @@ public class BookService {
         var aladinList = aladinService.getBestsellers(limit == null ? 20 : limit);
         return aladinList.stream()
                 .map(this::upsertFromAladin)
-                .filter(b -> b != null)          // ISBN 없는 항목 등 안전 필터
-                .map(BookDto::new)
-                .toList();
-    }
-
-    /** 에디터 추천(카테고리 미지정 호출; 가능하면 아래 카테고리 버전 사용 권장) → 보강/업서트 */
-    @Transactional
-    public List<BookDto> fetchEditorPicks(Integer limit) {
-        var aladinList = aladinService.getEditorPicks(limit == null ? 20 : limit);
-        return aladinList.stream()
-                .map(this::upsertFromAladin)
                 .filter(b -> b != null)
                 .map(BookDto::new)
                 .toList();
     }
 
-    /** ✅ 에디터 추천(카테고리 지정) → 보강/업서트 */
+    /** ✅ 신간 베스트 → 보강/업서트 */
     @Transactional
-    public List<BookDto> fetchEditorPicksByCategory(Integer categoryId, Integer limit) {
-        if (categoryId == null || categoryId <= 0) {
-            // 카테고리가 필수인 호출이면 빈 리스트 반환(또는 IllegalArgumentException 던져도 됨)
-            return List.of();
-        }
-        var aladinList = aladinService.getEditorPicksByCategory(categoryId, limit == null ? 20 : limit);
+    public List<BookDto> fetchNewBest(Integer limit) {
+        var aladinList = aladinService.getNewBest(limit == null ? 20 : limit);
         return aladinList.stream()
                 .map(this::upsertFromAladin)
                 .filter(b -> b != null)
@@ -93,20 +78,17 @@ public class BookService {
     @Transactional
     private Book upsertFromAladin(AladinService.AladinBook a) {
         if (a == null || a.isbn13() == null || a.isbn13().isBlank()) {
-            // ISBN 없으면 스킵
             return null;
         }
 
         Optional<Book> exist = bookRepository.findByIsbn(a.isbn13());
         if (exist.isPresent()) return exist.get();
 
-        // 구글북스로 보강 (ISBN 우선)
         BookDto enriched = googleBooksService.enrichByIsbn(a.isbn13());
 
         String mergedIsbn = firstNonEmpty(enriched != null ? enriched.getIsbn() : null, a.isbn13(), "");
-        if (mergedIsbn.isBlank()) return null; // 안전 가드
+        if (mergedIsbn.isBlank()) return null;
 
-        // 썸네일(https 정규화)
         String mergedImage = firstNonEmpty(
                 enriched != null ? enriched.getBookImage() : null,
                 a.coverUrl(), ""
@@ -127,59 +109,6 @@ public class BookService {
                 .build();
 
         return bookRepository.save(book);
-    }
-
-    /** 기존 제목 단건 수집 (유지) */
-    @Transactional
-    public BookDto fetchBookFromApis(String title) {
-        if (title == null || title.isBlank()) return null;
-
-        // 같은 제목이 여러 개여도 최근 1개만 사용
-        var existingByTitle = bookRepository.findFirstByBookNameOrderByIdDesc(title);
-        if (existingByTitle.isPresent()) {
-            return new BookDto(existingByTitle.get());
-        }
-
-        BookDto dto = googleBooksService.searchByTitle(title);
-        if (dto == null) return null;
-
-        if (dto.getIsbn() != null && !dto.getIsbn().isBlank()) {
-            var existingByIsbn = bookRepository.findByIsbn(dto.getIsbn());
-            if (existingByIsbn.isPresent()) return new BookDto(existingByIsbn.get());
-        }
-
-        // 썸네일(https 정규화)
-        String img = safe(dto.getBookImage());
-        if (!img.isBlank()) {
-            img = img.replaceFirst("^http://", "https://");
-        }
-
-        Book entity = Book.builder()
-                .isbn(safe(dto.getIsbn()))
-                .bookName(firstNonEmpty(dto.getBookName(), title))
-                .author(safe(dto.getAuthor()))
-                .publisher(safe(dto.getPublisher()))
-                .genre(dto.getGenre())
-                .content(safe(dto.getContent()))
-                .bookImage(img)
-                .pageCount(dto.getPageCount())
-                .build();
-
-        bookRepository.save(entity);
-        return new BookDto(entity);
-    }
-
-    /** (선택) 여러 제목 배치 수집 — 현재 쓰지 않으면 제거해도 무방 */
-    @Transactional
-    public List<BookDto> fetchBooksFromTitles(List<String> titles) {
-        if (titles == null || titles.isEmpty()) return List.of();
-        var out = new java.util.ArrayList<BookDto>(titles.size());
-        for (String t : titles) {
-            if (t == null || t.isBlank()) continue;
-            BookDto dto = fetchBookFromApis(t);
-            if (dto != null) out.add(dto);
-        }
-        return out;
     }
 
     /* =========================

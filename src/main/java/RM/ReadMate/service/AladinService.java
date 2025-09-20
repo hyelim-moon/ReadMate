@@ -26,21 +26,13 @@ public class AladinService {
         return callItemList("Bestseller", limit, null, "Book");
     }
 
-    /** 기존: Editor Picks (카테고리 미지정은 문서상 비권장/미지원일 수 있음) */
-    public List<AladinBook> getEditorPicks(int limit) {
-        // 카테고리 없이 호출해야 한다면 null로 두되, 가급적 아래의 byCategory 사용 권장
-        return callItemList("ItemEditorChoice", limit, null, "Book");
-    }
-
-    /** ✅ 신규: Editor Picks by CategoryId */
-    public List<AladinBook> getEditorPicksByCategory(int categoryId, int limit) {
-        return callItemList("ItemEditorChoice", limit, categoryId, "Book");
+    /** ✅ 신간 베스트 */
+    public List<AladinBook> getNewBest(int limit) {
+        return callItemList("ItemNewSpecial", limit, null, "Book");
     }
 
     /**
-     * 공통 호출 (QueryType + [선택]CategoryId + SearchTarget)
-     * - QueryType 예: ItemEditorChoice, Bestseller, ItemNewAll, ...
-     * - SearchTarget 예: "Book", "Foreign", "Music" (문서 기준)
+     * 공통 호출
      */
     private List<AladinBook> callItemList(String queryType, int limit, Integer categoryId, String searchTarget) {
         int max = (limit <= 0 ? 20 : Math.min(limit, 50));
@@ -53,11 +45,6 @@ public class AladinService {
                 .queryParam("SearchTarget", (searchTarget == null || searchTarget.isBlank()) ? "Book" : searchTarget)
                 .queryParam("Output", "JS")
                 .queryParam("Version", "20131101");
-
-        // ✅ 편집자 추천은 카테고리 기반이라면 CategoryId 추가
-        if (categoryId != null && categoryId > 0) {
-            builder.queryParam("CategoryId", categoryId);
-        }
 
         String uri = builder.build().toUriString();
 

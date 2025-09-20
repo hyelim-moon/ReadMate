@@ -10,8 +10,8 @@ function MainContent() {
             </section>
 
             <section className={styles.section}>
-                <h2 className={styles.title}>에디터 추천</h2>
-                <Banner type="picks" />
+                <h2 className={styles.title}>신작추천</h2>
+                <Banner type="newbest" />
             </section>
         </main>
     );
