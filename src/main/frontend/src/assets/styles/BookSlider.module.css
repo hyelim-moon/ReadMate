@@ -6,7 +6,7 @@
 }
 
 .slide {
-    height: 320px;
+    height: 26rem;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -15,12 +15,34 @@
     border-radius: 12px;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
+.coverBox {
+    width: 15.625rem;   /* 고정 너비 */
+    height: 21.875rem;  /* 고정 높이 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background-color: #fafafa; /* 빈 공간 색 */
+    overflow: hidden;
+}
 
 .image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain; /* 자르지 않고 비율 유지 */
+    border-radius: 4px;
+}
+
+.noImage {
     width: 100%;
-    height: 14.5rem;
-    object-fit: contain;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ddd;
+    color: #666;
     border-radius: 8px;
+    font-size: 0.9rem;
 }
 
 .info {
@@ -29,11 +51,8 @@
 }
 
 .info h3 {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     font-weight: bold;
 }
 
-.info p {
-    font-size: 0.9rem;
-    color: #666;
-}
+
