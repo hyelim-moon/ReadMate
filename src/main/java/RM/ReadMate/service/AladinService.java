@@ -21,12 +21,12 @@ public class AladinService {
     @Value("${aladin.ttb-key}")
     private String ttbKey;
 
-    /** 기존: Bestseller */
+    /** 베스트셀러 */
     public List<AladinBook> getBestsellers(int limit) {
         return callItemList("Bestseller", limit, null, "Book");
     }
 
-    /** ✅ 신간 베스트 */
+    /** 신간 베스트 */
     public List<AladinBook> getNewBest(int limit) {
         return callItemList("ItemNewSpecial", limit, null, "Book");
     }
@@ -68,13 +68,20 @@ public class AladinService {
             JSONObject subInfo = it.optJSONObject("subInfo");
             int pageCount = (subInfo != null) ? subInfo.optInt("itemPage", 0) : 0;
 
+            // 알라딘 응답 필드명: cover(기본), coverSmallUrl, coverLargeUrl
+            String coverSmall = it.optString("coverSmallUrl", "");
+            String cover      = it.optString("cover", "");
+            String coverLarge = it.optString("coverLargeUrl", "");
+
             list.add(new AladinBook(
                     it.optString("title", ""),
                     it.optString("author", ""),
                     it.optString("publisher", ""),
                     it.optString("isbn13", ""),
                     it.optString("description", ""),
-                    it.optString("cover", ""),
+                    coverSmall,
+                    cover,
+                    coverLarge,
                     pageCount
             ));
         }
@@ -88,7 +95,21 @@ public class AladinService {
             String publisher,
             String isbn13,
             String description,
-            String coverUrl,
+            String coverSmallUrl,  // 썸네일
+            String coverUrl,       // 기본
+            String coverLargeUrl,  // 큰 이미지
             int pageCount
-    ) {}
+    ) {
+        /** ✅ 고해상도 cover500 파생 URL */
+        public String cover500Url() {
+            String base = (coverLargeUrl != null && !coverLargeUrl.isBlank())
+                    ? coverLargeUrl
+                    : (coverUrl != null ? coverUrl : coverSmallUrl);
+
+            if (base == null || base.isBlank()) return "";
+
+            return base.replace("/coversum/", "/cover500/")
+                    .replace("/cover/", "/cover500/");
+        }
+    }
 }

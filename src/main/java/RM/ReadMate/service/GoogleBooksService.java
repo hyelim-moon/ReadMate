@@ -72,6 +72,7 @@ public class GoogleBooksService {
         }
     }
 
+    /** JSON → BookDto 변환 */
     private BookDto toDto(String json, String fallbackTitle, String fallbackIsbn) {
         if (json == null) return null;
 
@@ -84,16 +85,19 @@ public class GoogleBooksService {
 
         String isbn = extractIsbn(volumeInfo, fallbackIsbn);
 
+        // ✅ 이미지 선택: extraLarge → large → medium → thumbnail → smallThumbnail
         String image = "";
         if (volumeInfo.has("imageLinks")) {
             JSONObject il = volumeInfo.getJSONObject("imageLinks");
-            // smallThumbnail, thumbnail 순으로 시도
-            image = il.optString("thumbnail",
-                    il.optString("smallThumbnail", ""));
-            if (!image.isBlank()) {
-                // ✅ http → https 치환 (혼합콘텐츠 방지)
-                image = image.replaceFirst("^http://", "https://");
-            }
+            image = firstNonEmpty(
+                    il.optString("extraLarge", ""),
+                    il.optString("large", ""),
+                    il.optString("medium", ""),
+                    il.optString("thumbnail", ""),
+                    il.optString("smallThumbnail", "")
+            );
+            image = normalizeHttps(image);
+            image = upgradeGoogleContentZoom(image); // Google Books content면 zoom=5로 업그레이드
         }
 
         return BookDto.builder()
@@ -108,7 +112,7 @@ public class GoogleBooksService {
                 .build();
     }
 
-
+    /** ISBN 추출 */
     private String extractIsbn(JSONObject volumeInfo, String fallback) {
         if (volumeInfo.has("industryIdentifiers")) {
             JSONArray ids = volumeInfo.getJSONArray("industryIdentifiers");
@@ -124,5 +128,40 @@ public class GoogleBooksService {
             }
         }
         return fallback != null ? fallback : "";
+    }
+
+    /** 여러 후보 중 첫 번째 non-empty 반환 */
+    private String firstNonEmpty(String... values) {
+        for (String v : values) if (v != null && !v.isBlank()) return v;
+        return "";
+    }
+
+    /** http → https 변환 */
+    private String normalizeHttps(String url) {
+        if (url == null || url.isBlank()) return "";
+        String u = url.trim();
+        if (u.startsWith("http://")) {
+            u = "https://" + u.substring("http://".length());
+        }
+        return u;
+    }
+
+    /**
+     * Google Books content URL이면 zoom=5로 업그레이드
+     * 예: https://books.google.com/books/content?id=...&zoom=1
+     *  → https://books.google.com/books/content?id=...&zoom=5
+     */
+    private String upgradeGoogleContentZoom(String url) {
+        if (url == null || url.isBlank()) return "";
+        String u = url;
+        if (u.contains("books.google.com/books/content")) {
+            if (u.contains("zoom=")) {
+                u = u.replaceAll("zoom=\\d+", "zoom=5");
+            } else {
+                u += (u.contains("?") ? "&" : "?") + "zoom=5";
+            }
+            u = normalizeHttps(u);
+        }
+        return u;
     }
 }

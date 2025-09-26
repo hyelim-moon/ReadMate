@@ -18,34 +18,35 @@ repositories {
 }
 
 dependencies {
-	// Spring Boot Web + JPA
+	// Spring Boot Web (필요에 따라 Webflux 제거 가능)
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	// 만약 WebClient(Webflux)만 쓰면 위 줄 지우고 아래 줄만 남기면 됨
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
-	// Spring Security (JWT 인증 처리용)
+	// JPA + Security
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 
-	// JJWT (JWT 토큰 생성/검증)
+	// JWT
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
 	runtimeOnly   'io.jsonwebtoken:jjwt-impl:0.11.5'
 	runtimeOnly   'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
-	// Jakarta Annotation for @PostConstruct
+	// Jakarta Annotation
 	implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
 
-	// MySQL Database
+	// DB
 	implementation 'mysql:mysql-connector-java:8.0.33'
 
 	// Lombok
 	compileOnly 'org.projectlombok:lombok:1.18.30'
 	annotationProcessor 'org.projectlombok:lombok:1.18.30'
 
-	// Google Cloud OAuth 인증 및 HTTP 클라이언트
+	// Google Cloud OAuth + HTTP Client
 	implementation 'com.google.auth:google-auth-library-oauth2-http:1.19.0'
 	implementation 'com.google.http-client:google-http-client-gson:1.43.3'
 
-	// 외부 API 파싱용 추가 라이브러리
+	// 외부 API 파싱
 	implementation 'org.jsoup:jsoup:1.17.2'
 	implementation 'org.json:json:20231013'
 
@@ -60,19 +61,17 @@ tasks.named('test') {
 
 def frontendDir = "$projectDir/src/main/frontend"
 
-sourceSets {
-	main {
-		resources {
-			srcDirs = ["$projectDir/src/main/resources"]
-		}
-	}
-}
-
-// Frontend 빌드 작업
+// ─────────────────────────────────────────────
+// React 빌드 작업 (배포시에만 실행하도록 최적화)
+// ─────────────────────────────────────────────
 tasks.register("installReact", Exec) {
 	workingDir = file(frontendDir)
-	inputs.dir(frontendDir)
 	group = BasePlugin.BUILD_GROUP
+
+	// package.json 변경이 있을 때만 실행
+	inputs.file("$frontendDir/package.json")
+	inputs.file("$frontendDir/package-lock.json")
+	outputs.dir("$frontendDir/node_modules")
 
 	if (System.getProperty('os.name').toLowerCase().contains('windows')) {
 		commandLine "cmd", "/c", "npm install"
@@ -84,8 +83,10 @@ tasks.register("installReact", Exec) {
 tasks.register("buildReact", Exec) {
 	dependsOn("installReact")
 	workingDir = file(frontendDir)
-	inputs.dir(frontendDir)
 	group = BasePlugin.BUILD_GROUP
+
+	inputs.dir("$frontendDir/src")
+	outputs.dir("$frontendDir/build")
 
 	if (System.getProperty('os.name').toLowerCase().contains('windows')) {
 		commandLine "cmd", "/c", "npm run build"
@@ -100,7 +101,22 @@ tasks.register("copyReactBuildFiles", Copy) {
 	into("$projectDir/src/main/resources/static")
 }
 
-// React 빌드를 리소스 복사에 연결
-processResources {
-	dependsOn "copyReactBuildFiles"
+// ─────────────────────────────────────────────
+// 배포 시에만 React 빌드 연결 (-Pprod 옵션 필요)
+// ─────────────────────────────────────────────
+if (project.hasProperty("prod")) {
+	processResources {
+		dependsOn "copyReactBuildFiles"
+	}
+}
+
+// ─────────────────────────────────────────────
+// 리소스 기본 설정
+// ─────────────────────────────────────────────
+sourceSets {
+	main {
+		resources {
+			srcDirs = ["$projectDir/src/main/resources"]
+		}
+	}
 }

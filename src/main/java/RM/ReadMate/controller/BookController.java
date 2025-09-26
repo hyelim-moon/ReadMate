@@ -22,33 +22,43 @@ public class BookController {
 
     // ✅ 책 저장 - 로그인한 사용자만 가능
     @PostMapping
-    public ResponseEntity<Book> saveBook(@RequestBody Book book) {
+    public ResponseEntity<BookDto> saveBook(@RequestBody Book book) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String userid = auth.getName();
-        return ResponseEntity.ok(bookService.save(book, userid));
+        Book saved = bookService.save(book, userid);
+        return ResponseEntity.ok(bookService.convertToDto(saved));
     }
 
-    // ✅ 전체 책 목록
+    // ✅ 전체 책 목록 (Book → BookDto 변환)
     @GetMapping
-    public ResponseEntity<List<Book>> getAllBooks() {
-        return ResponseEntity.ok(bookService.findAll());
+    public ResponseEntity<List<BookDto>> getAllBooks() {
+        return ResponseEntity.ok(
+                bookService.findAll().stream()
+                        .map(bookService::convertToDto)
+                        .toList()
+        );
     }
 
-    // ✅ 장르별 책 목록
+    // ✅ 장르별 책 목록 (Book → BookDto 변환)
     @GetMapping("/genre/{genre}")
-    public ResponseEntity<List<Book>> getBooksByGenre(@PathVariable String genre) {
-        return ResponseEntity.ok(bookService.findByGenre(genre));
+    public ResponseEntity<List<BookDto>> getBooksByGenre(@PathVariable String genre) {
+        return ResponseEntity.ok(
+                bookService.findByGenre(genre).stream()
+                        .map(bookService::convertToDto)
+                        .toList()
+        );
     }
 
-    // ✅ ISBN으로 조회
+    // ✅ ISBN으로 조회 (Book → BookDto 변환)
     @GetMapping("/isbn/{isbn}")
-    public ResponseEntity<Book> getBookByIsbn(@PathVariable String isbn) {
+    public ResponseEntity<BookDto> getBookByIsbn(@PathVariable String isbn) {
         return bookService.findByIsbn(isbn)
+                .map(bookService::convertToDto)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // ✅ 베스트셀러
+    // ✅ 베스트셀러 (이미 BookDto 반환)
     @GetMapping("/bestseller")
     public ResponseEntity<List<BookDto>> getBestsellerBooks(
             @RequestParam(name = "limit", required = false) Integer limit
@@ -56,7 +66,7 @@ public class BookController {
         return ResponseEntity.ok(bookService.fetchBestsellers(limit));
     }
 
-    // ✅ 신간 베스트
+    // ✅ 신간 베스트 (이미 BookDto 반환)
     @GetMapping("/newbest")
     public ResponseEntity<List<BookDto>> getNewBestBooks(
             @RequestParam(name = "limit", required = false) Integer limit
@@ -64,7 +74,7 @@ public class BookController {
         return ResponseEntity.ok(bookService.fetchNewBest(limit));
     }
 
-    // ✅ ID로 조회
+    // ✅ ID로 조회 (Book → BookDto 변환)
     @GetMapping("/{id}")
     public ResponseEntity<BookDto> getBookById(@PathVariable Long id) {
         Optional<Book> found = bookService.findById(id);
