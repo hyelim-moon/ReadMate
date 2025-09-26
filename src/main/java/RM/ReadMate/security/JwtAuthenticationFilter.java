@@ -9,9 +9,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
+
 import java.io.IOException;
 
 @Component
@@ -34,41 +36,40 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         try {
             String token = parseJwt(request);
+
             if (token != null && jwtTokenProvider.validateToken(token)) {
                 String userid = jwtTokenProvider.getUseridFromToken(token);
 
-                if (userid != null) {
-                    logger.info("🛡️ 인증 시도: userid = " + userid);
-
+                if (userid != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     UserDetails userDetails = userDetailsService.loadUserByUsername(userid);
+
                     UsernamePasswordAuthenticationToken auth =
                             new UsernamePasswordAuthenticationToken(
-                                    userDetails, null, userDetails.getAuthorities());
+                                    userDetails,
+                                    null,
+                                    userDetails.getAuthorities()
+                            );
+                    // 표준적인 방식: 요청 기반 details 추가
+                    auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                    auth.setDetails(userDetails); // 🔥 인증 객체 완성도 보강
                     SecurityContextHolder.getContext().setAuthentication(auth);
-
-                    logger.info("✅ 인증 성공: SecurityContext에 인증 설정 완료");
-                } else {
-                    logger.warn("❗ JWT에서 userid 추출 실패");
                 }
-            } else {
-                logger.info("❌ JWT 토큰 없음 또는 유효하지 않음");
             }
+            // else: 토큰이 없거나 유효하지 않으면 그냥 통과 (403 주지 않음)
+
         } catch (Exception e) {
             logger.error("🚨 JWT 인증 중 예외 발생", e);
+            // 예외가 나도 필터 체인은 흘려보냄 (보안상 민감한 에러 메시지 노출 방지)
         }
+
         filterChain.doFilter(request, response);
     }
 
-
     private String parseJwt(HttpServletRequest request) {
         String headerAuth = request.getHeader("Authorization");
-
         if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
             return headerAuth.substring(7);
         }
-
         return null;
     }
 }

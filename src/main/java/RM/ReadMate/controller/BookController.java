@@ -10,8 +10,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/books")
@@ -25,7 +24,7 @@ public class BookController {
     @PostMapping
     public ResponseEntity<Book> saveBook(@RequestBody Book book) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String userid = auth.getName(); // JWT에서 추출한 사용자 ID
+        String userid = auth.getName();
         return ResponseEntity.ok(bookService.save(book, userid));
     }
 
@@ -43,45 +42,29 @@ public class BookController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // ✅ 에디터 추천 API
-    @GetMapping("/picks")
-    public ResponseEntity<List<BookDto>> getEditorPicks() {
-        List<String> titles = List.of(
-                "불편한 편의점", "역행자", "세이노의 가르침", "아몬드", "파과",
-                "안녕이라 그랬어", "첫 여름, 완주",
-                "어른의 행복은 조용하다", "모순", "완벽한 공부법"
-        );
-
-        List<BookDto> result = titles.stream()
-                .map(bookService::fetchBookFromApis)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(result);
-    }
-
-    // ✅ 베스트셀러 추천 API
+    // ✅ 베스트셀러
     @GetMapping("/bestseller")
-    public ResponseEntity<List<BookDto>> getBestsellerBooks() {
-        List<String> titles = List.of(
-                "단 한 번의 삶", "듀얼 브레인", "작은 땅의 야수들", "소년이 온다",
-                "여학교의 별 4", "빛과 실",
-                "초역 부처의 말", "작별하지 않는다", "스토너", "급류"
-        );
-
-        List<BookDto> result = titles.stream()
-                .map(bookService::fetchBookFromApis)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(result);
+    public ResponseEntity<List<BookDto>> getBestsellerBooks(
+            @RequestParam(name = "limit", required = false) Integer limit
+    ) {
+        return ResponseEntity.ok(bookService.fetchBestsellers(limit));
     }
 
-    // ✅ ID로 조회 (⚠ 반드시 마지막에 배치)
+    // ✅ 신간 베스트
+    @GetMapping("/newbest")
+    public ResponseEntity<List<BookDto>> getNewBestBooks(
+            @RequestParam(name = "limit", required = false) Integer limit
+    ) {
+        return ResponseEntity.ok(bookService.fetchNewBest(limit));
+    }
+
+    // ✅ ID로 조회
     @GetMapping("/{id}")
     public ResponseEntity<BookDto> getBookById(@PathVariable Long id) {
-        return bookService.findById(id)
-                .map(book -> ResponseEntity.ok(bookService.convertToDto(book)))
+        Optional<Book> found = bookService.findById(id);
+        return found
+                .map(bookService::convertToDto)
+                .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 

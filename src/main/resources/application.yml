@@ -15,7 +15,7 @@ spring:
       path: /h2-console          # H2 콘솔 접속 경로 설정
 
   datasource:
-    url: jdbc:mysql://127.0.0.1:3306/readmate?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    url: jdbc:mysql://127.0.0.1:3306/readmate?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root   # MySQL 실제 계정으로 변경
     password: 1234   # MySQL 실제 비밀번호로 변경
@@ -27,6 +27,7 @@ spring:
     properties:
       hibernate:
         format_sql: true         # SQL 예쁘게 출력 (가독성 ↑)
+        jdbc.time_zone: "Asia/Seoul"   # DB ↔ JPA 시간대 일치
 
   sql:
     init:
@@ -38,11 +39,24 @@ spring:
     resources:
       static-locations: file:./uploads/     # 업로드된 파일을 정적 리소스로 서빙
 
+  codec:
+    max-in-memory-size: 10MB      # WebClient가 큰 JSON(알라딘/구글북스) 받을 때 버퍼 용량
+
+  jackson:
+    time-zone: "Asia/Seoul"           # JSON 직렬화 시간대
 # ======== JWT 설정 ========
 jwt:
-  secret: ThisIsASecretKeyForJWTGeneration_ChangeThisToYourOwnSecret
+  secret: "ThisIsASecretKeyForJWTGeneration_ChangeThisToYourOwnSecret"
   expiration: 86400000   # 1일(밀리초 단위)
 
+# ======== 외부 API 키/엔드포인트 ========
+aladin:
+  ttb-key: "ttbzcbm19110945001"
+  base-url: "https://www.aladin.co.kr/ttb/api/ItemList.aspx"
+
+googlebooks:
+  api-key: "AIzaSyD8CJbNQX3AialFRwia9TcwPqDY1fWuPjU"
+  base-url: "https://www.googleapis.com/books/v1/volumes"
 # ======== 로깅 설정 ========
 logging:
   level:
