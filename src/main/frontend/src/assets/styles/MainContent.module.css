@@ -14,11 +14,38 @@
     font-weight: bold;
     padding-left: 1rem;
     margin: 0.5rem 0rem 1rem 0rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .icon {
     color: #005b29;
 }
+
+.categoryToggle {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    padding-left: 1rem;
+}
+
+.categoryButton {
+    padding: 0.5rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    background-color: #fff;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.categoryButton.active {
+    background-image: linear-gradient(135deg, #003016, #b79240 80%);
+    color: #fff;
+    border: none;
+}
+
 
 @media (max-width: 768px) {
     .main {

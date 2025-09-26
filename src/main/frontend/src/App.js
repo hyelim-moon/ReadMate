@@ -28,10 +28,9 @@ import PurchaseHistory from "./components/PurchaseHistory";
 import Storage from "./components/Storage";
 import ContactList from "./components/ContactList";
 import Contact from "./components/Contact";
-import TodaysRecord from "./components/BookList";
 import BookDetail from './components/BookDetail';
-import BookList from './components/BookList';
-// import FAQ from "./components/FAQ";
+import BookList from './components/Book/BookList';
+import GenreList from './components/Book/GenreList';
 
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -70,7 +69,6 @@ function AppContent({ userid, onLoginSuccess, isLoggedIn }) {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/mypage" element={<MyPage />} />
           <Route path="/chat" element={<ChatBot />} />
-          <Route path="/todaysrecord" element={<TodaysRecord />} />
           <Route path="/recordlist" element={<RecordList />} />
           {/* "/" 경로 중복 문제로 "/pointshop"으로 변경하고 userId 넘김 */}
           <Route path="/pointshop" element={<PointShop userid={userid} />} />
@@ -83,7 +81,8 @@ function AppContent({ userid, onLoginSuccess, isLoggedIn }) {
           <Route path="/community/write" element={<CommunityWrite />} />
           <Route path="/community/:id" element={<CommunityDetail />} />
           <Route path="/search" element={<Search />} />
-          <Route path="/booklist" element={<BookList />} />
+          <Route path="/booklist" element={<GenreList />} />
+          <Route path="/booklist/:genre" element={<BookList />} />
           <Route path="/record/:id" element={<RecordDetail />} />
           <Route path="/record/edit/:id" element={<RecordEdit />} />
           <Route path="/mylibrary" element={<MyLibrary />} />

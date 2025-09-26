@@ -34,6 +34,12 @@ public class BookController {
         return ResponseEntity.ok(bookService.findAll());
     }
 
+    // ✅ 장르별 책 목록
+    @GetMapping("/genre/{genre}")
+    public ResponseEntity<List<Book>> getBooksByGenre(@PathVariable String genre) {
+        return ResponseEntity.ok(bookService.findByGenre(genre));
+    }
+
     // ✅ ISBN으로 조회
     @GetMapping("/isbn/{isbn}")
     public ResponseEntity<Book> getBookByIsbn(@PathVariable String isbn) {

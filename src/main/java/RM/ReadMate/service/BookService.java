@@ -38,6 +38,9 @@ public class BookService {
     public List<Book> findAll() { return bookRepository.findAll(); }
 
     @Transactional(readOnly = true)
+    public List<Book> findByGenre(String genre) { return bookRepository.findByGenre(genre); }
+
+    @Transactional(readOnly = true)
     public Optional<Book> findByIsbn(String isbn) { return bookRepository.findByIsbn(isbn); }
 
     @Transactional(readOnly = true)
