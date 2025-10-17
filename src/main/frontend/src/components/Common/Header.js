@@ -147,7 +147,7 @@ function Header() {
                 <div>
                     <nav className={styles.navbar}>
                         <Link to="/booklist"><button><FaBook /> 도서 목록</button></Link>
-                        <Link to="/competition"><button><FaTrophy /> 독서 챌린지</button></Link>
+                        <Link to="/challenge"><button><FaTrophy /> 챌린지</button></Link>
                         <Link to="/pointShop"><button><FaShoppingCart /> 포인트샵</button></Link>
                         <Link to="/community"><button><FaComments /> 커뮤니티</button></Link>
                         <Link to="/"><button><FaQuestionCircle /> 도움말</button></Link>
