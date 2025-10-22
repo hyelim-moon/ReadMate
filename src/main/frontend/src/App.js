@@ -31,6 +31,7 @@ import Contact from "./components/Service/Contact";
 import BookDetail from './components/Book/BookDetail';
 import BookList from './components/Book/BookList';
 import GenreList from './components/Book/GenreList';
+import Challenge from "./components/Service/Challenge";
 
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -70,8 +71,8 @@ function AppContent({ userid, onLoginSuccess, isLoggedIn }) {
           <Route path="/mypage" element={<MyPage />} />
           <Route path="/chat" element={<ChatBot />} />
           <Route path="/recordlist" element={<RecordList />} />
-          {/* "/" 경로 중복 문제로 "/pointshop"으로 변경하고 userId 넘김 */}
           <Route path="/pointshop" element={<PointShop userid={userid} />} />
+          <Route path="/challenge" element={<Challenge />} />
           <Route
               path="/products/:id"
               element={<ProductDetail userid={userid} isLoggedIn={isLoggedIn} />}

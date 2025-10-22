@@ -1,0 +1,259 @@
+.challengePage {
+  max-width: 1200px;
+  margin: 1rem auto 2.5rem;
+  padding: 0 2rem;
+  box-sizing: border-box;
+  font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+  color: #1a1a1a;
+  min-height: 80vh;
+}
+
+.headerContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2.2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #003016;
+}
+
+.pageTitle {
+  font-size: 2.3rem;
+  font-weight: 800;
+  color: #003016;
+}
+
+.challengeTabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.tabButton {
+  font-weight: 600;
+  color: #4a5a5a;
+  padding: 0.75rem 1.5rem;
+  border-radius: 10px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 1.1rem;
+  border: 2px solid transparent;
+  background-color: #f0f0f0;
+  transition: all 0.2s ease-in-out;
+}
+
+.tabButton:hover {
+  background-color: #c3dbc7;
+  color: #003016;
+}
+
+.tabButton.active {
+  background-color: #003016;
+  color: white;
+  box-shadow: 0 4px 14px rgba(0, 48, 22, 0.5);
+  border-color: #003016;
+}
+
+.challengeContent {
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+  padding: 2rem;
+  min-height: 400px;
+}
+
+/* Challenge List Styles */
+.challengeList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2rem;
+}
+
+.challengeCard {
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.2s ease-in-out;
+  border-left: 5px solid #ccc;
+}
+
+.challengeCard:hover {
+  box-shadow: 0 8px 24px rgba(0, 48, 22, 0.15);
+  transform: translateY(-4px);
+}
+
+.challengeCard.참여-중 { border-color: #007bff; }
+.challengeCard.달성-완료 { border-color: #28a745; }
+.challengeCard.참여-가능 { border-color: #ffc107; }
+.challengeCard.예정 { border-color: #6c757d; }
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.challengeTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #003016;
+  margin: 0;
+}
+
+.challengeStatus {
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.3rem 0.7rem;
+  border-radius: 12px;
+  color: white;
+}
+
+.참여-중 .challengeStatus { background-color: #007bff; }
+.달성-완료 .challengeStatus { background-color: #28a745; }
+.참여-가능 .challengeStatus { background-color: #ffc107; color: #333;}
+.statusUpcoming { background-color: #6c757d; }
+
+.challengeDescription {
+  font-size: 1rem;
+  color: #4a5a5a;
+  margin-bottom: 1.5rem;
+  flex-grow: 1;
+}
+
+.challengeInfo {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: #555;
+  margin-bottom: 1rem;
+}
+
+.challengeInfo i {
+  margin-right: 0.5rem;
+}
+
+.progressContainer {
+  background-color: #e9ecef;
+  border-radius: 5px;
+  height: 10px;
+  margin-bottom: 0.5rem;
+}
+
+.progressBar {
+  background-color: #007bff;
+  height: 100%;
+  border-radius: 5px;
+  transition: width 0.3s ease-in-out;
+}
+
+.progressInfo {
+  text-align: right;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 1.5rem;
+}
+
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.challengeReward {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #003016;
+  margin: 0;
+}
+
+.participateButton {
+  background-color: #003016;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.participateButton:hover {
+  background-color: #004d24;
+}
+
+.participateButton:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* Leaderboard Table Styles */
+.leaderboardTable {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+}
+
+.leaderboardTable th, .leaderboardTable td {
+  padding: 1rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.leaderboardTable th {
+  background-color: #f8f9fa;
+  color: #003016;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.leaderboardTable tbody tr:hover {
+  background-color: #f1f8f3;
+}
+
+.rankCell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: #003016;
+}
+
+.medal {
+  font-size: 1.5rem;
+}
+
+.gold { color: #ffd700; }
+.silver { color: #c0c0c0; }
+.bronze { color: #cd7f32; }
+
+
+/* Empty Message Style */
+.emptyMessage {
+  text-align: center;
+  padding: 4rem 1rem;
+  color: #888;
+  font-size: 1.2rem;
+  font-style: italic;
+}
+
+/* My Progress Section Title */
+.progressSectionTitle {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #003016;
+  margin-top: 2rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+section:first-of-type .progressSectionTitle {
+  margin-top: 0;
+}
