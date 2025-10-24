@@ -87,7 +87,8 @@ const sampleMyProgress = [
 const ChallengesList = ({ challenges }) => {
     const navigate = useNavigate(); // useNavigate 훅 사용
 
-    const handleParticipate = (challengeId, challengeStatus) => {
+    const handleParticipate = (e, challengeId, challengeStatus) => {
+        e.stopPropagation(); // 이벤트 버블링 방지
         if (challengeStatus !== '참여 가능') {
             return; // '참여 가능' 상태가 아니면 아무것도 하지 않음
         }
@@ -109,7 +110,18 @@ const ChallengesList = ({ challenges }) => {
     return (
         <div className={styles.challengeList}>
             {challenges.map(challenge => (
-                <div key={challenge.id} className={`${styles.challengeCard} ${styles[challenge.status.replace(' ', '-')]}`}>
+                <div 
+                    key={challenge.id} 
+                    className={`${styles.challengeCard} ${styles[challenge.status.replace(' ', '-')]}`}
+                    onClick={() => navigate(`/challenges/${challenge.id}`)} // 카드 클릭 시 상세 페이지로 이동
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                            navigate(`/challenges/${challenge.id}`);
+                        }
+                    }}
+                >
                     <div className={styles.cardHeader}>
                         <h3 className={styles.challengeTitle}>{challenge.title}</h3>
                         <span className={`${styles.challengeStatus} ${challenge.status === '예정' ? styles.statusUpcoming : ''}`}>{challenge.status}</span>
@@ -134,7 +146,7 @@ const ChallengesList = ({ challenges }) => {
                         <button 
                             className={styles.participateButton} 
                             disabled={challenge.status !== '참여 가능'}
-                            onClick={() => handleParticipate(challenge.id, challenge.status)}
+                            onClick={(e) => handleParticipate(e, challenge.id, challenge.status)} // 이벤트 객체 전달
                         >
                             {challenge.status === '참여 가능' ? '참여하기' : (challenge.status === '예정' ? '예정' : '진행 중')}
                         </button>
