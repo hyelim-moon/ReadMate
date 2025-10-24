@@ -104,6 +104,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/books/**").permitAll()
                         .requestMatchers("/api/recommend/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/records/**").permitAll()
+                        .requestMatchers("/api/community/**").permitAll()
 
                         // 인증 필요 API
                         .requestMatchers(HttpMethod.POST, "/api/books/**").authenticated()
