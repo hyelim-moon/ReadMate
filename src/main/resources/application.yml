@@ -50,6 +50,11 @@ jwt:
   expiration: 86400000   # 1일(밀리초 단위)
 
 # ======== 외부 API 키/엔드포인트 ========
+gemini:
+  api-version: v1
+  model: gemini-2.0-flash    # 또는 gemini-1.5-flash-latest
+  api-key: ${GEMINI_API_KEY:}
+
 aladin:
   ttb-key: "ttbzcbm19110945001"
   base-url: "https://www.aladin.co.kr/ttb/api/ItemList.aspx"

@@ -1,15 +1,15 @@
 .container {
-    max-width: 1200px;
-    margin: 20px auto;
-    padding: 0 20px;
+    max-width: 1600px;
+    margin: 40px auto;
+    padding: 0 40px;
     font-family: 'Noto Sans KR', sans-serif;
     color: #374151;
 }
 
 .title {
-    font-size: 32px;
+    font-size: 36px;
     font-weight: 700;
-    margin-bottom: 32px;
+    margin-bottom: 40px;
     text-align: center;
     color: #2d5d39;
 }
@@ -18,23 +18,20 @@
     display: flex;
     justify-content: center;
     align-items: flex-end;
-    gap: 20px; /* 원래대로 유지 */
-    margin-bottom: 24px;
+    gap: 24px;
+    margin-bottom: 32px;
     flex-wrap: wrap;
 }
 
-/* 날짜 입력 그룹 */
 .dateGroup {
     display: flex;
-    gap: 30px; /* 시작일-종료일 사이만 벌림 */
+    gap: 30px;
 }
 
-/* 종료일 input에 오른쪽 마진 주기 */
 .dateGroup label:last-child {
-    margin-right: 30px; /* 종료일-검색어입력칸 사이 */
+    margin-right: 30px;
 }
 
-/* 날짜 입력 라벨 */
 .dateLabel {
     display: flex;
     flex-direction: column;
@@ -42,14 +39,13 @@
     color: #555;
 }
 
-/* 날짜 input */
 .dateInput {
     margin-top: 6px;
-    padding: 8px 12px;
+    padding: 10px 14px;
     font-size: 14px;
     border: 1.5px solid #ccc;
     border-radius: 8px;
-    width: 160px;
+    width: 180px;
     transition: border-color 0.3s ease;
 }
 
@@ -60,8 +56,8 @@
 }
 
 .searchInput {
-    width: 300px;
-    padding: 12px 16px;
+    width: 350px;
+    padding: 14px 18px;
     font-size: 14px;
     border-radius: 8px;
     border: 1.5px solid #ccc;
@@ -91,36 +87,35 @@
     background-color: #005b29;
 }
 
-/* 레이아웃 */
 .grid {
     display: flex;
-    gap: 24px;
+    gap: 40px;
 }
 
 .sectionBox {
-    width: 70%;
-    background-color: #ffffff;
-    padding: 16px 24px 24px 24px;
+    width: 78%;
+    padding: 32px;
     border-radius: 16px;
     border: 1px solid #e5e7eb;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     display: flex;
     flex-direction: column;
+    background-color: #ffffff;
 }
 
 .sectionBoxSmall {
-    width: 30%;
-    background-color: #f9fafb;
-    padding: 16px 20px 20px 20px;
+    width: 22%;
+    padding: 28px;
     border-radius: 16px;
     border: 1px solid #e5e7eb;
     box-shadow: 0 1px 6px rgba(0, 0, 0, 0.04);
     display: flex;
     flex-direction: column;
+    background-color: #f9fafb;
 }
 
 .subTitle {
-    font-size: 20px;
+    font-size: 22px;
     font-weight: 600;
     margin-top: 0;
     margin-bottom: 16px;
@@ -130,18 +125,17 @@
 .postList {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 18px;
     overflow-y: auto;
-    max-height: 600px;
+    max-height: 650px;
     padding-right: 8px;
 }
 
-/* 게시글 카드 (이미지+텍스트 가로 정렬) */
 .postCard {
     display: flex;
     flex-direction: row;
     align-items: flex-start;
-    padding: 16px;
+    padding: 18px;
     border-radius: 12px;
     border: 1px solid #ddd;
     background-color: #fafafa;
@@ -154,57 +148,51 @@
     background-color: #f0fdf4;
 }
 
-/* 게시글 이미지 */
 .postImage {
-    width: 100px;
-    height: 100px;
+    width: 120px;
+    height: 120px;
     object-fit: cover;
     border-radius: 8px;
-    margin-right: 16px;
+    margin-right: 18px;
     flex-shrink: 0;
 }
 
-/* 텍스트 박스 */
 .postContentBox {
     flex: 1;
     display: flex;
     flex-direction: column;
 }
 
-/* 게시글 제목 */
 .postTitle {
     font-weight: 700;
     color: #1f2937;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     margin-top: 8px;
-    font-size: 18px;
+    font-size: 20px;
 }
 
-/* 게시글 내용 (3줄 제한) */
 .postContent {
-    font-size: 14px;
+    font-size: 15px;
     color: #4b5563;
     margin-bottom: 12px;
-    line-height: 1.4;
+    line-height: 1.5;
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
 
-/* 게시글 메타 정보 */
 .postMeta {
-    font-size: 12px;
+    font-size: 13px;
     color: #9ca3af;
 }
 
-/* BEST 목록 */
 .bestList {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
     overflow-y: auto;
-    max-height: 600px;
+    max-height: 650px;
     padding-right: 8px;
 }
 
@@ -212,7 +200,7 @@
     background-color: white;
     border-radius: 12px;
     border: 1px solid #ddd;
-    padding: 12px 14px;
+    padding: 14px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     cursor: pointer;
     transition: background-color 0.2s ease;
@@ -224,7 +212,7 @@
 
 .bestTitle {
     font-weight: 600;
-    font-size: 16px;
+    font-size: 17px;
     color: #065f46;
     margin-bottom: 6px;
     white-space: nowrap;
@@ -233,7 +221,7 @@
 }
 
 .bestMeta {
-    font-size: 12px;
+    font-size: 13px;
     color: #6b7280;
 }
 
@@ -243,17 +231,16 @@
     right: 40px;
     background-color: #00753C;
     color: white;
-    padding: 0.8rem 1.6rem; /* padding 더 크게 */
+    padding: 0.8rem 1.6rem;
     border: none;
     border-radius: 2.5rem;
     cursor: pointer;
     font-weight: bold;
-    height: 3.5rem; /* height 조금 키움 */
-    font-size: clamp(1rem, 2.2vw, 1.3rem); /* 글자 크기도 살짝 업 */
+    height: 3.5rem;
+    font-size: clamp(1rem, 2.2vw, 1.3rem);
     transition: background-color 0.3s ease;
     z-index: 1000;
 }
-
 
 .floatingWriteButton:hover {
     background-color: #005b29;

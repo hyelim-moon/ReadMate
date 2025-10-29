@@ -1,76 +1,90 @@
 package RM.ReadMate.service;
 
-import com.google.auth.oauth2.GoogleCredentials;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
-import java.io.FileInputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.List;
-import java.util.Scanner;
+import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class GeminiService {
-    // ✅ API Key 없이 사용하는 Vertex AI Gemini API 엔드포인트
-    private static final String ENDPOINT =
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
+    @Value("${gemini.api-key:}") private String apiKey;
+    @Value("${gemini.model:gemini-1.5-flash}") private String model;
+    @Value("${gemini.api-version:v1}") private String apiVersion; // ← 추가
+
+    private final WebClient.Builder webClientBuilder;
+
+    private WebClient client() {
+        return webClientBuilder
+                .baseUrl("https://generativelanguage.googleapis.com")
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .defaultHeader("x-goog-api-key", apiKey)
+                .build();
+    }
 
     public String ask(String prompt) {
+        if (apiKey == null || apiKey.isBlank()) {
+            return "에러: GEMINI_API_KEY 환경변수가 비어 있습니다.";
+        }
+
+        Map<String, Object> body = Map.of(
+                "contents", List.of(Map.of("parts", List.of(Map.of("text", prompt))))
+        );
+
+        // v1 또는 v1beta를 yml에서 고를 수 있게
+        String path = "/" + apiVersion + "/models/" + model + ":generateContent";
+
         try {
-            // ✅ OAuth 인증 - 두 개의 스코프 포함
-            GoogleCredentials credentials = GoogleCredentials
-                    .fromStream(new FileInputStream(System.getenv("GOOGLE_APPLICATION_CREDENTIALS")))
-                    .createScoped(List.of(
-                            "https://www.googleapis.com/auth/cloud-platform",
-                            "https://www.googleapis.com/auth/generative-language"
-                    ));
-            credentials.refreshIfExpired();
-            String token = credentials.getAccessToken().getTokenValue();
+            // 상태코드와 본문을 모두 확보
+            var respMono = client().post()
+                    .uri(path)
+                    .bodyValue(body)
+                    .exchangeToMono(r ->
+                            r.bodyToMono(String.class)
+                                    .map(b -> new ApiResult(r.statusCode().value(), b))
+                    );
 
-            // ✅ 디버깅 출력
-            System.out.println("ACCESS TOKEN = " + token);
-            System.out.println("Authorization = Bearer " + token);
+            ApiResult ar = respMono.block();
+            if (ar == null) return "알 수 없는 오류";
 
-            // ✅ 요청 본문
-            String body = """
-            {
-              "contents": [{
-                "parts": [{
-                  "text": "%s"
-                }]
-              }]
+            if (ar.code >= 200 && ar.code < 300) {
+                JsonObject root = JsonParser.parseString(ar.body).getAsJsonObject();
+                return root.getAsJsonArray("candidates")
+                        .get(0).getAsJsonObject()
+                        .getAsJsonObject("content")
+                        .getAsJsonArray("parts")
+                        .get(0).getAsJsonObject()
+                        .get("text").getAsString();
             }
-            """.formatted(prompt);
-            System.out.println("Body = " + body);
 
-            // ✅ HTTP POST 요청
-            URL url = new URL(ENDPOINT);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Authorization", "Bearer " + token);
-            conn.setRequestProperty("Content-Type", "application/json");
-            conn.setDoOutput(true);
-            conn.getOutputStream().write(body.getBytes());
-            System.out.println("URL = " + url);
+            // 404일 때 친절한 힌트
+            if (ar.code == 404) {
+                return "모델을 찾지 못했습니다. ("
+                        + model + ", " + apiVersion + ")\n"
+                        + "👉 yml에서 api-version을 v1로 바꾸고 모델을 "
+                        + "`gemini-1.5-flash`(또는 `gemini-1.5-flash-latest`)로 설정하세요.\n"
+                        + "원문: " + ar.body;
+            }
 
-            // ✅ 응답 받기
-            Scanner scanner = new Scanner(conn.getInputStream());
-            String response = scanner.useDelimiter("\\A").next();
-            scanner.close();
-
-            // ✅ 응답 파싱
-            JsonObject json = JsonParser.parseString(response).getAsJsonObject();
-            return json.getAsJsonArray("candidates")
-                    .get(0).getAsJsonObject()
-                    .getAsJsonObject("content")
-                    .getAsJsonArray("parts")
-                    .get(0).getAsJsonObject()
-                    .get("text").getAsString();
+            return "Gemini API 오류 (" + ar.code + "): " + ar.body;
 
         } catch (Exception e) {
-            return "에러 발생: " + e.getMessage();
+            return "예외: " + e.getMessage();
         }
     }
+    public String listModels() {
+        String path = "/v1beta/models"; // 목록은 v1beta 예시가 많음
+        return client().get().uri(path).retrieve().bodyToMono(String.class).block();
+    }
+
+    private record ApiResult(int code, String body) {}
 }
+
