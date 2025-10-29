@@ -118,12 +118,42 @@ const ChallengeDetail = () => {
         </div>
     );
 
-    const renderProgress = () => (
-        <div className={styles.myProgressSection}>
-            {/* 실제 앱에서는 사용자의 특정 챌린지 진행 상황을 가져와 표시합니다. */}
-            <p className={styles.emptyMessage}>아직 이 챌린지에 대한 진행 상황이 없습니다.</p>
-        </div>
-    );
+    const renderProgressTabContent = () => {
+        const token = localStorage.getItem("ACCESS_TOKEN");
+
+        return (
+            <div>
+                <section>
+                    <h2 className={styles.progressSectionTitle}>내 챌린지 현황</h2>
+                    {token ? (
+                        <div className={styles.myProgressSection}>
+                            {/* 실제 앱에서는 사용자의 특정 챌린지 진행 상황을 가져와 표시합니다. */}
+                            <p>나의 진행률: {challenge.currentProgress} / {challenge.goal}</p>
+                            <div className={styles.progressContainer} style={{marginTop: '1rem'}}>
+                                <div className={styles.progressBar} style={{ width: `${(challenge.currentProgress / challenge.goal) * 100}%` }}></div>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className={styles.loginPrompt}>
+                            <p>로그인하고 챌린지 진행 현황을 확인해보세요!</p>
+                            <button onClick={() => navigate('/login')} className={styles.loginButton}>로그인</button>
+                        </div>
+                    )}
+                </section>
+
+                <section>
+                    <h2 className={styles.progressSectionTitle}>참가자 현황</h2>
+                    {challenge.participants > 0 ? (
+                        <p className={styles.participantText}>
+                            현재 총 {challenge.participants}명이 참여하고 있습니다.
+                        </p>
+                    ) : (
+                        <p className={styles.emptyMessage}>아직 참가자가 없습니다.</p>
+                    )}
+                </section>
+            </div>
+        );
+    };
 
     return (
         <div className={styles.challengePage}>
@@ -139,7 +169,7 @@ const ChallengeDetail = () => {
                     className={`${styles.tabButton} ${activeTab === 'overview' ? styles.active : ''}`}
                     onClick={() => setActiveTab('overview')}
                 >
-                    개요
+                    챌린지 개요
                 </button>
                 <button
                     className={`${styles.tabButton} ${activeTab === 'progress' ? styles.active : ''}`}
@@ -150,7 +180,7 @@ const ChallengeDetail = () => {
             </div>
 
             <div className={styles.challengeContent}>
-                {activeTab === 'overview' ? renderOverview() : renderProgress()}
+                {activeTab === 'overview' ? renderOverview() : renderProgressTabContent()}
             </div>
         </div>
     );
