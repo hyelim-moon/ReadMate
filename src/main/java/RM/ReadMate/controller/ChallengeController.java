@@ -46,4 +46,14 @@ public class ChallengeController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", e.getMessage()));
         }
     }
+
+    @GetMapping("/my-progress")
+    public ResponseEntity<List<ChallengeDTO>> getMyChallengeProgress(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        String userIdString = jwtTokenProvider.getUseridFromToken(token);
+        Long userId = Long.parseLong(userIdString);
+
+        List<ChallengeDTO> myProgress = challengeService.getMyChallengeProgress(userId);
+        return ResponseEntity.ok(myProgress);
+    }
 }

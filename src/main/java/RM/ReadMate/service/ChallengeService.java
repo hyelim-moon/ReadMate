@@ -83,9 +83,31 @@ public class ChallengeService {
         participation.setChallenge(challenge);
         participation.setParticipationDate(LocalDate.now());
 
+        // Add to collections for in-memory consistency
+        challenge.getParticipations().add(participation);
+        user.getChallengeParticipations().add(participation);
+
         user.addPoints(challenge.getReward()); // Update user's points
 
+        // Save only the owning side of the ManyToOne relationship
         challengeParticipationRepository.save(participation);
-        userRepository.save(user);
+        // The changes to 'user' (points and collection) and 'challenge' (collection)
+        // will be flushed automatically at the end of the @Transactional method
+        // because they are managed entities and their collections have CascadeType.ALL.
+    }
+
+    @Transactional(readOnly = true)
+    public List<ChallengeDTO> getMyChallengeProgress(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        return user.getChallengeParticipations().stream()
+                .map(participation -> {
+                    Challenge challenge = participation.getChallenge();
+                    // TODO: 실제 진행 상황에 따라 status를 더 세분화해야 할 수 있습니다.
+                    // 현재는 일반 챌린지 상태 로직을 따릅니다.
+                    String status = getStatus(challenge);
+                    long participants = challengeParticipationRepository.countByChallenge(challenge);
+                    return new ChallengeDTO(challenge, status, participants);
+                })
+                .collect(Collectors.toList());
     }
 }

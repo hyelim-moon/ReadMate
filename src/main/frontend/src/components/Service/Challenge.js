@@ -63,9 +63,6 @@ const ChallengesList = ({ challenges, setChallenges, loading }) => {
                 const buttonStatusLabel = isParticipating ? '참여중' : (challenge.status === '진행중' ? '참여 가능' : challenge.status);
                 const isDisabled = buttonStatusLabel !== '참여 가능';
 
-                // 디버깅을 위한 console.log 제거 (문제 해결 후)
-                // console.log(`Challenge ID: ${challenge.id}, Backend Status: ${challenge.status}, isParticipating: ${isParticipating}, Button Label: ${buttonStatusLabel}, Is Disabled: ${isDisabled}`);
-
                 return (
                     <div
                         key={challenge.id}
@@ -161,12 +158,13 @@ const MyProgress = ({ progressData, loading }) => {
         return <div>진행 상황을 불러오는 중...</div>;
     }
 
-    const inProgressChallenges = progressData.filter(c => c.status === '참여 중');
-    const completedChallenges = progressData.filter(c => c.status === '달성 완료');
-
-    if (progressData.length === 0) {
+    // progressData가 비어있을 경우를 대비하여 Array.isArray로 확인
+    if (!Array.isArray(progressData) || progressData.length === 0) {
         return <p className={styles.emptyMessage}>아직 참여 중인 챌린지가 없습니다. 새로운 챌린지에 도전해보세요!</p>;
     }
+
+    const inProgressChallenges = progressData.filter(c => c.status === '진행중' || c.status === '참여중');
+    const completedChallenges = progressData.filter(c => c.status === '종료'); // '달성 완료' 대신 '종료'로 필터링
 
     return (
         <div>
@@ -182,17 +180,20 @@ const MyProgress = ({ progressData, loading }) => {
                                 </div>
                                 <p className={styles.challengeDescription}>{challenge.description}</p>
                                 <div className={styles.challengeInfo}>
-                                    <span><i className="fas fa-calendar-alt"></i> {challenge.period}</span>
-                                    <span><i className="fas fa-play-circle"></i> 시작일: {challenge.myStartDate}</span>
+                                    <span><i className="fas fa-calendar-alt"></i> {challenge.startDate} ~ {challenge.endDate}</span>
+                                    {/* TODO: 실제 참여 시작일과 진행률 정보가 필요하면 백엔드에서 추가해야 합니다. */}
                                 </div>
+                                {/* TODO: 진행률 바는 백엔드에서 진행률 데이터를 받아와야 구현 가능합니다. */}
+                                {/*
                                 <div className={styles.progressContainer}>
                                     <div className={styles.progressBar} style={{ width: `${(challenge.currentProgress / challenge.goal) * 100}%` }}></div>
                                 </div>
                                 <div className={styles.progressInfo}>
                                     <span>{challenge.currentProgress} / {challenge.goal}</span>
                                 </div>
+                                */}
                                 <div className={styles.cardFooter}>
-                                    <p className={styles.challengeReward}><strong>보상:</strong> {challenge.reward}</p>
+                                    <p className={styles.challengeReward}><strong>보상:</strong> {challenge.reward} 포인트</p>
                                 </div>
                             </div>
                         ))}
@@ -214,17 +215,11 @@ const MyProgress = ({ progressData, loading }) => {
                                 </div>
                                 <p className={styles.challengeDescription}>{challenge.description}</p>
                                 <div className={styles.challengeInfo}>
-                                    <span><i className="fas fa-calendar-alt"></i> {challenge.period}</span>
-                                    <span><i className="fas fa-check-circle"></i> 완료일: {challenge.myCompletionDate}</span>
-                                </div>
-                                <div className={styles.progressContainer}>
-                                    <div className={styles.progressBar} style={{ width: `100%` }}></div>
-                                </div>
-                                <div className={styles.progressInfo}>
-                                    <span>달성 완료!</span>
+                                    <span><i className="fas fa-calendar-alt"></i> {challenge.startDate} ~ {challenge.endDate}</span>
+                                    {/* TODO: 실제 완료일 정보가 필요하면 백엔드에서 추가해야 합니다. */}
                                 </div>
                                 <div className={styles.cardFooter}>
-                                    <p className={styles.challengeReward}><strong>획득 보상:</strong> {challenge.reward}</p>
+                                    <p className={styles.challengeReward}><strong>획득 보상:</strong> {challenge.reward} 포인트</p>
                                 </div>
                             </div>
                         ))}
@@ -319,7 +314,27 @@ const Challenge = () => {
 
         } else if (activeTab === 'progress') {
             if (isLoggedIn) {
-                setLoading(false);
+                const token = localStorage.getItem("ACCESS_TOKEN");
+                fetch('http://localhost:8080/api/challenges/my-progress', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                })
+                .then(res => {
+                    if (!res.ok) {
+                        throw new Error('Failed to fetch my challenge progress');
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    setProgressData(Array.isArray(data) ? data : []);
+                    setLoading(false);
+                })
+                .catch(err => {
+                    console.error('Failed to fetch my challenge progress:', err);
+                    setProgressData([]);
+                    setLoading(false);
+                });
             } else {
                 setProgressData([]);
                 setLoading(false);
