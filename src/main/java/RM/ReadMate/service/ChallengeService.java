@@ -6,6 +6,7 @@ import RM.ReadMate.entity.ChallengeParticipation;
 import RM.ReadMate.entity.User;
 import RM.ReadMate.repository.ChallengeParticipationRepository;
 import RM.ReadMate.repository.ChallengeRepository;
+import RM.ReadMate.repository.RecordRepository;
 import RM.ReadMate.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,6 +26,7 @@ public class ChallengeService {
     private final ChallengeRepository challengeRepository;
     private final ChallengeParticipationRepository challengeParticipationRepository;
     private final UserRepository userRepository;
+    private final RecordRepository recordRepository; // RecordRepository 주입
 
     @PostConstruct
     public void initChallenges() {
@@ -99,14 +103,35 @@ public class ChallengeService {
     @Transactional(readOnly = true)
     public List<ChallengeDTO> getMyChallengeProgress(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        
+        // 사용자의 모든 기록을 미리 가져옵니다. (챌린지 기간 필터링 불가)
+        List<RM.ReadMate.entity.Record> userRecords = recordRepository.findByUser(user);
+
         return user.getChallengeParticipations().stream()
                 .map(participation -> {
                     Challenge challenge = participation.getChallenge();
-                    // TODO: 실제 진행 상황에 따라 status를 더 세분화해야 할 수 있습니다.
-                    // 현재는 일반 챌린지 상태 로직을 따릅니다.
                     String status = getStatus(challenge);
                     long participants = challengeParticipationRepository.countByChallenge(challenge);
-                    return new ChallengeDTO(challenge, status, participants);
+
+                    // TODO: Record 엔티티에 날짜 필드가 없어 챌린지 기간 내의 기록만 필터링 불가.
+                    // 현재는 사용자의 전체 기록 수를 currentProgress로 사용합니다.
+                    int currentProgress = userRecords.size(); 
+
+                    // description에서 목표 값 추출 (예: "책 5권 읽기" -> 5)
+                    int goal = 0;
+                    Pattern pattern = Pattern.compile("\\d+"); // 숫자 추출 정규식
+                    Matcher matcher = pattern.matcher(challenge.getDescription());
+                    if (matcher.find()) {
+                        try {
+                            goal = Integer.parseInt(matcher.group());
+                        } catch (NumberFormatException e) {
+                            goal = 1; // 파싱 실패 시 기본값
+                        }
+                    } else {
+                        goal = 1; // 숫자가 없으면 기본값
+                    }
+
+                    return new ChallengeDTO(challenge, status, participants, currentProgress, goal);
                 })
                 .collect(Collectors.toList());
     }

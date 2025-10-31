@@ -164,7 +164,7 @@ const MyProgress = ({ progressData, loading }) => {
     }
 
     const inProgressChallenges = progressData.filter(c => c.status === '진행중' || c.status === '참여중');
-    const completedChallenges = progressData.filter(c => c.status === '종료'); // '달성 완료' 대신 '종료'로 필터링
+    const completedChallenges = progressData.filter(c => c.status === '종료');
 
     return (
         <div>
@@ -172,31 +172,36 @@ const MyProgress = ({ progressData, loading }) => {
                 <h2 className={styles.progressSectionTitle}>진행 중인 챌린지</h2>
                 {inProgressChallenges.length > 0 ? (
                     <div className={styles.challengeList}>
-                        {inProgressChallenges.map(challenge => (
-                            <div key={challenge.id} className={`${styles.challengeCard} ${styles[challenge.status.replace(' ', '-')]}`}>
-                                <div className={styles.cardHeader}>
-                                    <h3 className={styles.challengeTitle}>{challenge.title}</h3>
-                                    <span className={styles.challengeStatus}>{challenge.status}</span>
+                        {inProgressChallenges.map(challenge => {
+                            // 디버깅을 위한 console.log 추가
+                            console.log(`MyProgress - Challenge ID: ${challenge.id}, Title: ${challenge.title}, Current Progress: ${challenge.currentProgress}, Goal: ${challenge.goal}`);
+                            const progressPercentage = (challenge.goal > 0) ? Math.min(100, (challenge.currentProgress / challenge.goal) * 100) : 0;
+
+                            return (
+                                <div key={challenge.id} className={`${styles.challengeCard} ${styles[challenge.status.replace(' ', '-')]}`}>
+                                    <div className={styles.cardHeader}>
+                                        <h3 className={styles.challengeTitle}>{challenge.title}</h3>
+                                        <span className={styles.challengeStatus}>{challenge.status}</span>
+                                    </div>
+                                    <p className={styles.challengeDescription}>{challenge.description}</p>
+                                    <div className={styles.challengeInfo}>
+                                        <span><i className="fas fa-calendar-alt"></i> {challenge.startDate} ~ {challenge.endDate}</span>
+                                    </div>
+                                    <div className={styles.progressContainer}>
+                                        <div 
+                                            className={styles.progressBar} 
+                                            style={{ width: `${progressPercentage}%` }}
+                                        ></div>
+                                    </div>
+                                    <div className={styles.progressInfo}>
+                                        <span>{challenge.currentProgress} / {challenge.goal}</span>
+                                    </div>
+                                    <div className={styles.cardFooter}>
+                                        <p className={styles.challengeReward}><strong>보상:</strong> {challenge.reward} 포인트</p>
+                                    </div>
                                 </div>
-                                <p className={styles.challengeDescription}>{challenge.description}</p>
-                                <div className={styles.challengeInfo}>
-                                    <span><i className="fas fa-calendar-alt"></i> {challenge.startDate} ~ {challenge.endDate}</span>
-                                    {/* TODO: 실제 참여 시작일과 진행률 정보가 필요하면 백엔드에서 추가해야 합니다. */}
-                                </div>
-                                {/* TODO: 진행률 바는 백엔드에서 진행률 데이터를 받아와야 구현 가능합니다. */}
-                                {/*
-                                <div className={styles.progressContainer}>
-                                    <div className={styles.progressBar} style={{ width: `${(challenge.currentProgress / challenge.goal) * 100}%` }}></div>
-                                </div>
-                                <div className={styles.progressInfo}>
-                                    <span>{challenge.currentProgress} / {challenge.goal}</span>
-                                </div>
-                                */}
-                                <div className={styles.cardFooter}>
-                                    <p className={styles.challengeReward}><strong>보상:</strong> {challenge.reward} 포인트</p>
-                                </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 ) : (
                     <p className={styles.emptyMessage}>현재 진행 중인 챌린지가 없습니다.</p>
@@ -216,7 +221,6 @@ const MyProgress = ({ progressData, loading }) => {
                                 <p className={styles.challengeDescription}>{challenge.description}</p>
                                 <div className={styles.challengeInfo}>
                                     <span><i className="fas fa-calendar-alt"></i> {challenge.startDate} ~ {challenge.endDate}</span>
-                                    {/* TODO: 실제 완료일 정보가 필요하면 백엔드에서 추가해야 합니다. */}
                                 </div>
                                 <div className={styles.cardFooter}>
                                     <p className={styles.challengeReward}><strong>획득 보상:</strong> {challenge.reward} 포인트</p>
@@ -346,8 +350,6 @@ const Challenge = () => {
         if ((tab === 'progress' || tab === 'leaderboard') && !isLoggedIn) {
             if (tab === 'progress' && window.confirm("회원 전용 서비스입니다.\n로그인이 필요합니다.\n지금 로그인하시겠습니까?")) {
                 navigate('/login');
-            } else {
-                 setActiveTab(tab);
             }
         } else {
             setActiveTab(tab);
@@ -373,7 +375,7 @@ const Challenge = () => {
     };
 
     return (
-        <div className={styles.challengePage}>
+        <div className className={styles.challengePage}>
             <div className={styles.headerContainer}>
                 <h1 className={styles.pageTitle}>챌린지</h1>
             </div>
