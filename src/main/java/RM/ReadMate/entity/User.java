@@ -70,12 +70,17 @@ public class User {
     @Builder.Default
     private List<Wishlist> wishlists = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    @Builder.Default
+    private List<ChallengeParticipation> challengeParticipations = new ArrayList<>();
+
     public User(String nickname, int points) {
         this.nickname = nickname;
         this.points = points;
     }
 
     public void addPoints(int amount) {
-        this.points += amount;
+        setPoints(this.points + amount);
     }
 }

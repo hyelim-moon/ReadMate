@@ -90,6 +90,7 @@
 .challengeCard.달성-완료 { border-color: #28a745; }
 .challengeCard.참여-가능 { border-color: #ffc107; }
 .challengeCard.예정 { border-color: #6c757d; }
+.challengeCard.종료 { border-color: #999; } /* 종료된 챌린지 테두리 색상 추가 */
 
 .cardHeader {
   display: flex;
@@ -116,7 +117,8 @@
 .참여-중 .challengeStatus { background-color: #007bff; }
 .달성-완료 .challengeStatus { background-color: #28a745; }
 .참여-가능 .challengeStatus { background-color: #ffc107; color: #333;}
-.statusUpcoming { background-color: #6c757d; }
+.예정 .challengeStatus { background-color: #6c757d; }
+.종료 .challengeStatus { background-color: #999; } /* 종료된 챌린지 상태 뱃지 색상 추가 */
 
 .challengeDescription {
   font-size: 1rem;
@@ -214,6 +216,11 @@
 
 .leaderboardTable tbody tr:hover {
   background-color: #f1f8f3;
+}
+
+.myRankRow {
+  background-color: #e6f4ea !important; /* 연한 녹색 배경 */
+  font-weight: bold;
 }
 
 .rankCell {

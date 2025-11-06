@@ -45,15 +45,14 @@ public class SecurityConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        // 포트가 바뀌어도 허용되도록 패턴 사용
         CorsConfiguration cfg = new CorsConfiguration();
         cfg.setAllowedOriginPatterns(List.of(
                 "http://localhost:*",
                 "http://127.0.0.1:*"
         ));
         cfg.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS","PATCH","HEAD"));
-        cfg.setAllowedHeaders(List.of("*"));         // Authorization, Content-Type 등 모두 허용
-        cfg.setExposedHeaders(List.of("Authorization","Location")); // 필요 시 프론트에서 읽을 헤더
+        cfg.setAllowedHeaders(List.of("*"));
+        cfg.setExposedHeaders(List.of("Authorization","Location"));
         cfg.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -64,16 +63,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                // CORS/CSRF/세션
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
-                // 기본 인증/폼 로그인 비활성 (JWT만 사용)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
-
-                // 인증 안 된 사용자 허용 + 예외를 JSON으로 응답
                 .anonymous(Customizer.withDefaults())
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((req, res, e) -> {
@@ -87,16 +81,9 @@ public class SecurityConfig {
                             res.getWriter().write("{\"message\":\"Forbidden\"}");
                         })
                 )
-
-                // 인가 규칙
                 .authorizeHttpRequests(auth -> auth
-                        // Preflight
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-
-                        // 개발 편의를 위한 콘솔/에러/정적 리소스
                         .requestMatchers("/h2-console/**", "/error", "/uploads/**").permitAll()
-
-                        // 공개 API
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/gemini/**").permitAll()
                         .requestMatchers("/api/products/**").permitAll()
@@ -105,25 +92,21 @@ public class SecurityConfig {
                         .requestMatchers("/api/recommend/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/records/**").permitAll()
                         .requestMatchers("/api/community/**").permitAll()
-
-                        // 인증 필요 API
+                        .requestMatchers(HttpMethod.GET, "/api/challenges/**").permitAll()
+                        
                         .requestMatchers(HttpMethod.POST, "/api/books/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/records/**").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/records/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/challenges/**").authenticated()
                         .requestMatchers("/api/users/me").authenticated()
                         .requestMatchers("/api/users/award-points").authenticated()
                         .requestMatchers("/api/points/**").authenticated()
                         .requestMatchers("/api/saved-books/**").authenticated()
                         .requestMatchers("/api/wishlist/**").authenticated()
-
-                        // 나머지는 인증 필요
+                        
                         .anyRequest().authenticated()
                 )
-
-                // H2 콘솔 frame 허용(개발용)
                 .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
-
-                // JWT 필터
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

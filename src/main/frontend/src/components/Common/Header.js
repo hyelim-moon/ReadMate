@@ -150,7 +150,7 @@ function Header() {
                         <Link to="/challenge"><button><FaTrophy /> 챌린지</button></Link>
                         <Link to="/pointShop"><button><FaShoppingCart /> 포인트샵</button></Link>
                         <Link to="/community"><button><FaComments /> 커뮤니티</button></Link>
-                        <Link to="/"><button><FaQuestionCircle /> 도움말</button></Link>
+                        <Link to="/help"><button><FaQuestionCircle /> 도움말</button></Link>
                     </nav>
                 </div>
 

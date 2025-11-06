@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { BrowserRouter, Routes, Route, useLocation, useNavigate } from "react-router-dom";
@@ -32,7 +33,8 @@ import BookDetail from './components/Book/BookDetail';
 import BookList from './components/Book/BookList';
 import GenreList from './components/Book/GenreList';
 import Challenge from "./components/Service/Challenge";
-import ChallengeDetail from "./components/Service/ChallengeDetail"; // ChallengeDetail 추가
+import ChallengeDetail from "./components/Service/ChallengeDetail";
+import Help from "./components/Service/Help"; // Help 컴포넌트 추가
 
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -74,7 +76,8 @@ function AppContent({ userid, onLoginSuccess, isLoggedIn }) {
           <Route path="/recordlist" element={<RecordList />} />
           <Route path="/pointshop" element={<PointShop userid={userid} />} />
           <Route path="/challenge" element={<Challenge />} />
-          <Route path="/challenges/:id" element={<ChallengeDetail />} /> {/* 챌린지 상세 페이지 라우트 추가 */}
+          <Route path="/challenges/:id" element={<ChallengeDetail />} />
+          <Route path="/help" element={<Help />} />
           <Route
               path="/products/:id"
               element={<ProductDetail userid={userid} isLoggedIn={isLoggedIn} />}
