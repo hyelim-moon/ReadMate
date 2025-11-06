@@ -21,7 +21,7 @@ const BookSlider = ({ apiUrl }) => {
                 const mapped = items.map((item) => {
                     // 책 제목이 "제목 - 소제목" 또는 "제목: 소제목" 형식일 경우 앞부분만 사용
                     const mainTitle = item.bookName
-                        ? item.bookName.split(/[-:]/)[0].trim()
+                        ? item.bookName.split(/[-:()]/)[0].trim()
                         : "제목 정보 없음";
 
                     return {

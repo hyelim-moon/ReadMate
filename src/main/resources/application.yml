@@ -32,7 +32,7 @@ spring:
   sql:
     init:
       mode: never                        # 서버 시작 시 SQL 스크립트 실행 모드
-      encoding: UTF-8                      # SQL 파일 인코딩
+      encoding: UTF-8                    # SQL 파일 인코딩
       defer-datasource-initialization: false # 데이터베이스 초기화 지연하지 않음
 
   web:
@@ -44,6 +44,7 @@ spring:
 
   jackson:
     time-zone: "Asia/Seoul"           # JSON 직렬화 시간대
+
 # ======== JWT 설정 ========
 jwt:
   secret: "ThisIsASecretKeyForJWTGeneration_ChangeThisToYourOwnSecret"
@@ -62,6 +63,22 @@ aladin:
 googlebooks:
   api-key: "AIzaSyD8CJbNQX3AialFRwia9TcwPqDY1fWuPjU"
   base-url: "https://www.googleapis.com/books/v1/volumes"
+
+# 백필 러너가 읽는 키 alias (google.books.api-key)
+google:
+  books:
+    api-key: ${googlebooks.api-key}
+
+# ======== 장르 백필 스위치 ========
+backfill:
+  genre:
+    enabled: true       # 실행할 때만 true
+    limit: -1           # -1이면 '전체'
+    batch-size: 200
+    throttle-ms: 250
+    use-heuristics: true
+
+
 # ======== 로깅 설정 ========
 logging:
   level:
