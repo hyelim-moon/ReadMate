@@ -15,6 +15,8 @@ const sampleChallenges = [
         status: '참여 중',
         currentProgress: 2,
         goal: 5,
+        relatedLink: '/booklist',
+        relatedLinkText: '도서 목록 바로가기'
     },
     {
         id: 2,
@@ -26,6 +28,8 @@ const sampleChallenges = [
         status: '참여 가능',
         currentProgress: 0,
         goal: 300,
+        relatedLink: '/recordlist',
+        relatedLinkText: '내 독서 기록 바로가기'
     },
     {
         id: 3,
@@ -37,6 +41,8 @@ const sampleChallenges = [
         status: '달성 완료',
         currentProgress: 7,
         goal: 7,
+        relatedLink: '/recordlist',
+        relatedLinkText: '내 독서 기록 바로가기'
     },
     {
         id: 4,
@@ -48,6 +54,34 @@ const sampleChallenges = [
         status: '예정',
         currentProgress: 0,
         goal: 31,
+        relatedLink: '/recordlist',
+        relatedLinkText: '내 독서 기록 바로가기'
+    },
+    {
+        id: 5,
+        title: '다독왕 챌린지',
+        description: '일주일 동안 3권 이상 읽기',
+        reward: '200 포인트',
+        participants: 0,
+        period: '진행중',
+        status: '참여 가능',
+        currentProgress: 0,
+        goal: 3,
+        relatedLink: '/booklist',
+        relatedLinkText: '도서 목록 바로가기'
+    },
+    {
+        id: 6,
+        title: '장르 탐험가 챌린지',
+        description: '2주 동안 서로 다른 장르의 책 2권 읽기',
+        reward: '150 포인트',
+        participants: 0,
+        period: '진행중',
+        status: '참여 가능',
+        currentProgress: 0,
+        goal: 2,
+        relatedLink: '/booklist',
+        relatedLinkText: '도서 목록 바로가기'
     },
 ];
 
@@ -132,6 +166,13 @@ const ChallengeDetail = () => {
                             <div className={styles.progressContainer} style={{marginTop: '1rem'}}>
                                 <div className={styles.progressBar} style={{ width: `${(challenge.currentProgress / challenge.goal) * 100}%` }}></div>
                             </div>
+                            {challenge.relatedLink && (
+                                <div className={styles.actionButtonContainer}>
+                                    <button onClick={() => navigate(challenge.relatedLink)} className={styles.actionButton}>
+                                        {challenge.relatedLinkText}
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     ) : (
                         <div className={styles.loginPrompt}>

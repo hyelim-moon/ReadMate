@@ -31,7 +31,7 @@ spring:
 
   sql:
     init:
-      mode: never                        # 서버 시작 시 SQL 스크립트 실행 모드
+      mode: always                        # 서버 시작 시 SQL 스크립트 실행 모드
       encoding: UTF-8                      # SQL 파일 인코딩
       defer-datasource-initialization: false # 데이터베이스 초기화 지연하지 않음
 

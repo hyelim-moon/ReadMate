@@ -154,11 +154,12 @@ const Leaderboard = ({ leaderboardData, loading, isLoggedIn, onLoginClick }) => 
 };
 
 const MyProgress = ({ progressData, loading }) => {
+    const navigate = useNavigate();
+
     if (loading) {
         return <div>진행 상황을 불러오는 중...</div>;
     }
 
-    // progressData가 비어있을 경우를 대비하여 Array.isArray로 확인
     if (!Array.isArray(progressData) || progressData.length === 0) {
         return <p className={styles.emptyMessage}>아직 참여 중인 챌린지가 없습니다. 새로운 챌린지에 도전해보세요!</p>;
     }
@@ -173,12 +174,15 @@ const MyProgress = ({ progressData, loading }) => {
                 {inProgressChallenges.length > 0 ? (
                     <div className={styles.challengeList}>
                         {inProgressChallenges.map(challenge => {
-                            // 디버깅을 위한 console.log 추가
-                            console.log(`MyProgress - Challenge ID: ${challenge.id}, Title: ${challenge.title}, Current Progress: ${challenge.currentProgress}, Goal: ${challenge.goal}`);
                             const progressPercentage = (challenge.goal > 0) ? Math.min(100, (challenge.currentProgress / challenge.goal) * 100) : 0;
 
                             return (
-                                <div key={challenge.id} className={`${styles.challengeCard} ${styles[challenge.status.replace(' ', '-')]}`}>
+                                <div key={challenge.id} 
+                                     className={`${styles.challengeCard} ${styles[challenge.status.replace(' ', '-')]}`}
+                                     onClick={() => navigate(`/challenges/${challenge.id}`)} // 카드 클릭 시 상세 페이지로 이동
+                                     role="button"
+                                     tabIndex={0}
+                                     onKeyDown={(e) => e.key === 'Enter' && navigate(`/challenges/${challenge.id}`)}>
                                     <div className={styles.cardHeader}>
                                         <h3 className={styles.challengeTitle}>{challenge.title}</h3>
                                         <span className={styles.challengeStatus}>{challenge.status}</span>
@@ -348,7 +352,7 @@ const Challenge = () => {
 
     const handleTabClick = (tab) => {
         if ((tab === 'progress' || tab === 'leaderboard') && !isLoggedIn) {
-            if (tab === 'progress' && window.confirm("회원 전용 서비스입니다.\n로그인이 필요합니다.\n지금 로그인하시겠습니까?")) {
+            if (window.confirm("회원 전용 서비스입니다.\n로그인이 필요합니다.\n지금 로그인하시겠습니까?")) {
                 navigate('/login');
             }
         } else {

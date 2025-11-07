@@ -29,24 +29,52 @@ public class ChallengeService {
     private final RecordRepository recordRepository; // RecordRepository 주입
 
     @PostConstruct
+    @Transactional
     public void initChallenges() {
-        if (challengeRepository.count() == 0) {
-            Challenge challenge1 = new Challenge();
-            challenge1.setTitle("10월 독서 마라톤");
-            challenge1.setDescription("10월 한 달 동안 책 5권 읽기");
-            challenge1.setReward(500);
-            challenge1.setStartDate(LocalDate.of(2024, 10, 1));
-            challenge1.setEndDate(LocalDate.of(2024, 10, 31));
-            challengeRepository.save(challenge1);
+        // 챌린지 1: 없으면 만들고, 있으면 정보 업데이트
+        Challenge challenge1 = challengeRepository.findByTitle("10월 독서 마라톤").orElse(new Challenge());
+        challenge1.setTitle("10월 독서 마라톤");
+        challenge1.setDescription("10월 한 달 동안 책 5권 읽기");
+        challenge1.setReward(500);
+        challenge1.setStartDate(LocalDate.of(2024, 10, 1));
+        challenge1.setEndDate(LocalDate.of(2024, 10, 31));
+        challengeRepository.save(challenge1);
 
-            Challenge challenge2 = new Challenge();
-            challenge2.setTitle("주말 독서 챌린지");
-            challenge2.setDescription("주말 동안 300페이지 이상 읽기");
-            challenge2.setReward(100);
-            challenge2.setStartDate(LocalDate.now().minusDays(1));
-            challenge2.setEndDate(LocalDate.now().plusDays(1));
-            challengeRepository.save(challenge2);
-        }
+        // 챌린지 2: 없으면 만들고, 있으면 정보 업데이트
+        Challenge challenge2 = challengeRepository.findByTitle("주말 독서 챌린지").orElse(new Challenge());
+        challenge2.setTitle("주말 독서 챌린지");
+        challenge2.setDescription("주말 동안 300페이지 이상 읽기");
+        challenge2.setReward(100);
+        challenge2.setStartDate(LocalDate.now().minusDays(1));
+        challenge2.setEndDate(LocalDate.now().plusDays(1));
+        challengeRepository.save(challenge2);
+
+        // 챌린지 3: 없으면 만들고, 있으면 정보 업데이트
+        Challenge challenge3 = challengeRepository.findByTitle("연말 독서 챌린지").orElse(new Challenge());
+        challenge3.setTitle("연말 독서 챌린지");
+        challenge3.setDescription("12월 한 달 동안 책 3권 읽기");
+        challenge3.setReward(300);
+        challenge3.setStartDate(LocalDate.of(2025, 12, 1));
+        challenge3.setEndDate(LocalDate.of(2025, 12, 31));
+        challengeRepository.save(challenge3);
+
+        // 챌린지 4 (새로 추가): 다독왕 챌린지
+        Challenge challenge4 = challengeRepository.findByTitle("다독왕 챌린지").orElse(new Challenge());
+        challenge4.setTitle("다독왕 챌린지");
+        challenge4.setDescription("일주일 동안 3권 이상 읽기");
+        challenge4.setReward(200);
+        challenge4.setStartDate(LocalDate.now().minusDays(3));
+        challenge4.setEndDate(LocalDate.now().plusDays(4));
+        challengeRepository.save(challenge4);
+
+        // 챌린지 5 (새로 추가): 장르 탐험가 챌린지
+        Challenge challenge5 = challengeRepository.findByTitle("장르 탐험가 챌린지").orElse(new Challenge());
+        challenge5.setTitle("장르 탐험가 챌린지");
+        challenge5.setDescription("2주 동안 서로 다른 장르의 책 2권 읽기");
+        challenge5.setReward(150);
+        challenge5.setStartDate(LocalDate.now());
+        challenge5.setEndDate(LocalDate.now().plusWeeks(2));
+        challengeRepository.save(challenge5);
     }
 
     public List<ChallengeDTO> getChallenges() {
@@ -103,9 +131,6 @@ public class ChallengeService {
     @Transactional(readOnly = true)
     public List<ChallengeDTO> getMyChallengeProgress(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-        
-        // 사용자의 모든 기록을 미리 가져옵니다. (챌린지 기간 필터링 불가)
-        List<RM.ReadMate.entity.Record> userRecords = recordRepository.findByUser(user);
 
         return user.getChallengeParticipations().stream()
                 .map(participation -> {
@@ -113,25 +138,30 @@ public class ChallengeService {
                     String status = getStatus(challenge);
                     long participants = challengeParticipationRepository.countByChallenge(challenge);
 
-                    // TODO: Record 엔티티에 날짜 필드가 없어 챌린지 기간 내의 기록만 필터링 불가.
-                    // 현재는 사용자의 전체 기록 수를 currentProgress로 사용합니다.
-                    int currentProgress = userRecords.size(); 
+                    // 챌린지 기간 내의 독서 기록 수만 집계
+                    int currentProgress = recordRepository.countByUserAndRecordDateBetween(user, challenge.getStartDate(), challenge.getEndDate());
 
-                    // description에서 목표 값 추출 (예: "책 5권 읽기" -> 5)
                     int goal = 0;
-                    Pattern pattern = Pattern.compile("\\d+"); // 숫자 추출 정규식
+                    Pattern pattern = Pattern.compile("\\d+");
                     Matcher matcher = pattern.matcher(challenge.getDescription());
                     if (matcher.find()) {
                         try {
                             goal = Integer.parseInt(matcher.group());
                         } catch (NumberFormatException e) {
-                            goal = 1; // 파싱 실패 시 기본값
+                            goal = 1;
                         }
                     } else {
-                        goal = 1; // 숫자가 없으면 기본값
+                        goal = 1;
                     }
 
-                    return new ChallengeDTO(challenge, status, participants, currentProgress, goal);
+                    String relatedLink = "/recordlist";
+                    String relatedLinkText = "내 독서 기록 바로가기";
+                    if (challenge.getDescription().contains("책") || challenge.getDescription().contains("장르")) {
+                        relatedLink = "/booklist";
+                        relatedLinkText = "도서 목록 바로가기";
+                    }
+
+                    return new ChallengeDTO(challenge, status, participants, currentProgress, goal, relatedLink, relatedLinkText);
                 })
                 .collect(Collectors.toList());
     }

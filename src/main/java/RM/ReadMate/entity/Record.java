@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
+
 @Entity
 @Table(name = "records")
 @Getter
@@ -34,6 +36,9 @@ public class Record {
 
     @Column(nullable = true)
     private String photo; // 사진은 null 가능
+
+    @Column(nullable = true) // null 허용으로 변경
+    private LocalDate recordDate; // 독서 기록 날짜
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

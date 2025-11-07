@@ -14,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.Map;
@@ -87,6 +88,7 @@ public class RecordController {
                     .genre(genre)
                     .content(content)
                     .user(user) // ✅ 여기 핵심!
+                    .recordDate(LocalDate.now()) // 현재 날짜 추가
                     .build();
 
             Record saved = recordService.saveRecord(userId, record, photo);
@@ -209,6 +211,6 @@ public class RecordController {
             }
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("삭제 중 오류 발생: " + e.getMessage());
-        }
+        }    
     }
 }
