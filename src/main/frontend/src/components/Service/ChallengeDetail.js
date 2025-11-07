@@ -1,97 +1,44 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import styles from '../../assets/styles/Challenge.module.css';
-
-// 샘플 데이터 (실제로는 API 또는 공유 데이터 소스에서 가져와야 함)
-const sampleChallenges = [
-    {
-        id: 1,
-        title: '10월 독서 마라톤',
-        description: '10월 한 달 동안 책 5권 읽기',
-        reward: '500 포인트',
-        participants: 123,
-        period: '2025.10.31까지',
-        status: '참여 중',
-        currentProgress: 2,
-        goal: 5,
-        relatedLink: '/booklist',
-        relatedLinkText: '도서 목록 바로가기'
-    },
-    {
-        id: 2,
-        title: '주말 독서 챌린지',
-        description: '주말 동안 300페이지 이상 읽기',
-        reward: '100 포인트',
-        participants: 45,
-        period: '2025.10.31까지',
-        status: '참여 가능',
-        currentProgress: 0,
-        goal: 300,
-        relatedLink: '/recordlist',
-        relatedLinkText: '내 독서 기록 바로가기'
-    },
-    {
-        id: 3,
-        title: '신년 목표: 독서왕',
-        description: '새해 첫 주에 매일 독서 기록 남기기',
-        reward: '300 포인트',
-        participants: 78,
-        period: '2024.01.07까지',
-        status: '달성 완료',
-        currentProgress: 7,
-        goal: 7,
-        relatedLink: '/recordlist',
-        relatedLinkText: '내 독서 기록 바로가기'
-    },
-    {
-        id: 4,
-        title: '연말 독서 챌린지',
-        description: '12월 한 달간 매일 30분 이상 독서하기',
-        reward: '1000 포인트',
-        participants: 0,
-        period: '2024.12.01 ~ 2024.12.31',
-        status: '예정',
-        currentProgress: 0,
-        goal: 31,
-        relatedLink: '/recordlist',
-        relatedLinkText: '내 독서 기록 바로가기'
-    },
-    {
-        id: 5,
-        title: '다독왕 챌린지',
-        description: '일주일 동안 3권 이상 읽기',
-        reward: '200 포인트',
-        participants: 0,
-        period: '진행중',
-        status: '참여 가능',
-        currentProgress: 0,
-        goal: 3,
-        relatedLink: '/booklist',
-        relatedLinkText: '도서 목록 바로가기'
-    },
-    {
-        id: 6,
-        title: '장르 탐험가 챌린지',
-        description: '2주 동안 서로 다른 장르의 책 2권 읽기',
-        reward: '150 포인트',
-        participants: 0,
-        period: '진행중',
-        status: '참여 가능',
-        currentProgress: 0,
-        goal: 2,
-        relatedLink: '/booklist',
-        relatedLinkText: '도서 목록 바로가기'
-    },
-];
 
 const ChallengeDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const challenge = sampleChallenges.find(c => c.id === parseInt(id));
+    const [challenge, setChallenge] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [activeTab, setActiveTab] = useState('overview');
 
-    const handleParticipate = (e) => {
+    const isLoggedIn = !!localStorage.getItem("ACCESS_TOKEN");
+
+    useEffect(() => {
+        const fetchChallengeDetails = async () => {
+            setLoading(true);
+            setError(null);
+            try {
+                const token = localStorage.getItem("ACCESS_TOKEN");
+                const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+                const response = await fetch(`http://localhost:8080/api/challenges/${id}/details`, {
+                    headers: headers,
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch challenge details');
+                }
+                const data = await response.json();
+                setChallenge(data);
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchChallengeDetails();
+    }, [id, isLoggedIn]); // id와 로그인 상태가 변경될 때마다 다시 불러오도록
+
+    const handleParticipate = async (e) => {
         e.stopPropagation();
         if (challenge.status !== '참여 가능') return;
 
@@ -100,11 +47,59 @@ const ChallengeDetail = () => {
             if (window.confirm("회원 전용 서비스입니다.\n로그인이 필요합니다.\n지금 로그인하시겠습니까?")) {
                 navigate('/login');
             }
-        } else {
-            alert(`챌린지 '${challenge.title}'에 참여합니다!`);
-            // 여기에 챌린지 참여 API 호출 로직을 추가할 수 있습니다.
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://localhost:8080/api/challenges/${challenge.id}/participate`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
+            if (response.ok) {
+                alert('챌린지 참여가 완료되었습니다.');
+                // 참여 후 챌린지 상세 정보를 다시 불러와 UI 업데이트
+                const updatedChallengeResponse = await fetch(`http://localhost:8080/api/challenges/${challenge.id}/details`, {
+                    headers: { 'Authorization': `Bearer ${token}` },
+                });
+                const updatedChallengeData = await updatedChallengeResponse.json();
+                setChallenge(updatedChallengeData);
+            } else {
+                const err = await response.json();
+                alert(err.message || '챌린지 참여에 실패했습니다.');
+            }
+        } catch (error) {
+            alert('네트워크 오류가 발생했습니다.');
         }
     };
+
+    if (loading) {
+        return (
+            <div className={styles.challengePage}>
+                <div className={styles.headerContainer}>
+                    <h1 className={styles.pageTitle}>챌린지 정보</h1>
+                </div>
+                <div className={styles.challengeContent}>
+                    <p className={styles.emptyMessage}>챌린지 정보를 불러오는 중...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className={styles.challengePage}>
+                <div className={styles.headerContainer}>
+                    <h1 className={styles.pageTitle}>챌린지 정보</h1>
+                </div>
+                <div className={styles.challengeContent}>
+                    <p className={styles.emptyMessage}>오류 발생: {error}</p>
+                </div>
+            </div>
+        );
+    }
 
     if (!challenge) {
         return (
@@ -119,11 +114,13 @@ const ChallengeDetail = () => {
         );
     }
 
+    const progressPercentage = (challenge.goal > 0) ? Math.min(100, (challenge.currentProgress / challenge.goal) * 100) : 0;
+
     const renderOverview = () => (
         <div className={styles.overviewSection}>
             <div className={styles.overviewItem}>
                 <h3 className={styles.overviewTitle}>기간</h3>
-                <p>{challenge.period}</p>
+                <p>{challenge.startDate} ~ {challenge.endDate}</p>
             </div>
             <div className={styles.overviewItem}>
                 <h3 className={styles.overviewTitle}>목표</h3>
@@ -131,7 +128,7 @@ const ChallengeDetail = () => {
             </div>
             <div className={styles.overviewItem}>
                 <h3 className={styles.overviewTitle}>보상</h3>
-                <p>{challenge.reward}</p>
+                <p>{challenge.reward} 포인트</p>
             </div>
             <div className={styles.overviewItem}>
                 <h3 className={styles.overviewTitle}>참여방법</h3>
@@ -153,18 +150,15 @@ const ChallengeDetail = () => {
     );
 
     const renderProgressTabContent = () => {
-        const token = localStorage.getItem("ACCESS_TOKEN");
-
         return (
             <div>
                 <section>
                     <h2 className={styles.progressSectionTitle}>내 챌린지 현황</h2>
-                    {token ? (
+                    {isLoggedIn ? (
                         <div className={styles.myProgressSection}>
-                            {/* 실제 앱에서는 사용자의 특정 챌린지 진행 상황을 가져와 표시합니다. */}
                             <p>나의 진행률: {challenge.currentProgress} / {challenge.goal}</p>
                             <div className={styles.progressContainer} style={{marginTop: '1rem'}}>
-                                <div className={styles.progressBar} style={{ width: `${(challenge.currentProgress / challenge.goal) * 100}%` }}></div>
+                                <div className={styles.progressBar} style={{ width: `${progressPercentage}%` }}></div>
                             </div>
                             {challenge.relatedLink && (
                                 <div className={styles.actionButtonContainer}>

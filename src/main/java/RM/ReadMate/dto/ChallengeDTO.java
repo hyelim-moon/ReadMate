@@ -21,6 +21,7 @@ public class ChallengeDTO {
     private int goal;
     private String relatedLink;
     private String relatedLinkText;
+    private boolean isRewardClaimed; // 보상 수령 여부 필드 추가
 
     public ChallengeDTO(Challenge challenge, String status, long participants) {
         this.id = challenge.getId();
@@ -33,6 +34,7 @@ public class ChallengeDTO {
         this.participants = participants;
         this.currentProgress = 0;
         this.goal = 0;
+        this.isRewardClaimed = false; // 기본값 설정
     }
 
     public ChallengeDTO(Challenge challenge, String status, long participants, int currentProgress, int goal) {
@@ -41,10 +43,11 @@ public class ChallengeDTO {
         this.goal = goal;
     }
 
-    // 모든 필드를 포함하는 생성자
-    public ChallengeDTO(Challenge challenge, String status, long participants, int currentProgress, int goal, String relatedLink, String relatedLinkText) {
+    // 모든 필드를 포함하는 생성자 (isRewardClaimed 추가)
+    public ChallengeDTO(Challenge challenge, String status, long participants, int currentProgress, int goal, String relatedLink, String relatedLinkText, boolean isRewardClaimed) {
         this(challenge, status, participants, currentProgress, goal);
         this.relatedLink = relatedLink;
         this.relatedLinkText = relatedLinkText;
+        this.isRewardClaimed = isRewardClaimed;
     }
 }

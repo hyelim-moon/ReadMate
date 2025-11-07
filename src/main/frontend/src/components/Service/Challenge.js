@@ -153,8 +153,74 @@ const Leaderboard = ({ leaderboardData, loading, isLoggedIn, onLoginClick }) => 
     );
 };
 
-const MyProgress = ({ progressData, loading }) => {
+const MyProgress = ({ progressData, loading, setProgressData }) => { // setProgressData 추가
     const navigate = useNavigate();
+
+    const handleClaimReward = async (challengeId) => {
+        const token = localStorage.getItem("ACCESS_TOKEN");
+        if (!token) {
+            alert("로그인이 필요합니다.");
+            navigate('/login');
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://localhost:8080/api/challenges/${challengeId}/claim-reward`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+            });
+
+            if (response.ok) {
+                const updatedChallenge = await response.json();
+                alert(`챌린지 보상 ${updatedChallenge.reward} 포인트가 지급되었습니다!`);
+                // UI 업데이트: 해당 챌린지의 isRewardClaimed 상태를 true로 변경
+                setProgressData(prevData => prevData.map(c => 
+                    c.id === challengeId ? { ...c, isRewardClaimed: true } : c
+                ));
+            } else {
+                const errorData = await response.json();
+                alert(errorData.message || '보상 수령에 실패했습니다.');
+            }
+        } catch (error) {
+            alert('네트워크 오류가 발생했습니다.');
+        }
+    };
+
+    const handleAbandonChallenge = async (challengeId) => {
+        const token = localStorage.getItem("ACCESS_TOKEN");
+        if (!token) {
+            alert("로그인이 필요합니다.");
+            navigate('/login');
+            return;
+        }
+
+        if (!window.confirm("정말로 챌린지를 포기하시겠습니까? 포기 시 진행 상황이 초기화됩니다.")) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://localhost:8080/api/challenges/${challengeId}/abandon`, {
+                method: 'DELETE', // DELETE 메서드 사용
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
+            if (response.ok) {
+                alert('챌린지를 포기했습니다.');
+                // UI 업데이트: 해당 챌린지를 progressData에서 제거
+                setProgressData(prevData => prevData.filter(c => c.id !== challengeId));
+            } else {
+                const errorData = await response.json();
+                alert(errorData.message || '챌린지 포기에 실패했습니다.');
+            }
+        } catch (error) {
+            alert('네트워크 오류가 발생했습니다.');
+        }
+    };
 
     if (loading) {
         return <div>진행 상황을 불러오는 중...</div>;
@@ -202,6 +268,13 @@ const MyProgress = ({ progressData, loading }) => {
                                     </div>
                                     <div className={styles.cardFooter}>
                                         <p className={styles.challengeReward}><strong>보상:</strong> {challenge.reward} 포인트</p>
+                                        {/* 진행 중인 챌린지에 포기하기 버튼 추가 */}
+                                        <button 
+                                            className={styles.abandonButton} 
+                                            onClick={(e) => { e.stopPropagation(); handleAbandonChallenge(challenge.id); }}
+                                        >
+                                            포기하기
+                                        </button>
                                     </div>
                                 </div>
                             );
@@ -216,21 +289,47 @@ const MyProgress = ({ progressData, loading }) => {
                 <h2 className={styles.progressSectionTitle}>완료한 챌린지</h2>
                 {completedChallenges.length > 0 ? (
                     <div className={styles.challengeList}>
-                        {completedChallenges.map(challenge => (
-                            <div key={challenge.id} className={`${styles.challengeCard} ${styles[challenge.status.replace(' ', '-')]}`}>
-                                <div className={styles.cardHeader}>
-                                    <h3 className={styles.challengeTitle}>{challenge.title}</h3>
-                                    <span className={styles.challengeStatus}>{challenge.status}</span>
+                        {completedChallenges.map(challenge => {
+                            const isGoalMet = challenge.currentProgress >= challenge.goal;
+                            const canClaimReward = challenge.status === '종료' && isGoalMet && !challenge.isRewardClaimed;
+
+                            return (
+                                <div key={challenge.id} 
+                                     className={`${styles.challengeCard} ${styles[challenge.status.replace(' ', '-')]} ${challenge.status === '종료' ? styles.challengeEnded : ''}`}
+                                     onClick={() => navigate(`/challenges/${challenge.id}`)}
+                                     role="button"
+                                     tabIndex={0}
+                                     onKeyDown={(e) => e.key === 'Enter' && navigate(`/challenges/${challenge.id}`)}>
+                                    <div className={styles.cardHeader}>
+                                        <h3 className={styles.challengeTitle}>{challenge.title}</h3>
+                                        <span className={styles.challengeStatus}>{challenge.status}</span>
+                                    </div>
+                                    <p className={styles.challengeDescription}>{challenge.description}</p>
+                                    <div className={styles.challengeInfo}>
+                                        <span><i className="fas fa-calendar-alt"></i> {challenge.startDate} ~ {challenge.endDate}</span>
+                                    </div>
+                                    <div className={styles.progressInfo}>
+                                        <span>{challenge.currentProgress} / {challenge.goal}</span>
+                                    </div>
+                                    <div className={styles.cardFooter}>
+                                        {canClaimReward ? (
+                                            <button 
+                                                className={styles.claimRewardButton} 
+                                                onClick={(e) => { e.stopPropagation(); handleClaimReward(challenge.id); }}
+                                            >
+                                                보상 받기 ({challenge.reward} 포인트)
+                                            </button>
+                                        ) : (
+                                            challenge.isRewardClaimed ? (
+                                                <p className={styles.rewardClaimedText}>보상 수령 완료</p>
+                                            ) : (
+                                                <p className={styles.challengeReward}><strong>보상:</strong> {challenge.reward} 포인트</p>
+                                            )
+                                        )}
+                                    </div>
                                 </div>
-                                <p className={styles.challengeDescription}>{challenge.description}</p>
-                                <div className={styles.challengeInfo}>
-                                    <span><i className="fas fa-calendar-alt"></i> {challenge.startDate} ~ {challenge.endDate}</span>
-                                </div>
-                                <div className={styles.cardFooter}>
-                                    <p className={styles.challengeReward}><strong>획득 보상:</strong> {challenge.reward} 포인트</p>
-                                </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 ) : (
                     <p className={styles.emptyMessage}>아직 완료한 챌린지가 없습니다.</p>
@@ -372,7 +471,7 @@ const Challenge = () => {
                     onLoginClick={() => navigate('/login')}
                 />;
             case 'progress':
-                return <MyProgress progressData={progressData} loading={loading} />;
+                return <MyProgress progressData={progressData} loading={loading} setProgressData={setProgressData} />;
             default:
                 return <ChallengesList challenges={challenges} setChallenges={setChallenges} loading={loading} />;
         }

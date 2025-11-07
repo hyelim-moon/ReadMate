@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate; // LocalDate import 추가
 import java.util.List;
 
 @Service
@@ -60,6 +61,9 @@ public class RecordService {
                 record.setUser(user);
             }
 
+            // 새로운 독서 기록은 항상 현재 날짜로 recordDate 설정
+            record.setRecordDate(LocalDate.now());
+
             Record savedRecord = recordRepository.save(record);
 
             // 포인트 지급
@@ -76,7 +80,7 @@ public class RecordService {
         }
     }
 
-    // 수정 메서드 (이미지 삭제 기능 포함)
+    // 수정 메서드
     public Record updateRecord(Long id, String title, String author, String publisher, String genre, String content, MultipartFile photo, boolean removePhoto) {
         try {
             Record existingRecord = recordRepository.findById(id)
@@ -91,6 +95,7 @@ public class RecordService {
             existingRecord.setPublisher(publisher);
             existingRecord.setGenre(genre);
             existingRecord.setContent(content);
+            existingRecord.setRecordDate(LocalDate.now());
 
             String uploadDir = Paths.get(System.getProperty("user.dir"), "uploads").toString();
 

@@ -19,4 +19,7 @@ public interface RecordRepository extends JpaRepository<Record, Long> {
     Record findByIdWithUser(@Param("id") Long id);
 
     int countByUserAndRecordDateBetween(User user, LocalDate startDate, LocalDate endDate);
+
+    // 특정 사용자, 시작 날짜, 종료 날짜 사이의 모든 독서 기록을 가져오는 메서드 추가
+    List<Record> findByUserAndRecordDateBetween(User user, LocalDate startDate, LocalDate endDate);
 }

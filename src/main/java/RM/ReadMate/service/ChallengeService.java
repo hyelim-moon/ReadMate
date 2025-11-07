@@ -3,6 +3,7 @@ package RM.ReadMate.service;
 import RM.ReadMate.dto.ChallengeDTO;
 import RM.ReadMate.entity.Challenge;
 import RM.ReadMate.entity.ChallengeParticipation;
+import RM.ReadMate.entity.Record; // Record import 추가
 import RM.ReadMate.entity.User;
 import RM.ReadMate.repository.ChallengeParticipationRepository;
 import RM.ReadMate.repository.ChallengeRepository;
@@ -18,6 +19,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.Set; // Set import 추가
+import java.util.HashSet; // HashSet import 추가
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +30,7 @@ public class ChallengeService {
     private final ChallengeParticipationRepository challengeParticipationRepository;
     private final UserRepository userRepository;
     private final RecordRepository recordRepository; // RecordRepository 주입
+    private final UserService userService; // UserService 주입
 
     @PostConstruct
     @Transactional
@@ -43,7 +47,7 @@ public class ChallengeService {
         // 챌린지 2: 없으면 만들고, 있으면 정보 업데이트
         Challenge challenge2 = challengeRepository.findByTitle("주말 독서 챌린지").orElse(new Challenge());
         challenge2.setTitle("주말 독서 챌린지");
-        challenge2.setDescription("주말 동안 300페이지 이상 읽기");
+        challenge2.setDescription("주말 동안 독서 기록 1개 남기기"); // 목표 변경
         challenge2.setReward(100);
         challenge2.setStartDate(LocalDate.now().minusDays(1));
         challenge2.setEndDate(LocalDate.now().plusDays(1));
@@ -114,12 +118,13 @@ public class ChallengeService {
         participation.setUser(user);
         participation.setChallenge(challenge);
         participation.setParticipationDate(LocalDate.now());
+        participation.setRewardClaimed(false); // 보상 수령 여부 초기화
 
         // Add to collections for in-memory consistency
         challenge.getParticipations().add(participation);
         user.getChallengeParticipations().add(participation);
 
-        user.addPoints(challenge.getReward()); // Update user's points
+        // user.addPoints(challenge.getReward()); // 보상은 챌린지 완료 후 수령 시 지급
 
         // Save only the owning side of the ManyToOne relationship
         challengeParticipationRepository.save(participation);
@@ -138,8 +143,24 @@ public class ChallengeService {
                     String status = getStatus(challenge);
                     long participants = challengeParticipationRepository.countByChallenge(challenge);
 
-                    // 챌린지 기간 내의 독서 기록 수만 집계
-                    int currentProgress = recordRepository.countByUserAndRecordDateBetween(user, challenge.getStartDate(), challenge.getEndDate());
+                    // 챌린지 참여 날짜와 챌린지 시작일 중 더 늦은 날짜를 독서 기록 집계 시작일로 사용
+                    LocalDate effectiveStartDate = participation.getParticipationDate().isAfter(challenge.getStartDate()) ?
+                                                   participation.getParticipationDate() : challenge.getStartDate();
+
+                    int currentProgress = 0;
+                    // "장르 탐험가 챌린지"인 경우 고유 장르 수를 세고, 그 외에는 독서 기록 수를 셉니다.
+                    if ("장르 탐험가 챌린지".equals(challenge.getTitle())) {
+                        List<Record> records = recordRepository.findByUserAndRecordDateBetween(user, effectiveStartDate, challenge.getEndDate());
+                        Set<String> uniqueGenres = new HashSet<>();
+                        for (Record record : records) {
+                            if (record.getGenre() != null && !record.getGenre().trim().isEmpty()) {
+                                uniqueGenres.add(record.getGenre().trim());
+                            }
+                        }
+                        currentProgress = uniqueGenres.size();
+                    } else {
+                        currentProgress = recordRepository.countByUserAndRecordDateBetween(user, effectiveStartDate, challenge.getEndDate());
+                    }
 
                     int goal = 0;
                     Pattern pattern = Pattern.compile("\\d+");
@@ -150,19 +171,170 @@ public class ChallengeService {
                         } catch (NumberFormatException e) {
                             goal = 1;
                         }
-                    } else {
-                        goal = 1;
                     }
 
-                    String relatedLink = "/recordlist";
+                    String relatedLink = "/recordlist"; // 기본값: 내 독서 기록 바로가기
                     String relatedLinkText = "내 독서 기록 바로가기";
-                    if (challenge.getDescription().contains("책") || challenge.getDescription().contains("장르")) {
-                        relatedLink = "/booklist";
-                        relatedLinkText = "도서 목록 바로가기";
-                    }
 
-                    return new ChallengeDTO(challenge, status, participants, currentProgress, goal, relatedLink, relatedLinkText);
+                    // ChallengeDTO에 isRewardClaimed 필드 추가
+                    return new ChallengeDTO(challenge, status, participants, currentProgress, goal, relatedLink, relatedLinkText, participation.isRewardClaimed());
                 })
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public ChallengeDTO getChallengeDetailsForUser(Long challengeId, Long userId) {
+        System.out.println("\n--- Debugging Challenge Progress ---");
+        System.out.println("Challenge ID: " + challengeId + ", User ID: " + userId);
+
+        Challenge challenge = challengeRepository.findById(challengeId)
+                .orElseThrow(() -> new RuntimeException("Challenge not found"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        System.out.println("Challenge Title: " + challenge.getTitle());
+        System.out.println("Challenge Start Date: " + challenge.getStartDate() + ", End Date: " + challenge.getEndDate());
+
+        String status = getStatus(challenge);
+        long participants = challengeParticipationRepository.countByChallenge(challenge);
+
+        ChallengeParticipation participation = challengeParticipationRepository.findByUserAndChallenge(user, challenge)
+                .orElse(null);
+
+        int currentProgress = 0;
+        boolean isRewardClaimed = false; // isRewardClaimed 초기화
+        if (participation != null) {
+            System.out.println("User participated. Participation Date: " + participation.getParticipationDate());
+            LocalDate effectiveStartDate = participation.getParticipationDate().isAfter(challenge.getStartDate()) ?
+                                           participation.getParticipationDate() : challenge.getStartDate();
+            System.out.println("Effective Start Date for records: " + effectiveStartDate);
+
+            if ("장르 탐험가 챌린지".equals(challenge.getTitle())) {
+                System.out.println("Calculating progress for '장르 탐험가 챌린지' (unique genres).");
+                List<Record> records = recordRepository.findByUserAndRecordDateBetween(user, effectiveStartDate, challenge.getEndDate());
+                System.out.println("Found " + records.size() + " records for user in period.");
+                Set<String> uniqueGenres = new HashSet<>();
+                for (Record record : records) {
+                    System.out.println("  Record ID: " + record.getId() + ", Date: " + record.getRecordDate() + ", Genre: " + record.getGenre());
+                    if (record.getGenre() != null && !record.getGenre().trim().isEmpty()) {
+                        uniqueGenres.add(record.getGenre().trim());
+                    } else {
+                        System.out.println("  Record ID: " + record.getId() + " has null or empty genre. Skipping.");
+                    }
+                }
+                currentProgress = uniqueGenres.size();
+                System.out.println("Unique genres count: " + currentProgress);
+            } else {
+                currentProgress = recordRepository.countByUserAndRecordDateBetween(user, effectiveStartDate, challenge.getEndDate());
+                System.out.println("Calculating progress for other challenge (record count): " + currentProgress);
+            }
+            isRewardClaimed = participation.isRewardClaimed(); // 참여 정보에서 보상 수령 여부 가져옴
+        } else {
+            System.out.println("User has not participated in this challenge.");
+        }
+
+        int goal = 0;
+        Pattern pattern = Pattern.compile("\\d+");
+        Matcher matcher = pattern.matcher(challenge.getDescription());
+        if (matcher.find()) {
+            try {
+                goal = Integer.parseInt(matcher.group());
+            } catch (NumberFormatException e) {
+                goal = 1;
+            }
+        }
+        System.out.println("Calculated Goal: " + goal);
+        System.out.println("--- End Debugging Challenge Progress ---\n");
+
+        String relatedLink = "/recordlist"; // 기본값: 내 독서 기록 바로가기
+        String relatedLinkText = "내 독서 기록 바로가기";
+
+        return new ChallengeDTO(challenge, status, participants, currentProgress, goal, relatedLink, relatedLinkText, isRewardClaimed);
+    }
+
+    @Transactional
+    public ChallengeDTO claimChallengeReward(Long challengeId, Long userId) {
+        Challenge challenge = challengeRepository.findById(challengeId)
+                .orElseThrow(() -> new RuntimeException("Challenge not found"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        ChallengeParticipation participation = challengeParticipationRepository.findByUserAndChallenge(user, challenge)
+                .orElseThrow(() -> new RuntimeException("User has not participated in this challenge."));
+
+        // 챌린지가 종료되었는지 확인
+        if (LocalDate.now().isBefore(challenge.getEndDate())) {
+            throw new RuntimeException("Challenge has not ended yet.");
+        }
+
+        // 이미 보상을 수령했는지 확인
+        if (participation.isRewardClaimed()) {
+            throw new RuntimeException("Reward already claimed for this challenge.");
+        }
+
+        // 챌린지 목표 달성 여부 확인 (currentProgress 재계산)
+        LocalDate effectiveStartDate = participation.getParticipationDate().isAfter(challenge.getStartDate()) ?
+                                       participation.getParticipationDate() : challenge.getStartDate();
+
+        int currentProgress = 0;
+        if ("장르 탐험가 챌린지".equals(challenge.getTitle())) {
+            List<Record> records = recordRepository.findByUserAndRecordDateBetween(user, effectiveStartDate, challenge.getEndDate());
+            Set<String> uniqueGenres = new HashSet<>();
+            for (Record record : records) {
+                if (record.getGenre() != null && !record.getGenre().trim().isEmpty()) {
+                    uniqueGenres.add(record.getGenre().trim());
+                }
+            }
+            currentProgress = uniqueGenres.size();
+        } else {
+            currentProgress = recordRepository.countByUserAndRecordDateBetween(user, effectiveStartDate, challenge.getEndDate());
+        }
+
+        int goal = 0;
+        Pattern pattern = Pattern.compile("\\d+");
+        Matcher matcher = pattern.matcher(challenge.getDescription());
+        if (matcher.find()) {
+            try {
+                goal = Integer.parseInt(matcher.group());
+            } catch (NumberFormatException e) {
+                goal = 1;
+            }
+        }
+
+        if (currentProgress < goal) {
+            throw new RuntimeException("Challenge goal not met. Current progress: " + currentProgress + ", Goal: " + goal);
+        }
+
+        // 보상 지급
+        userService.addPoints(userId, challenge.getReward());
+        participation.setRewardClaimed(true);
+        challengeParticipationRepository.save(participation);
+
+        // 업데이트된 ChallengeDTO 반환
+        String status = getStatus(challenge);
+        long participants = challengeParticipationRepository.countByChallenge(challenge);
+        String relatedLink = "/recordlist";
+        String relatedLinkText = "내 독서 기록 바로가기";
+
+        return new ChallengeDTO(challenge, status, participants, currentProgress, goal, relatedLink, relatedLinkText, true);
+    }
+
+    @Transactional
+    public void abandonChallenge(Long challengeId, Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        Challenge challenge = challengeRepository.findById(challengeId)
+                .orElseThrow(() -> new RuntimeException("Challenge not found"));
+
+        ChallengeParticipation participation = challengeParticipationRepository.findByUserAndChallenge(user, challenge)
+                .orElseThrow(() -> new RuntimeException("User has not participated in this challenge. "));
+
+        // 챌린지가 이미 종료되었으면 포기할 수 없음
+        if (LocalDate.now().isAfter(challenge.getEndDate())) {
+            throw new RuntimeException("Cannot abandon a challenge that has already ended.");
+        }
+
+        // 챌린지 참여 기록 삭제
+        challengeParticipationRepository.delete(participation);
     }
 }

@@ -23,4 +23,5 @@ public class ChallengeParticipation {
     private Challenge challenge;
 
     private LocalDate participationDate;
+    private boolean isRewardClaimed = false; // 보상 수령 여부 필드 추가, 기본값 false
 }
