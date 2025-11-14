@@ -23,5 +23,12 @@ public class ChallengeParticipation {
     private Challenge challenge;
 
     private LocalDate participationDate;
-    private boolean isRewardClaimed = false; // 보상 수령 여부 필드 추가, 기본값 false
+    private boolean isRewardClaimed = false;
+
+    @Column(nullable = false)
+    private String status = "진행중"; // 챌린지 상태 (진행중, 달성, 완료, 실패)
+
+    private Integer finalProgress; // 챌린지 종료 시점의 진행도
+
+    private boolean isCompleted = false; // 완료 여부 필드 (상태 영구성 판단)
 }

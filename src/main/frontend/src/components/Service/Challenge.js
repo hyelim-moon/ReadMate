@@ -176,9 +176,9 @@ const MyProgress = ({ progressData, loading, setProgressData }) => { // setProgr
             if (response.ok) {
                 const updatedChallenge = await response.json();
                 alert(`챌린지 보상 ${updatedChallenge.reward} 포인트가 지급되었습니다!`);
-                // UI 업데이트: 해당 챌린지의 isRewardClaimed 상태를 true로 변경
+                // UI 업데이트: 서버로부터 받은 최신 데이터로 갱신
                 setProgressData(prevData => prevData.map(c => 
-                    c.id === challengeId ? { ...c, isRewardClaimed: true } : c
+                    c.id === challengeId ? { ...c, ...updatedChallenge, isRewardClaimed: updatedChallenge.rewardClaimed } : c
                 ));
             } else {
                 const errorData = await response.json();
@@ -230,8 +230,8 @@ const MyProgress = ({ progressData, loading, setProgressData }) => { // setProgr
         return <p className={styles.emptyMessage}>아직 참여 중인 챌린지가 없습니다. 새로운 챌린지에 도전해보세요!</p>;
     }
 
-    const inProgressChallenges = progressData.filter(c => c.status === '진행중' || c.status === '참여중');
-    const completedChallenges = progressData.filter(c => c.status === '종료');
+    const inProgressChallenges = progressData.filter(c => c.status === '진행중');
+    const completedOrAchievedChallenges = progressData.filter(c => c.status === '완료' || c.status === '달성' || c.status === '실패');
 
     return (
         <div>
@@ -268,7 +268,6 @@ const MyProgress = ({ progressData, loading, setProgressData }) => { // setProgr
                                     </div>
                                     <div className={styles.cardFooter}>
                                         <p className={styles.challengeReward}><strong>보상:</strong> {challenge.reward} 포인트</p>
-                                        {/* 진행 중인 챌린지에 포기하기 버튼 추가 */}
                                         <button 
                                             className={styles.abandonButton} 
                                             onClick={(e) => { e.stopPropagation(); handleAbandonChallenge(challenge.id); }}
@@ -286,16 +285,13 @@ const MyProgress = ({ progressData, loading, setProgressData }) => { // setProgr
             </section>
 
             <section>
-                <h2 className={styles.progressSectionTitle}>완료한 챌린지</h2>
-                {completedChallenges.length > 0 ? (
+                <h2 className={styles.progressSectionTitle}>완료/종료된 챌린지</h2>
+                {completedOrAchievedChallenges.length > 0 ? (
                     <div className={styles.challengeList}>
-                        {completedChallenges.map(challenge => {
-                            const isGoalMet = challenge.currentProgress >= challenge.goal;
-                            const canClaimReward = challenge.status === '종료' && isGoalMet && !challenge.isRewardClaimed;
-
+                        {completedOrAchievedChallenges.map(challenge => {
                             return (
                                 <div key={challenge.id} 
-                                     className={`${styles.challengeCard} ${styles[challenge.status.replace(' ', '-')]} ${challenge.status === '종료' ? styles.challengeEnded : ''}`}
+                                     className={`${styles.challengeCard} ${styles[challenge.status.replace(' ', '-')]} ${styles.challengeEnded}`}
                                      onClick={() => navigate(`/challenges/${challenge.id}`)}
                                      role="button"
                                      tabIndex={0}
@@ -312,19 +308,20 @@ const MyProgress = ({ progressData, loading, setProgressData }) => { // setProgr
                                         <span>{challenge.currentProgress} / {challenge.goal}</span>
                                     </div>
                                     <div className={styles.cardFooter}>
-                                        {canClaimReward ? (
+                                        <p className={styles.challengeReward}><strong>보상:</strong> {challenge.reward} 포인트</p>
+                                        {challenge.status === '달성' && !challenge.isRewardClaimed && (
                                             <button 
                                                 className={styles.claimRewardButton} 
                                                 onClick={(e) => { e.stopPropagation(); handleClaimReward(challenge.id); }}
                                             >
-                                                보상 받기 ({challenge.reward} 포인트)
+                                                보상 받기
                                             </button>
-                                        ) : (
-                                            challenge.isRewardClaimed ? (
-                                                <p className={styles.rewardClaimedText}>보상 수령 완료</p>
-                                            ) : (
-                                                <p className={styles.challengeReward}><strong>보상:</strong> {challenge.reward} 포인트</p>
-                                            )
+                                        )}
+                                        {challenge.status === '완료' && (
+                                            <p className={styles.rewardClaimedText}>수령 완료</p>
+                                        )}
+                                        {challenge.status === '실패' && (
+                                            <p className={styles.challengeFailedText}>도전 실패</p>
                                         )}
                                     </div>
                                 </div>
@@ -332,7 +329,7 @@ const MyProgress = ({ progressData, loading, setProgressData }) => { // setProgr
                         })}
                     </div>
                 ) : (
-                    <p className={styles.emptyMessage}>아직 완료한 챌린지가 없습니다.</p>
+                    <p className={styles.emptyMessage}>아직 완료하거나 종료된 챌린지가 없습니다.</p>
                 )}
             </section>
         </div>
