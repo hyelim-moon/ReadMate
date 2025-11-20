@@ -11,6 +11,7 @@ import RM.ReadMate.service.TitleNormalizer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import RM.ReadMate.service.NovelSubgenreClassifier;
 
 import java.util.List;
 
@@ -146,6 +147,14 @@ public class BookEnrichmentService {
             if (!genre.equals(book.getGenre())) {
                 book.setGenre(genre);
                 changed = true;
+            }
+
+            // 추가: '소설' 장르를 세부 분류 (고전 소설/영미소설/한국소설/소설)
+            if ("소설".equals(genre)) {
+                String sub = NovelSubgenreClassifier.classify(book);
+                if (sub != null && !sub.isBlank()) {
+                    genre = sub;
+                }
             }
         }
 

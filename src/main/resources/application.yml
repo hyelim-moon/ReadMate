@@ -66,3 +66,7 @@ googlebooks:
 logging:
   level:
     org.springframework.security: DEBUG
+
+readmate:
+  novel-reclassify:
+    enabled: true
