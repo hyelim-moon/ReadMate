@@ -1,17 +1,21 @@
 import BookSlider from "../Book/BookSlider";
 
-function Banner({ type }) {
+function Banner({ type, limit = 40, hideSubtitle = true, category = "전체" }) {
     let apiUrl = "";
     if (type === "bestseller") {
-        apiUrl = "http://localhost:8080/api/books/bestseller?limit=20";
+        apiUrl = `http://localhost:8080/api/books/bestseller?limit=${limit}`;
     } else if (type === "newbest") {
-        apiUrl = "http://localhost:8080/api/books/newbest?limit=20";
+        apiUrl = `http://localhost:8080/api/books/newbest?limit=${limit}`;
+    } else {
+        apiUrl = `http://localhost:8080/api/books/bestseller?limit=${limit}`;
     }
 
     return (
-        <div>
-            <BookSlider apiUrl={apiUrl} />
-        </div>
+        <BookSlider
+            apiUrl={apiUrl}
+            hideSubtitle={hideSubtitle}
+            category={category}
+        />
     );
 }
 
