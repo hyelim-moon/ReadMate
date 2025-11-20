@@ -3,6 +3,7 @@ package RM.ReadMate.controller;
 import RM.ReadMate.dto.BookDto;
 import RM.ReadMate.entity.Book;
 import RM.ReadMate.service.BookService;
+import RM.ReadMate.service.enrichment.BookEnrichmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -19,6 +20,7 @@ import java.util.Optional;
 public class BookController {
 
     private final BookService bookService;
+    private final BookEnrichmentService bookEnrichmentService;
 
     // ✅ 책 저장 - 로그인한 사용자만 가능
     @PostMapping
@@ -89,5 +91,17 @@ public class BookController {
     public ResponseEntity<Void> deleteBook(@PathVariable Long id) {
         bookService.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    // ✅ 새로 추가: 비어 있는 필드(genre/content/pageCount) 자동 채우기 백필 API
+    //  - 예: POST /api/books/enrich-missing
+    //  - SecurityConfig 에서 이 URL 은 permitAll 로 열어 둠
+    @PostMapping("/enrich-missing")
+    public ResponseEntity<String> enrichMissingBooks(
+            @RequestParam(name = "batchSize", required = false) Integer batchSize
+    ) {
+        int updated = bookEnrichmentService.enrichMissing(batchSize);
+        String message = "백필 완료: " + updated + "권의 책 정보가 업데이트되었습니다.";
+        return ResponseEntity.ok(message);
     }
 }

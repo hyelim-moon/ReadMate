@@ -93,7 +93,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/records/**").permitAll()
                         .requestMatchers("/api/community/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/challenges/**").permitAll()
-                        
+
+                        // ✅ 새로 추가: 책 메타데이터 백필용 엔드포인트는 개발 편의를 위해 permitAll
+                        //  (운영 환경에서는 토큰 인증을 요구하거나, admin 전용으로 바꾸는 것을 권장)
+                        .requestMatchers(HttpMethod.POST, "/api/books/enrich-missing").permitAll()
+
                         .requestMatchers(HttpMethod.POST, "/api/books/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/records/**").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/records/**").authenticated()
@@ -103,7 +107,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/points/**").authenticated()
                         .requestMatchers("/api/saved-books/**").authenticated()
                         .requestMatchers("/api/wishlist/**").authenticated()
-                        
+
                         .anyRequest().authenticated()
                 )
                 .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))

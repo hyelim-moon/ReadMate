@@ -6,42 +6,64 @@ import { FaBook } from 'react-icons/fa';
 import defaultBookImage from '../../assets/images/book-normal.jpg';
 
 function BookList() {
-    const { genre } = useParams();
+    // URL 에서는 인코딩된 값이 들어오므로 다시 디코딩
+    const { genre: rawGenreParam } = useParams();
+    const genre = rawGenreParam ? decodeURIComponent(rawGenreParam) : null;
+
     const [books, setBooks] = useState([]);
     const [groupedBooks, setGroupedBooks] = useState({});
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         setLoading(true);
-        const isNovelCategory = genre === '소설';
-        const fetchUrl = isNovelCategory || (genre && genre === '전체') || !genre
-            ? 'http://localhost:8080/api/books'
-            : `http://localhost:8080/api/books/genre/${genre}`;
 
-        axios.get(fetchUrl)
-            .then(response => {
-                if (isNovelCategory) {
-                    // 장르 이름에 '소설'이 포함된 모든 책을 필터링합니다.
-                    const novelBooks = response.data.filter(book => book.genre && book.genre.includes('소설'));
-                    
+        // 항상 전체 도서를 불러와서 프론트에서 장르 필터링
+        axios
+            .get('http://localhost:8080/api/books')
+            .then((response) => {
+                const allBooks = response.data || [];
+
+                // 선택된 장르에 따라 필터링 방식 결정
+                if (!genre || genre === '전체') {
+                    // 전체
+                    setBooks(allBooks);
+                    setGroupedBooks({});
+                } else if (genre === '소설') {
+                    // "소설"은 하위 장르(예: "한국 소설", "영미 소설")별로 그룹핑
+                    const novelBooks = allBooks.filter(
+                        (book) => book.genre && book.genre.includes('소설')
+                    );
+
                     const grouped = novelBooks.reduce((acc, book) => {
-                        const key = book.genre; // '고전 소설', '영미 소설' 등을 그룹 이름으로 사용합니다.
-                        if (!acc[key]) {
-                            acc[key] = [];
-                        }
+                        const key = book.genre || '기타 소설';
+                        if (!acc[key]) acc[key] = [];
                         acc[key].push(book);
                         return acc;
                     }, {});
-                    
+
                     setGroupedBooks(grouped);
                     setBooks([]);
+                } else if (genre === '시-에세이') {
+                    // 시/희곡 + 에세이 묶음
+                    const filtered = allBooks.filter(
+                        (book) =>
+                            book.genre === '시/희곡' ||
+                            book.genre === '에세이'
+                    );
+                    setBooks(filtered);
+                    setGroupedBooks({});
                 } else {
-                    setBooks(response.data);
+                    // 나머지(경제/경영, 자기계발, 인문 등)는 장르 정확히 일치
+                    const filtered = allBooks.filter(
+                        (book) => book.genre === genre
+                    );
+                    setBooks(filtered);
                     setGroupedBooks({});
                 }
+
                 setLoading(false);
             })
-            .catch(error => {
+            .catch((error) => {
                 console.error(`Error fetching books for genre ${genre}:`, error);
                 setLoading(false);
             });
@@ -55,13 +77,17 @@ function BookList() {
 
     const renderBookList = (bookList) => (
         <div className={styles.bookList}>
-            {bookList.map(book => (
-                <Link to={`/books/${book.id}`} key={book.id} className={styles.bookItemLink}>
+            {bookList.map((book) => (
+                <Link
+                    to={`/books/${book.id}`}
+                    key={book.id}
+                    className={styles.bookItemLink}
+                >
                     <div className={styles.bookItem}>
-                        <img 
-                            src={book.bookImage || defaultBookImage} 
-                            alt={book.bookName} 
-                            className={styles.bookCover} 
+                        <img
+                            src={book.bookImage || defaultBookImage}
+                            alt={book.bookName}
+                            className={styles.bookCover}
                         />
                         <h3 className={styles.bookTitle}>{book.bookName}</h3>
                         <p className={styles.bookAuthor}>{book.author}</p>
@@ -76,20 +102,29 @@ function BookList() {
             <h1 className={styles.title}>
                 <FaBook /> {pageTitle}
             </h1>
-            
+
             {genre === '소설' ? (
                 Object.keys(groupedBooks).length > 0 ? (
-                    Object.entries(groupedBooks).map(([groupName, booksInGroup]) => (
-                        <section key={groupName} className={styles.subGenreSection}>
-                            <h2 className={styles.subGenreTitle}>{groupName}</h2>
-                            {renderBookList(booksInGroup)}
-                        </section>
-                    ))
+                    Object.entries(groupedBooks).map(
+                        ([groupName, booksInGroup]) => (
+                            <section
+                                key={groupName}
+                                className={styles.subGenreSection}
+                            >
+                                <h2 className={styles.subGenreTitle}>
+                                    {groupName}
+                                </h2>
+                                {renderBookList(booksInGroup)}
+                            </section>
+                        )
+                    )
                 ) : (
                     <p>해당 장르의 도서가 없습니다.</p>
                 )
+            ) : books.length > 0 ? (
+                renderBookList(books)
             ) : (
-                books.length > 0 ? renderBookList(books) : <p>해당 장르의 도서가 없습니다.</p>
+                <p>해당 장르의 도서가 없습니다.</p>
             )}
         </div>
     );
