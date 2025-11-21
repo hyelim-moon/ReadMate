@@ -111,7 +111,7 @@ public class ChallengeService {
         Challenge challenge = challengeRepository.findById(challengeId).orElseThrow(() -> new RuntimeException("Challenge not found"));
 
         if (challengeParticipationRepository.findByUserAndChallenge(user, challenge).isPresent()) {
-            throw new RuntimeException("Already participating in the challenge");
+            throw new RuntimeException("이미 참여한 챌린지 입니다.");
         }
 
         ChallengeParticipation participation = new ChallengeParticipation();
@@ -145,12 +145,15 @@ public class ChallengeService {
                         status = participation.getStatus();
                         currentProgress = participation.getFinalProgress();
                     } else {
-                        LocalDate effectiveStartDate = participation.getParticipationDate().isAfter(challenge.getStartDate()) ?
-                                                       participation.getParticipationDate() : challenge.getStartDate();
+                        LocalDate effectiveStartDate = participation.getParticipationDate();
                         currentProgress = calculateProgress(user, challenge, effectiveStartDate);
                         
                         if (currentProgress >= goal) {
                             status = "달성";
+                            participation.setCompleted(true);
+                            participation.setStatus("달성");
+                            participation.setFinalProgress(currentProgress);
+                            challengeParticipationRepository.save(participation);
                         } else if (LocalDate.now().isAfter(challenge.getEndDate())) {
                             status = "실패";
                             // 실패 상태를 영구 저장
@@ -194,15 +197,18 @@ public class ChallengeService {
                 status = participation.getStatus();
                 currentProgress = participation.getFinalProgress();
             } else {
-                LocalDate effectiveStartDate = participation.getParticipationDate().isAfter(challenge.getStartDate()) ?
-                                               participation.getParticipationDate() : challenge.getStartDate();
+                LocalDate effectiveStartDate = participation.getParticipationDate();
                 currentProgress = calculateProgress(user, challenge, effectiveStartDate);
 
                 if (currentProgress >= goal) {
                     status = "달성";
+                    participation.setCompleted(true);
+                    participation.setStatus("달성");
+                    participation.setFinalProgress(currentProgress);
+                    challengeParticipationRepository.save(participation);
                 } else if (LocalDate.now().isAfter(challenge.getEndDate())) {
                     status = "실패";
-                     // 실패 상태를 영구 저장
+                    // 실패 상태를 영구 저장
                     participation.setCompleted(true);
                     participation.setStatus("실패");
                     participation.setFinalProgress(currentProgress);
@@ -236,27 +242,21 @@ public class ChallengeService {
             throw new RuntimeException("Reward already claimed for this challenge.");
         }
 
-        LocalDate effectiveStartDate = participation.getParticipationDate().isAfter(challenge.getStartDate()) ?
-                                       participation.getParticipationDate() : challenge.getStartDate();
-        int currentProgress = calculateProgress(user, challenge, effectiveStartDate);
-        int goal = parseGoal(challenge.getDescription());
-
-        if (currentProgress < goal) {
-            throw new RuntimeException("Challenge goal not met. Current progress: " + currentProgress + ", Goal: " + goal);
+        if (!"달성".equals(participation.getStatus())) {
+            throw new RuntimeException("Challenge goal not met.");
         }
 
         userService.addPoints(userId, challenge.getReward());
         participation.setRewardClaimed(true);
-        participation.setCompleted(true);
         participation.setStatus("완료");
-        participation.setFinalProgress(currentProgress);
         challengeParticipationRepository.save(participation);
 
         long participants = challengeParticipationRepository.countByChallenge(challenge);
         String relatedLink = "/recordlist";
         String relatedLinkText = "내 독서 기록 바로가기";
+        int goal = parseGoal(challenge.getDescription());
 
-        return new ChallengeDTO(challenge, "완료", participants, currentProgress, goal, relatedLink, relatedLinkText, true);
+        return new ChallengeDTO(challenge, "완료", participants, participation.getFinalProgress(), goal, relatedLink, relatedLinkText, true);
     }
     
     private int calculateProgress(User user, Challenge challenge, LocalDate startDate) {
