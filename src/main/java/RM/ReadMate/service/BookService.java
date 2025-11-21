@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -64,28 +65,38 @@ public class BookService {
     /** 베스트셀러 → 보강/업서트 */
     @Transactional
     public List<BookDto> fetchBestsellers(Integer limit) {
-        var aladinList = aladinService.getBestsellers(limit == null ? 20 : limit);
-        return aladinList.stream()
-                .map(this::upsertFromAladin)
-                .filter(b -> b != null)
-                .map(BookDto::new)
-                .toList();
+        int max = (limit == null || limit <= 0) ? 20 : limit;
+        List<AladinService.AladinBook> aladinList = aladinService.getBestsellers(max);
+
+        List<BookDto> result = new ArrayList<>();
+        if (aladinList == null) return result;
+
+        for (AladinService.AladinBook a : aladinList) {
+            Book b = upsertFromAladin(a);
+            if (b != null) result.add(new BookDto(b));
+        }
+        return result;
     }
 
     /** 신간 베스트 → 보강/업서트 */
     @Transactional
     public List<BookDto> fetchNewBest(Integer limit) {
-        var aladinList = aladinService.getNewBest(limit == null ? 20 : limit);
-        return aladinList.stream()
-                .map(this::upsertFromAladin)
-                .filter(b -> b != null)
-                .map(BookDto::new)
-                .toList();
+        int max = (limit == null || limit <= 0) ? 20 : limit;
+        List<AladinService.AladinBook> aladinList = aladinService.getNewBest(max);
+
+        List<BookDto> result = new ArrayList<>();
+        if (aladinList == null) return result;
+
+        for (AladinService.AladinBook a : aladinList) {
+            Book b = upsertFromAladin(a);
+            if (b != null) result.add(new BookDto(b));
+        }
+        return result;
     }
 
     /**
      * 알라딘 1권 → (구글 보강 후) DB 업서트, Book 반환
-     * - 이미지 우선순위: Google(zoom=5) → Aladin cover500 → Aladin coverLarge → Aladin cover
+     * - 이미지 우선순위: Google(zoom=5) → Aladin coverLarge → Aladin cover → Aladin coverSmall
      * - 이미 존재하면 부족한 필드 보강 업데이트
      */
     private Book upsertFromAladin(AladinService.AladinBook a) {
@@ -103,14 +114,14 @@ public class BookService {
         );
         if (mergedIsbn.isBlank()) return null;
 
-        // 3) 이미지 후보 생성 (각 후보를 즉시 ensureHighRes로 보정)
+        // 3) 이미지 후보 생성 (ensureHighRes가 자동 승격: google zoom=5, aladin cover→cover500 등)
         String candidateGoogle = ensureHighRes(enriched != null ? enriched.getBookImage() : null);
-        String candidateA500   = ensureHighRes(a.cover500Url());           // ✅ 최우선 알라딘 500
         String candidateALarge = ensureHighRes(a.coverLargeUrl());
         String candidateADef   = ensureHighRes(a.coverUrl());
+        String candidateASmall = ensureHighRes(a.coverSmallUrl());
 
         String mergedImage = ensureHighRes(
-                firstNonEmpty(candidateGoogle, candidateA500, candidateALarge, candidateADef)
+                firstNonEmpty(candidateGoogle, candidateALarge, candidateADef, candidateASmall)
         );
 
         // 4) 이미 존재하는 경우 → 보강 업데이트
@@ -151,7 +162,7 @@ public class BookService {
             }
 
             if (!isBlank(mergedImage)) {
-                exist.setBookImage(ensureHighRes(mergedImage)); // ✅ 항상 보정
+                exist.setBookImage(ensureHighRes(mergedImage));
             }
 
             return bookRepository.save(exist);
@@ -177,7 +188,7 @@ public class BookService {
                         enriched != null ? enriched.getContent() : null,
                         a.description(), ""
                 ))
-                .bookImage(ensureHighRes(mergedImage)) // ✅ 항상 보정
+                .bookImage(ensureHighRes(mergedImage))
                 .pageCount(enriched != null ? enriched.getPageCount() : Math.max(a.pageCount(), 0))
                 .build();
 
