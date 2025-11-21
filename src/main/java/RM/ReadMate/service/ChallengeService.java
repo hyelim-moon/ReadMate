@@ -139,13 +139,10 @@ public class ChallengeService {
                     long participants = challengeParticipationRepository.countByChallenge(challenge);
                     int goal = parseGoal(challenge.getDescription());
 
-                    String status;
+                    String status = participation.getStatus();
                     int currentProgress;
 
-                    if (participation.isCompleted()) {
-                        status = participation.getStatus();
-                        currentProgress = participation.getFinalProgress();
-                    } else {
+                    if ("진행중".equals(status)) {
                         LocalDateTime effectiveStartDate = participation.getParticipationDate();
                         currentProgress = calculateProgress(user, challenge, effectiveStartDate);
                         
@@ -161,9 +158,9 @@ public class ChallengeService {
                             participation.setStatus("실패");
                             participation.setFinalProgress(currentProgress);
                             challengeParticipationRepository.save(participation);
-                        } else {
-                            status = "진행중";
                         }
+                    } else {
+                        currentProgress = participation.getFinalProgress();
                     }
 
                     String relatedLink = "/recordlist";
@@ -193,10 +190,9 @@ public class ChallengeService {
 
         if (participation != null) {
             isRewardClaimed = participation.isRewardClaimed();
-            if (participation.isCompleted()) {
-                status = participation.getStatus();
-                currentProgress = participation.getFinalProgress();
-            } else {
+            status = participation.getStatus();
+
+            if ("진행중".equals(status)) {
                 LocalDateTime effectiveStartDate = participation.getParticipationDate();
                 currentProgress = calculateProgress(user, challenge, effectiveStartDate);
 
@@ -212,9 +208,9 @@ public class ChallengeService {
                     participation.setStatus("실패");
                     participation.setFinalProgress(currentProgress);
                     challengeParticipationRepository.save(participation);
-                } else {
-                    status = "진행중";
                 }
+            } else {
+                currentProgress = participation.getFinalProgress();
             }
         } else {
             status = getStatus(challenge);

@@ -39,9 +39,9 @@ function MyPage() {
                 }
             });
 
-        // 독서 기록
+        // 독서 기록 (최신 8개)
         axios
-            .get('http://localhost:8080/api/records', { headers })
+            .get('http://localhost:8080/api/records/latest?limit=8', { headers })
             .then(({ data }) => {
                 setProfile(prev => ({
                     ...prev,
@@ -49,7 +49,7 @@ function MyPage() {
                 }));
             })
             .catch(err => {
-                console.error('독서 기록 불러오기 실패:', err);
+                console.error('최신 독서 기록 불러오기 실패:', err);
             });
 
         // 찜한 도서
