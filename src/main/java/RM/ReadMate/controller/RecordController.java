@@ -28,17 +28,36 @@ public class RecordController {
     private final UserService userService;
 
     @GetMapping
-    public ResponseEntity<?> getMyRecords(@RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) {
+    public ResponseEntity<?> getMyRecords(
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader,
+            @RequestParam(value = "sortBy", defaultValue = "latest") String sortBy) {
         try {
             String token = authHeader.replace("Bearer ", "").trim();
             if (!jwtTokenProvider.validateToken(token)) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("유효하지 않은 토큰입니다.");
             }
             String userid = jwtTokenProvider.getUseridFromToken(token);
-            List<Record> records = recordService.getRecordsByUserid(userid);
+            List<Record> records = recordService.getRecordsByUserid(userid, sortBy);
             return ResponseEntity.ok(records);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("기록 조회 중 오류 발생: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/latest")
+    public ResponseEntity<?> getLatestRecords(
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader,
+            @RequestParam(value = "limit", defaultValue = "5") int limit) {
+        try {
+            String token = authHeader.replace("Bearer ", "").trim();
+            if (!jwtTokenProvider.validateToken(token)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("유효하지 않은 토큰입니다.");
+            }
+            String userid = jwtTokenProvider.getUseridFromToken(token);
+            List<Record> records = recordService.getLatestRecordsForUser(userid, limit);
+            return ResponseEntity.ok(records);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("최신 기록 조회 중 오류 발생: " + e.getMessage());
         }
     }
 
@@ -150,7 +169,7 @@ public class RecordController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("업데이트 중 오류 발생: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("업데이트 중 오류 발생: " + e.getMessage());
         }
     }
 
@@ -181,7 +200,28 @@ public class RecordController {
                 return ResponseEntity.notFound().build();
             }
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("삭제 중 오류 발생: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제 중 오류 발생: " + e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/batch")
+    public ResponseEntity<?> deleteRecordsInBatch(
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader,
+            @RequestBody List<Long> recordIds) {
+        try {
+            String token = authHeader.replace("Bearer ", "").trim();
+            if (!jwtTokenProvider.validateToken(token)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("유효하지 않은 토큰입니다.");
+            }
+
+            String userid = jwtTokenProvider.getUseridFromToken(token);
+            recordService.deleteRecordsByIds(recordIds, userid); // 일괄 삭제 서비스 호출
+
+            return ResponseEntity.noContent().build();
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("선택된 기록 삭제 중 오류 발생: " + e.getMessage());
         }
     }
 }

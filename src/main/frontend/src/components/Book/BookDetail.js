@@ -2,14 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import styles from '../../assets/styles/BookDetail.module.css';
-import { FaHeart, FaRegHeart } from 'react-icons/fa'; // ❤️ 찜 아이콘
+import { FaHeart, FaRegHeart, FaBookOpen } from 'react-icons/fa'; // 찜 아이콘, 독서 기록 아이콘 추가
 
 function BookDetail() {
     const { id } = useParams();
     const navigate = useNavigate();
     const [book, setBook] = useState(null);
     const [showFullContent, setShowFullContent] = useState(false);
-    const [isWished, setIsWished] = useState(false); // 💖 찜 여부 상태
+    const [isWished, setIsWished] = useState(false); // 찜 여부 상태
 
     // 🔹 책 상세 정보 요청
     useEffect(() => {
@@ -68,44 +68,46 @@ function BookDetail() {
 
     if (!book) return <div>로딩 중...</div>;
 
-    const truncatedContent = book.content?.length > 100
-        ? book.content.slice(0, 100) + '...'
+    const truncatedContent = book.content?.length > 150 // 더 긴 내용 표시를 위해 길이 조정
+        ? book.content.slice(0, 150) + '...'
         : book.content;
 
     return (
         <div className={styles.container}>
             <div className={styles.topSection}>
-                <div className={styles.left}>
-                    <img src={book.bookImage} alt={book.bookName} className={styles.image}/>
+                <div className={styles.bookImageWrapper}>
+                    <img src={book.bookImage} alt={book.bookName} className={styles.bookImage}/>
                 </div>
-                <div className={styles.right}>
-                    <h2>{book.bookName}</h2>
-                    <p><strong>저자:</strong> {book.author}</p>
-                    <p><strong>출판사:</strong> {book.publisher}</p>
-                    <p><strong>ISBN:</strong> {book.isbn}</p>
-                    <p><strong>장르:</strong> {book.genre}</p>
-                    <div style={{display: 'flex', gap: '10px', alignItems: 'center', marginTop: '1rem'}}>
+                <div className={styles.bookDetails}>
+                    <h2 className={styles.bookTitle}>{book.bookName}</h2>
+                    <p className={styles.detailItem}><strong>저자:</strong> {book.author}</p>
+                    <p className={styles.detailItem}><strong>출판사:</strong> {book.publisher}</p>
+                    <p className={styles.detailItem}><strong>ISBN:</strong> {book.isbn}</p>
+                    <p className={styles.detailItem}><strong>장르:</strong> {book.genre}</p>
+                    <div className={styles.actionButtons}>
                         <button onClick={toggleWishlist} className={styles.wishBtn}>
-                            {isWished ? <FaHeart/> : <FaRegHeart/>}
+                            {isWished ? <FaHeart className={styles.heartIconFilled}/> : <FaRegHeart className={styles.heartIconEmpty}/>}
+                            <span>{isWished ? '찜 해제' : '찜하기'}</span>
                         </button>
                         <button
                             className={styles.recordBtn}
                             onClick={() => navigate(`/record?bookId=${book.id}`)}
                         >
-                            📘 독서 기록 쓰러 가기
+                            <FaBookOpen className={styles.recordIcon}/>
+                            <span>독서 기록 쓰기</span>
                         </button>
                     </div>
                 </div>
             </div>
 
             <div className={styles.contentSection}>
-                <h2>책 소개</h2>
+                <h3 className={styles.sectionTitle}>책 소개</h3>
                 <div className={styles.descriptionWrapper}>
                     <p className={styles.description}>
                         {showFullContent ? book.content : truncatedContent}
                     </p>
                     {
-                        book.content?.length > 100 && (
+                        book.content?.length > 150 && ( // 길이 조정에 맞춰 조건 변경
                             <button onClick={() => setShowFullContent(prev => !prev)} className={styles.toggleBtn}>
                                 {showFullContent ? '접기' : '더보기'}
                             </button>
@@ -115,22 +117,27 @@ function BookDetail() {
             </div>
 
             <div className={styles.reviewSection}>
+                <h3 className={styles.sectionTitle}>리뷰</h3>
                 <div className={styles.reviewHeader}>
-                    <span>⭐ 평점: {book.rating || '등록된 평점 없음'}</span>
+                    <span className={styles.ratingDisplay}>⭐ 평점: {book.rating || '등록된 평점 없음'}</span>
                     <button
-                        className={styles.reviewBtn}
+                        className={styles.viewAllReviewsBtn}
                         onClick={() => navigate(`/books/${book.id}/reviews`)}
                     >
                         전체보기
                     </button>
                 </div>
-                <ul className={styles.reviewList}>
-                    {(book.reviews || []).map((r, i) => (
-                        <li key={i}>
-                            <strong>({r.nickname})</strong>: {r.content}
-                        </li>
-                    ))}
-                </ul>
+                {book.reviews && book.reviews.length > 0 ? (
+                    <ul className={styles.reviewList}>
+                        {book.reviews.map((r, i) => (
+                            <li key={i} className={styles.reviewItem}>
+                                <span className={styles.reviewNickname}>({r.nickname})</span>: {r.content}
+                            </li>
+                        ))}
+                    </ul>
+                ) : (
+                    <p className={styles.noReviews}>아직 등록된 리뷰가 없습니다.</p>
+                )}
             </div>
         </div>
     );
