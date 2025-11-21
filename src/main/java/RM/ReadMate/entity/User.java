@@ -35,7 +35,7 @@ public class User {
     private String email;
 
     @Setter
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String phone;
 
     @Setter

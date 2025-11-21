@@ -66,6 +66,8 @@ public class UserController {
         }
 
         User user = userOpt.get();
+        int availableCoupons = purchaseService.getAvailableCouponCount(userid); // 사용 가능한 쿠폰 개수 가져오기
+
         Map<String, Object> profile = Map.of(
                 "username", user.getUserid(),
                 "nickname", user.getNickname(),
@@ -73,7 +75,7 @@ public class UserController {
                 "email", user.getEmail(),
                 "phone", user.getPhone(),
                 "birthDate", user.getBirthdate(),
-                "coupons", 0,
+                "coupons", availableCoupons, // 실제 쿠폰 값 반영
                 "mileage", user.getPoints(),
                 "wishlist", List.of(),
                 "recent", List.of()

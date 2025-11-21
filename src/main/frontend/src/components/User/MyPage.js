@@ -113,10 +113,10 @@ function MyPage() {
                 </div>
 
                 <div className={styles.stats}>
-                    <div className={styles.statBox}>
+                    <Link to="/storage" className={styles.statBox}>
                         <p>{profile.coupons}장</p>
                         <span>쿠폰</span>
-                    </div>
+                    </Link>
                     <Link to="/point-history" className={styles.statBox}>
                         <p>{profile.mileage}P</p>
                         <span>포인트</span>

@@ -29,5 +29,10 @@ public class PurchaseService {
                 ))
                 .collect(Collectors.toList());
     }
-}
 
+    public int getAvailableCouponCount(String userid) {
+        return (int) purchaseRepository.findByUserUserid(userid).stream()
+                .filter(p -> "구매 완료".equals(p.getStatus())) // productName 필터링 조건 제거
+                .count();
+    }
+}
