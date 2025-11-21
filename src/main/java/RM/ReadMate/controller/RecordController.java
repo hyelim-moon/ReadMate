@@ -2,11 +2,10 @@ package RM.ReadMate.controller;
 
 import RM.ReadMate.entity.Record;
 import RM.ReadMate.entity.User;
-import RM.ReadMate.repository.UserRepository;
 import RM.ReadMate.security.JwtTokenProvider;
 import RM.ReadMate.service.RecordService;
 import RM.ReadMate.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,43 +15,28 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/records")
-@CrossOrigin(origins = "http://localhost:3000") // CORS 허용 (React용)
+@RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:3000")
 public class RecordController {
 
     private final RecordService recordService;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService;
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    public RecordController(RecordService recordService, JwtTokenProvider jwtTokenProvider, UserService userService) {
-        this.recordService = recordService;
-        this.jwtTokenProvider = jwtTokenProvider;
-        this.userService = userService;
-    }
-
-    // 로그인한 사용자의 기록만 반환
     @GetMapping
     public ResponseEntity<?> getMyRecords(@RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) {
         try {
             String token = authHeader.replace("Bearer ", "").trim();
-
             if (!jwtTokenProvider.validateToken(token)) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("유효하지 않은 토큰입니다.");
             }
-
             String userid = jwtTokenProvider.getUseridFromToken(token);
-
             List<Record> records = recordService.getRecordsByUserid(userid);
             return ResponseEntity.ok(records);
-
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("기록 조회 중 오류 발생: " + e.getMessage());
         }
@@ -60,7 +44,6 @@ public class RecordController {
 
     @PostMapping(consumes = {"multipart/form-data"})
     public ResponseEntity<?> createRecord(
-            Authentication authentication,
             @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader,
             @RequestParam("title") String title,
             @RequestParam("author") String author,
@@ -71,15 +54,13 @@ public class RecordController {
 
         try {
             String token = authHeader.replace("Bearer ", "").trim();
-
             if (!jwtTokenProvider.validateToken(token)) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("유효하지 않은 토큰입니다.");
             }
 
             String userid = jwtTokenProvider.getUseridFromToken(token);
-            User user = userService.findByUserid(userid); // ✅ String → User
-            Long userId = user.getId(); // ✅ Long 타입 추출
-
+            User user = userService.findByUserid(userid);
+            Long userId = user.getId();
 
             Record record = Record.builder()
                     .title(title)
@@ -87,13 +68,11 @@ public class RecordController {
                     .publisher(publisher)
                     .genre(genre)
                     .content(content)
-                    .user(user) // ✅ 여기 핵심!
-                    .recordDate(LocalDateTime.now()) // 현재 날짜 추가
+                    .user(user)
+                    .recordDate(LocalDateTime.now())
                     .build();
 
             Record saved = recordService.saveRecord(userId, record, photo);
-
-            userService.addPoints(userId, 10);
 
             return ResponseEntity.ok(Map.of(
                     "record", saved,
@@ -104,14 +83,12 @@ public class RecordController {
         }
     }
 
-
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Record>> getRecordsByUserId(@PathVariable Long userId) {
         List<Record> records = recordService.getRecordsByUserId(userId);
         return ResponseEntity.ok(records);
     }
 
-    // 특정 독서 기록 불러오기
     @GetMapping("/{id}")
     public ResponseEntity<?> getRecordById(
             @PathVariable Long id,
@@ -119,7 +96,6 @@ public class RecordController {
 
         try {
             String token = authHeader.replace("Bearer ", "").trim();
-
             if (!jwtTokenProvider.validateToken(token)) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("유효하지 않은 토큰입니다.");
             }
@@ -131,19 +107,16 @@ public class RecordController {
                 return ResponseEntity.notFound().build();
             }
 
-            // 권한 체크: record.getUser()가 null일 수 있으니 null 체크도 하세요
             if (record.getUser() == null || !record.getUser().getUserid().equals(userid)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한이 없습니다.");
             }
 
             return ResponseEntity.ok(record);
-
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("오류 발생: " + e.getMessage());
         }
     }
 
-    // 독서 기록 수정 (이미지 삭제 기능 포함)
     @PutMapping(value = "/{id}", consumes = {"multipart/form-data"})
     public ResponseEntity<?> updateRecord(
             @PathVariable Long id,
@@ -158,7 +131,6 @@ public class RecordController {
     ) {
         try {
             String token = authHeader.replace("Bearer ", "").trim();
-
             if (!jwtTokenProvider.validateToken(token)) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("유효하지 않은 토큰입니다.");
             }
@@ -188,7 +160,6 @@ public class RecordController {
             @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) {
         try {
             String token = authHeader.replace("Bearer ", "").trim();
-
             if (!jwtTokenProvider.validateToken(token)) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("유효하지 않은 토큰입니다.");
             }
@@ -205,12 +176,12 @@ public class RecordController {
 
             boolean deleted = recordService.deleteRecord(id);
             if (deleted) {
-                return ResponseEntity.noContent().build(); // 204 No Content
+                return ResponseEntity.noContent().build();
             } else {
-                return ResponseEntity.notFound().build(); // 404 Not Found
+                return ResponseEntity.notFound().build();
             }
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("삭제 중 오류 발생: " + e.getMessage());
-        }    
+        }
     }
 }

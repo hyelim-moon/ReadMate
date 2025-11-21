@@ -90,6 +90,7 @@ function MyPage() {
                     <ul className={styles.menuList}>
                         <li><Link to="/profile-edit">내 정보</Link></li>
                         <li><Link to="/mylibrary">내 서재</Link></li>
+                        <li><Link to="/challenge">챌린지</Link></li>
                         <li><Link to="/recordlist">독서기록</Link></li>
                         <li><Link to="/myreview">도서리뷰</Link></li>
                         <li><Link to="/storage">보관함</Link></li>
@@ -116,10 +117,10 @@ function MyPage() {
                         <p>{profile.coupons}장</p>
                         <span>쿠폰</span>
                     </div>
-                    <div className={styles.statBox}>
+                    <Link to="/point-history" className={styles.statBox}>
                         <p>{profile.mileage}P</p>
                         <span>포인트</span>
-                    </div>
+                    </Link>
                 </div>
 
                 {/* 독서 기록 */}

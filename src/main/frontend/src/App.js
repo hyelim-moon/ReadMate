@@ -34,7 +34,8 @@ import BookList from './components/Book/BookList';
 import GenreList from './components/Book/GenreList';
 import Challenge from "./components/Service/Challenge";
 import ChallengeDetail from "./components/Service/ChallengeDetail";
-import Help from "./components/Service/Help"; // Help 컴포넌트 추가
+import Help from "./components/Service/Help";
+import PointHistory from "./components/User/PointHistory";
 
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -78,6 +79,7 @@ function AppContent({ userid, onLoginSuccess, isLoggedIn }) {
           <Route path="/challenge" element={<Challenge />} />
           <Route path="/challenges/:id" element={<ChallengeDetail />} />
           <Route path="/help" element={<Help />} />
+          <Route path="/point-history" element={<PointHistory />} />
           <Route
               path="/products/:id"
               element={<ProductDetail userid={userid} isLoggedIn={isLoggedIn} />}

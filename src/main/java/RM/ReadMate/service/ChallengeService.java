@@ -245,7 +245,7 @@ public class ChallengeService {
             throw new RuntimeException("Challenge goal not met.");
         }
 
-        userService.addPoints(userId, challenge.getReward());
+        userService.addPoints(userId, challenge.getReward(), "챌린지 보상");
         participation.setRewardClaimed(true);
         participation.setStatus("완료");
         challengeParticipationRepository.save(participation);

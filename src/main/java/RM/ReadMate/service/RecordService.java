@@ -3,7 +3,7 @@ package RM.ReadMate.service;
 import RM.ReadMate.entity.Record;
 import RM.ReadMate.entity.User;
 import RM.ReadMate.repository.RecordRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -11,34 +11,26 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDateTime; // LocalDateTime import 추가
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class RecordService {
 
     private final RecordRepository recordRepository;
     private final UserService userService;
 
-    @Autowired
-    public RecordService(RecordRepository recordRepository, UserService userService) {
-        this.recordRepository = recordRepository;
-        this.userService = userService;
-    }
-
     public List<Record> getRecordsByUserId(Long userId) {
-        // userId로 User 객체를 먼저 찾는 게 더 정확
         var user = userService.findUserById(userId);
         return recordRepository.findByUser(user);
     }
 
-    // userid(String)로 Records 조회
     public List<Record> getRecordsByUserid(String userid) {
         User user = userService.findByUserid(userid);
         return recordRepository.findByUser(user);
     }
 
-    // 저장 메서드 (신규)
     public Record saveRecord(Long userId, Record record, MultipartFile photo) {
         try {
             if (record.getContent() != null && record.getContent().length() > 1000) {
@@ -55,20 +47,17 @@ public class RecordService {
                 record.setPhoto(null);
             }
 
-            // 유저 연결은 저장 전에 반드시 해줘야 함
             if (userId != null) {
                 var user = userService.findUserById(userId);
                 record.setUser(user);
             }
 
-            // 새로운 독서 기록은 항상 현재 날짜와 시간으로 recordDate 설정
             record.setRecordDate(LocalDateTime.now());
 
             Record savedRecord = recordRepository.save(record);
 
-            // 포인트 지급
             if (userId != null) {
-                userService.addPoints(userId, 10);
+                userService.addPoints(userId, 10, "독서 기록 작성");
             }
 
             return savedRecord;
@@ -80,7 +69,6 @@ public class RecordService {
         }
     }
 
-    // 수정 메서드
     public Record updateRecord(Long id, String title, String author, String publisher, String genre, String content, MultipartFile photo, boolean removePhoto) {
         try {
             Record existingRecord = recordRepository.findById(id)
@@ -99,7 +87,6 @@ public class RecordService {
 
             String uploadDir = Paths.get(System.getProperty("user.dir"), "uploads").toString();
 
-            // 이미지 삭제 요청 시
             if (removePhoto) {
                 if (existingRecord.getPhoto() != null) {
                     try {
@@ -113,7 +100,6 @@ public class RecordService {
                 existingRecord.setPhoto(null);
             }
 
-            // 새 이미지가 있으면 저장
             if (photo != null && !photo.isEmpty()) {
                 Files.createDirectories(Paths.get(uploadDir));
                 Path filePath = Paths.get(uploadDir, photo.getOriginalFilename());
