@@ -3,7 +3,7 @@ package RM.ReadMate.service;
 import RM.ReadMate.dto.ChallengeDTO;
 import RM.ReadMate.entity.Challenge;
 import RM.ReadMate.entity.ChallengeParticipation;
-import RM.ReadMate.entity.Record; // Record import 추가
+import RM.ReadMate.entity.Record;
 import RM.ReadMate.entity.User;
 import RM.ReadMate.repository.ChallengeParticipationRepository;
 import RM.ReadMate.repository.ChallengeRepository;
@@ -15,12 +15,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.Set; // Set import 추가
-import java.util.HashSet; // HashSet import 추가
+import java.util.Set;
+import java.util.HashSet;
 
 @Service
 @RequiredArgsConstructor
@@ -29,8 +30,8 @@ public class ChallengeService {
     private final ChallengeRepository challengeRepository;
     private final ChallengeParticipationRepository challengeParticipationRepository;
     private final UserRepository userRepository;
-    private final RecordRepository recordRepository; // RecordRepository 주입
-    private final UserService userService; // UserService 주입
+    private final RecordRepository recordRepository;
+    private final UserService userService;
 
     @PostConstruct
     @Transactional
@@ -117,7 +118,7 @@ public class ChallengeService {
         ChallengeParticipation participation = new ChallengeParticipation();
         participation.setUser(user);
         participation.setChallenge(challenge);
-        participation.setParticipationDate(LocalDate.now());
+        participation.setParticipationDate(LocalDateTime.now());
         participation.setRewardClaimed(false);
         participation.setCompleted(false);
         participation.setStatus("진행중");
@@ -145,7 +146,7 @@ public class ChallengeService {
                         status = participation.getStatus();
                         currentProgress = participation.getFinalProgress();
                     } else {
-                        LocalDate effectiveStartDate = participation.getParticipationDate();
+                        LocalDateTime effectiveStartDate = participation.getParticipationDate();
                         currentProgress = calculateProgress(user, challenge, effectiveStartDate);
                         
                         if (currentProgress >= goal) {
@@ -154,9 +155,8 @@ public class ChallengeService {
                             participation.setStatus("달성");
                             participation.setFinalProgress(currentProgress);
                             challengeParticipationRepository.save(participation);
-                        } else if (LocalDate.now().isAfter(challenge.getEndDate())) {
+                        } else if (LocalDateTime.now().isAfter(challenge.getEndDate().atTime(23, 59, 59))) {
                             status = "실패";
-                            // 실패 상태를 영구 저장
                             participation.setCompleted(true);
                             participation.setStatus("실패");
                             participation.setFinalProgress(currentProgress);
@@ -197,7 +197,7 @@ public class ChallengeService {
                 status = participation.getStatus();
                 currentProgress = participation.getFinalProgress();
             } else {
-                LocalDate effectiveStartDate = participation.getParticipationDate();
+                LocalDateTime effectiveStartDate = participation.getParticipationDate();
                 currentProgress = calculateProgress(user, challenge, effectiveStartDate);
 
                 if (currentProgress >= goal) {
@@ -206,9 +206,8 @@ public class ChallengeService {
                     participation.setStatus("달성");
                     participation.setFinalProgress(currentProgress);
                     challengeParticipationRepository.save(participation);
-                } else if (LocalDate.now().isAfter(challenge.getEndDate())) {
+                } else if (LocalDateTime.now().isAfter(challenge.getEndDate().atTime(23, 59, 59))) {
                     status = "실패";
-                    // 실패 상태를 영구 저장
                     participation.setCompleted(true);
                     participation.setStatus("실패");
                     participation.setFinalProgress(currentProgress);
@@ -259,9 +258,10 @@ public class ChallengeService {
         return new ChallengeDTO(challenge, "완료", participants, participation.getFinalProgress(), goal, relatedLink, relatedLinkText, true);
     }
     
-    private int calculateProgress(User user, Challenge challenge, LocalDate startDate) {
+    private int calculateProgress(User user, Challenge challenge, LocalDateTime startDate) {
+        LocalDateTime endDate = challenge.getEndDate().atTime(23, 59, 59);
         if ("장르 탐험가 챌린지".equals(challenge.getTitle())) {
-            List<Record> records = recordRepository.findByUserAndRecordDateBetween(user, startDate, challenge.getEndDate());
+            List<Record> records = recordRepository.findByUserAndRecordDateBetween(user, startDate, endDate);
             Set<String> uniqueGenres = new HashSet<>();
             for (Record record : records) {
                 if (record.getGenre() != null && !record.getGenre().trim().isEmpty()) {
@@ -270,7 +270,7 @@ public class ChallengeService {
             }
             return uniqueGenres.size();
         } else {
-            return recordRepository.countByUserAndRecordDateBetween(user, startDate, challenge.getEndDate());
+            return recordRepository.countByUserAndRecordDateBetween(user, startDate, endDate);
         }
     }
 
@@ -297,7 +297,7 @@ public class ChallengeService {
         ChallengeParticipation participation = challengeParticipationRepository.findByUserAndChallenge(user, challenge)
                 .orElseThrow(() -> new RuntimeException("User has not participated in this challenge. "));
 
-        if (LocalDate.now().isAfter(challenge.getEndDate())) {
+        if (LocalDateTime.now().isAfter(challenge.getEndDate().atTime(23, 59, 59))) {
             throw new RuntimeException("Cannot abandon a challenge that has already ended.");
         }
 

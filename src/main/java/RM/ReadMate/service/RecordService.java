@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDate; // LocalDate import 추가
+import java.time.LocalDateTime; // LocalDateTime import 추가
 import java.util.List;
 
 @Service
@@ -61,8 +61,8 @@ public class RecordService {
                 record.setUser(user);
             }
 
-            // 새로운 독서 기록은 항상 현재 날짜로 recordDate 설정
-            record.setRecordDate(LocalDate.now());
+            // 새로운 독서 기록은 항상 현재 날짜와 시간으로 recordDate 설정
+            record.setRecordDate(LocalDateTime.now());
 
             Record savedRecord = recordRepository.save(record);
 
@@ -95,7 +95,7 @@ public class RecordService {
             existingRecord.setPublisher(publisher);
             existingRecord.setGenre(genre);
             existingRecord.setContent(content);
-            existingRecord.setRecordDate(LocalDate.now());
+            existingRecord.setRecordDate(LocalDateTime.now());
 
             String uploadDir = Paths.get(System.getProperty("user.dir"), "uploads").toString();
 

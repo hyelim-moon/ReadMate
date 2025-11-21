@@ -14,7 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Map;
@@ -88,7 +88,7 @@ public class RecordController {
                     .genre(genre)
                     .content(content)
                     .user(user) // ✅ 여기 핵심!
-                    .recordDate(LocalDate.now()) // 현재 날짜 추가
+                    .recordDate(LocalDateTime.now()) // 현재 날짜 추가
                     .build();
 
             Record saved = recordService.saveRecord(userId, record, photo);
