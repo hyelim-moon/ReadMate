@@ -1,3 +1,5 @@
+/* MyLibrary.module.css */
+
 .recordPages {
     width: 100%;
     margin: 0;
@@ -163,75 +165,17 @@
     margin-top: 0.3rem;
 }
 
-/* 필터 버튼 컨테이너 */
-.filterContainer {
-    display: flex;
-    gap: 1rem;
-    justify-content: flex-start;
-    padding: 1rem 2.5rem;
-    flex-wrap: wrap;
-    border-bottom: 1px solid #ddd;
-    margin-bottom: 1rem;
-}
-
-/* 필터 버튼 */
-.filterButton {
-    padding: 0.4rem 1rem;
-    font-size: 0.9rem;
-    color: #004225;
-    background-color: #f0f5f0;
-    border: 1.5px solid #00753C;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: background-color 0.2s ease, color 0.2s ease;
-    user-select: none;
-    white-space: nowrap;
-}
-
-.filterButton:hover {
-    background-color: #00753C;
-    color: #fff;
-}
-
-.filterButton.active {
-    background-color: #00753C;
-    color: white;
-    font-weight: 600;
-}
-
-/* 정렬 버튼 컨테이너 */
-.sortContainer {
-    display: flex;
-    justify-content: space-between; /* 좌우 공간 분리 */
-    align-items: center;
-    padding: 0 2.5rem 1rem 2.5rem;
-    border-bottom: 1px solid #ddd;
-    margin-bottom: 1.5rem;
-    flex-wrap: wrap;
-    font-size: 0.9rem;
-    color: #004225;
-}
-
-/* 정렬 라벨 */
-.sortLabel {
-    font-weight: 600;
-}
-
-/* 오른쪽 버튼 그룹 */
-.sortButtonsGroup {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-}
-
+/* 필터 + 정렬 섹션 디자인 */
 .topControls {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 2.5rem;
+    padding: 1rem 2.5rem; /* 여백 조정 */
     margin-bottom: 1.5rem;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: 1rem; /* 요소 간 간격 */
+    border-radius: 10px; /* 둥근 모서리 */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05); /* 그림자 추가 */
 }
 
 .filterButtons {
@@ -242,13 +186,13 @@
 
 .filterButton {
     padding: 0.35rem 0.9rem;
-    background-color: #f7faf7;
+    background-color: #fff; /* 필터 버튼 배경색 */
     border: 1px solid #00753C;
-    border-radius: 6px;
+    border-radius: 20px; /* 더 둥근 버튼 */
     cursor: pointer;
     color: #004225;
     font-size: 0.9rem;
-    transition: background-color 0.2s ease, color 0.2s ease;
+    transition: all 0.3s ease;
     user-select: none;
     white-space: nowrap;
 }
@@ -256,45 +200,57 @@
 .filterButton:hover {
     background-color: #00753C;
     color: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 .filterButton.active {
-    background-color: #004225;
-    color: white;
+    background-color: #004225; /* 활성 버튼 배경색을 원래대로 */
+    color: white; /* 활성 버튼 글씨색을 원래대로 */
     font-weight: 600;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    border: 1px solid #00753C; /* 테두리 색상 유지 */
 }
 
 .sortLabelContainer {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 0.5rem; /* 정렬 옵션 간 간격 줄임 */
     font-size: 0.95rem;
     color: #004225;
     user-select: none;
+    background-color: #fff; /* 정렬 컨테이너 배경색 */
+    border-radius: 20px; /* 둥근 모서리 */
+    padding: 0.35rem 0.8rem; /* 패딩 조정 */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
-.sortLabelContainer > span:first-child {
-    margin-right: 8px;
-    font-weight: 600;
+/* 정렬 라벨 텍스트 스타일 */
+.sortLabelContainer > span:not(.sortOrderToggle) {
+    font-weight: 500;
+    color: #555;
 }
 
 .sortLabel {
     cursor: pointer;
     padding: 4px 8px;
-    border-radius: 4px;
-    transition: background-color 0.2s ease, color 0.2s ease;
+    border-radius: 15px; /* 둥근 정렬 라벨 */
+    transition: all 0.3s ease;
     user-select: none;
+    white-space: nowrap;
 }
 
 .sortLabel:hover,
 .sortLabel:focus {
-    color: #003016;
+    background-color: #e8f5e9; /* 호버 시 배경색 */
+    color: #00753C;
     outline: none;
 }
 
-.sortLabel.active {
-    border-bottom: 2px solid #003016;
-    font-weight: 700;
+/* 우선순위를 높여서 color: white가 적용되도록 수정 */
+.sortLabelContainer .sortLabel.active {
+    background-color: #00753C; /* 활성 상태 배경색 */
+    color: white; /* 이제 이 색상이 적용됩니다. */
+    font-weight: 600;
 }
 
 .sortOrderToggle {
@@ -305,6 +261,7 @@
     font-size: 1.1rem;
     color: #00753C;
     transition: color 0.2s ease;
+    margin-left: 0.5rem; /* 화살표와 라벨 사이 간격 */
 }
 
 .sortOrderToggle:hover,
@@ -355,5 +312,16 @@
 
     .reviewExcerpt {
         font-size: 0.85rem;
+    }
+
+    .topControls {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1rem;
+    }
+
+    .filterButtons, .sortLabelContainer {
+        width: 100%;
+        justify-content: center;
     }
 }

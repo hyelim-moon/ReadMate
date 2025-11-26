@@ -1,50 +1,97 @@
 package RM.ReadMate.controller;
 
 import RM.ReadMate.dto.SavedBookDTO;
+import RM.ReadMate.dto.SavedBookUpdateDTO;
+import RM.ReadMate.entity.Book;
 import RM.ReadMate.entity.SavedBook;
+import RM.ReadMate.entity.User;
+import RM.ReadMate.repository.BookRepository;
+import RM.ReadMate.repository.SavedBookRepository;
+import RM.ReadMate.repository.UserRepository;
 import RM.ReadMate.service.SavedBookService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/saved-books")
+@RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:3000")
 public class SavedBookController {
 
+    private final SavedBookRepository savedBookRepository;
+    private final UserRepository userRepository;
+    private final BookRepository bookRepository;
     private final SavedBookService savedBookService;
 
-    @Autowired
-    public SavedBookController(SavedBookService savedBookService) {
-        this.savedBookService = savedBookService;
-    }
+    @PostMapping("/{bookId}")
+    public ResponseEntity<?> saveBook(@PathVariable Long bookId, Authentication authentication) {
+        User user = getUserFromAuthentication(authentication);
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new RuntimeException("Book not found"));
 
-    // 사용자별 저장된 책 목록 조회 (userid로 찾은 후)
-    @GetMapping("/by-user/{userid}")
-    public List<SavedBookDTO> getSavedBooksByUser(@PathVariable String userid) {
-        return savedBookService.getSavedBooksByUser(userid);
-    }
-
-    // 책 저장
-    @PostMapping("/save/{userId}")
-    public SavedBookDTO saveBookForUser(@PathVariable Long userId, @RequestBody SavedBook savedBook) {
-        // 저장된 책을 DTO로 변환하여 반환
-        SavedBook saved = savedBookService.saveBookForUser(userId, savedBook);
-        return new SavedBookDTO(saved);
-    }
-
-    // 책 삭제
-    @DeleteMapping("/{savedBookId}")
-    public ResponseEntity<String> deleteSavedBook(@PathVariable Long savedBookId) {
-        try {
-            savedBookService.deleteSavedBook(savedBookId);
-            return ResponseEntity.ok("책이 성공적으로 삭제되었습니다.");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제 중 오류가 발생했습니다.");
+        if (savedBookRepository.existsByUserAndBook(user, book)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 저장된 책입니다.");
         }
+
+        SavedBook savedBook = new SavedBook(user, book);
+        savedBookRepository.save(savedBook);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-}
+    @DeleteMapping("/{bookId}")
+    public ResponseEntity<?> removeBook(@PathVariable Long bookId, Authentication authentication) {
+        User user = getUserFromAuthentication(authentication);
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new RuntimeException("Book not found"));
 
+        SavedBook savedBook = savedBookRepository.findByUserAndBook(user, book)
+                .orElseThrow(() -> new RuntimeException("저장된 책이 아닙니다."));
+
+        savedBookRepository.delete(savedBook);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/check")
+    public ResponseEntity<Boolean> checkBook(@RequestParam Long bookId, Authentication authentication) {
+        User user = getUserFromAuthentication(authentication);
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new RuntimeException("Book not found"));
+
+        boolean isSaved = savedBookRepository.existsByUserAndBook(user, book);
+        return ResponseEntity.ok(isSaved);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<SavedBookDTO>> getSavedBooks(Authentication authentication) {
+        User user = getUserFromAuthentication(authentication);
+        List<SavedBookDTO> savedBookDTOs = savedBookService.getSavedBooksByUser(user.getUserid());
+        return ResponseEntity.ok(savedBookDTOs);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<SavedBookDTO> getSavedBook(@PathVariable Long id, Authentication authentication) {
+        User user = getUserFromAuthentication(authentication);
+        SavedBookDTO savedBookDTO = savedBookService.getSavedBookById(id, user.getId());
+        return ResponseEntity.ok(savedBookDTO);
+    }
+
+    @PostMapping("/{id}/update")
+    public ResponseEntity<SavedBookDTO> updateSavedBook(@PathVariable Long id, @RequestBody SavedBookUpdateDTO updateDTO, Authentication authentication) {
+        User user = getUserFromAuthentication(authentication);
+        SavedBookDTO updatedSavedBook = savedBookService.updateSavedBook(id, user.getId(), updateDTO);
+        return ResponseEntity.ok(updatedSavedBook);
+    }
+
+    private User getUserFromAuthentication(Authentication authentication) {
+        String userId = authentication.getName();
+        return userRepository.findByUserid(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+}

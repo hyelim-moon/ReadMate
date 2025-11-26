@@ -61,7 +61,7 @@
     margin-top: 2rem;
 }
 
-.wishBtn, .recordBtn {
+.wishBtn, .recordBtn, .saveBtn {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -85,6 +85,16 @@
     transform: translateY(-2px);
 }
 
+.saveBtn {
+    background-color: #3498db; /* 내 서재 버튼은 파란색 */
+    color: white;
+}
+
+.saveBtn:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+}
+
 .recordBtn {
     background-color: #3B6D41; /* 사이트 주 색상으로 변경 */
     color: white;
@@ -95,7 +105,7 @@
     transform: translateY(-2px);
 }
 
-.heartIconFilled, .heartIconEmpty, .recordIcon {
+.heartIconFilled, .heartIconEmpty, .recordIcon, .saveIconFilled, .saveIconEmpty {
     margin-right: 0.6rem;
     font-size: 1.2rem;
 }
@@ -230,7 +240,7 @@
         width: 100%;
     }
 
-    .wishBtn, .recordBtn {
+    .wishBtn, .recordBtn, .saveBtn {
         width: 100%;
         padding: 0.7rem 1rem;
         font-size: 0.9rem;

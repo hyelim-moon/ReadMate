@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 function MyLibrary() {
     const [savedBooks, setSavedBooks] = useState([]);
     const [filter, setFilter] = useState('all'); // 전체, finished, reading, wishlist
-    const [sortKey, setSortKey] = useState('savedAt'); // savedAt, title, pageCount
+    const [sortKey, setSortKey] = useState('savedAt'); // savedAt, title, totalPages, score 추가
     const [sortOrder, setSortOrder] = useState('desc'); // desc (내림차순) or asc (오름차순)
     const [error, setError] = useState(null); // 에러 상태 추가
 
@@ -14,10 +14,6 @@ function MyLibrary() {
 
     useEffect(() => {
         const token = localStorage.getItem('ACCESS_TOKEN');
-        const userId = localStorage.getItem('USER_ID');
-
-        console.log('Token:', token);
-        console.log('UserId:', userId);
 
         if (!token || token === 'undefined' || token === '') {
             if (!hasPrompted.current) {
@@ -32,11 +28,9 @@ function MyLibrary() {
             return;
         }
 
-        if (!userId) return;
-
         const fetchSavedBooks = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/api/saved-books/by-user/${userId}`, {
+                const response = await fetch(`http://localhost:8080/api/saved-books`, { // API 경로 수정
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -45,7 +39,7 @@ function MyLibrary() {
                     throw new Error(`저장한 책 데이터를 불러오지 못했습니다. 상태: ${response.status} - ${response.statusText}`);
                 }
                 const data = await response.json();
-                console.log('응답 데이터:', data);
+                console.log('API 응답 데이터:', data); // API 응답 데이터 전체 확인
                 setSavedBooks(data);
             } catch (error) {
                 console.error('내 서재 데이터 오류:', error);
@@ -67,17 +61,33 @@ function MyLibrary() {
     // 정렬
     const sortedBooks = [...filteredBooks].sort((a, b) => {
         let valA, valB;
-        if (sortKey === 'title') {
-            valA = a.book?.title?.toLowerCase();
-            valB = b.book?.title?.toLowerCase();
-        } else if (sortKey === 'pageCount') {
-            valA = a.book?.pageCount;
-            valB = b.book?.pageCount;
-        } else if (sortKey === 'savedAt') {
-            valA = new Date(a.savedAt);
-            valB = new Date(b.savedAt);
+
+        switch (sortKey) {
+            case 'title':
+                valA = (a.bookTitle || '').toLowerCase();
+                valB = (b.bookTitle || '').toLowerCase();
+                console.log(`Sorting by title: A='${valA}', B='${valB}'`); // 디버깅 로그
+                return sortOrder === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+            case 'pageCount': // totalPages로 변경
+                valA = a.totalPages || 0; // totalPages로 수정
+                valB = b.totalPages || 0; // totalPages로 수정
+                console.log(`Sorting by totalPages: A=${valA}, B=${valB}`); // 디버깅 로그
+                break;
+            case 'savedAt':
+                valA = new Date(a.savedAt || 0);
+                valB = new Date(b.savedAt || 0);
+                console.log(`Sorting by savedAt: A=${valA}, B=${valB}`); // 디버깅 로그
+                break;
+            case 'rating': // score로 변경
+                valA = a.score || 0; // score로 수정
+                valB = b.score || 0; // score로 수정
+                console.log(`Sorting by score: A=${valA}, B=${valB}`); // 디버깅 로그
+                break;
+            default:
+                return 0; // 알 수 없는 sortKey일 경우 정렬하지 않음
         }
 
+        // 숫자 또는 날짜 비교
         if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
         if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
         return 0;
@@ -113,19 +123,21 @@ function MyLibrary() {
                     ))}
                 </div>
                 <div className={styles.sortLabelContainer}>
-                    {['savedAt', 'title', 'pageCount'].map((key) => (
+                    {['title', 'pageCount', 'rating'].map((key) => ( // 'pageCount' -> 'totalPages', 'rating' -> 'score'
                         <span
                             key={key}
                             className={`${styles.sortLabel} ${sortKey === key ? styles.active : ''}`}
                             onClick={() => setSortKey(key)}
                             role="button"
                             tabIndex={0}
-                            onKeyDown={(e) => { if (e.key === 'Enter') setSortKey(key); }}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') setSortKey(key);
+                            }}
                             aria-pressed={sortKey === key}
                         >
-                            {key === 'savedAt' && '최신 저장일순'}
                             {key === 'title' && '제목순'}
-                            {key === 'pageCount' && '쪽수순'}
+                            {key === 'pageCount' && '쪽수순'} {/* UI는 pageCount로 유지 */}
+                            {key === 'rating' && '별점순'} {/* UI는 rating으로 유지 */}
                         </span>
                     ))}
                     <span
@@ -133,7 +145,9 @@ function MyLibrary() {
                         onClick={toggleSortOrder}
                         role="button"
                         tabIndex={0}
-                        onKeyDown={(e) => { if (e.key === 'Enter') toggleSortOrder(); }}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') toggleSortOrder();
+                        }}
                         aria-label={`정렬 순서 ${sortOrder === 'asc' ? '오름차순' : '내림차순'} 토글`}
                     >
                         {sortOrder === 'asc' ? '▲' : '▼'}
@@ -156,6 +170,7 @@ function MyLibrary() {
                     </div>
                 ) : (
                     sortedBooks.map((saved) => {
+                        console.log('Rendering saved book:', saved); // 각 책 객체 전체 로그
                         return (
                             <div
                                 key={saved.id}
@@ -184,11 +199,18 @@ function MyLibrary() {
                                         <p><strong>출판사:</strong> {saved.bookPublisher || '출판사 미상'}</p>
                                         <p><strong>장르:</strong> {saved.bookGenre || '장르 미상'}</p>
                                     </div>
+                                    {/* 별점 표시 제거 */}
+                                    {/* {saved.rating !== undefined && (
+                                        <div className={styles.bookRating}>
+                                            {'⭐'.repeat(saved.rating)} ({saved.rating}/5)
+                                        </div>
+                                    )} */}
                                 </div>
 
                                 <div className={styles.readingInfo}>
                                     <div className={styles.progressWrapper}>
-                                        <div className={styles.progressBar}>
+                                        <div
+                                            className={styles.progressBar}>
                                             <div
                                                 className={styles.progressFill}
                                                 style={{ width: `${saved.progress}%` }}

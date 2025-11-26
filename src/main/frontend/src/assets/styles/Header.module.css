@@ -65,6 +65,7 @@
     position: relative;
 }
 
+/* 기존 검색 드롭다운 스타일 */
 .dropdown {
     position: relative;
     cursor: pointer;
@@ -139,6 +140,8 @@
 .searchBtn:hover {
     background-color: #005b29;
 }
+
+/* userInfo는 이제 드롭다운이 아니므로 position: relative와 cursor: pointer 제거 */
 .userInfo {
     display: flex;
     align-items: center;
@@ -175,10 +178,101 @@
     color: #b79240;
 }
 
+/* 네비게이션 바 내의 드롭다운 스타일 */
+.navbar .dropdown {
+    position: relative;
+    cursor: pointer;
+    padding: 0; /* 버튼 자체에 패딩이 있으므로 여기서는 0 */
+    background: transparent; /* 배경 투명 */
+    border-radius: 0; /* 둥근 모서리 제거 */
+    box-shadow: none; /* 그림자 제거 */
+    display: flex;
+    align-items: center;
+    gap: 0;
+    user-select: none;
+    white-space: nowrap;
+    margin-right: 0;
+}
+
+.navbar .dropdown button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.25rem;
+    color: #003016;
+    font-weight: bolder;
+    padding: 10px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.navbar .dropdown button:hover {
+    color: #b79240;
+}
+
+.navbar .dropdown .dropdownMenu {
+    position: absolute;
+    top: 100%; /* 버튼 바로 아래에 위치 */
+    left: 50%; /* 중앙 정렬을 위해 */
+    transform: translateX(-50%); /* 중앙 정렬을 위해 */
+    background: white;
+    border-radius: 0.5rem; /* 약간 둥근 모서리 */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    padding: 0.5rem 0;
+    min-width: 120px; /* 최소 너비 설정 */
+    z-index: 1000; /* 다른 요소 위에 표시 */
+    text-align: center;
+}
+
+.navbar .dropdown .dropdownMenu li {
+    list-style: none;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    white-space: nowrap;
+    font-size: 1rem;
+    color: #333;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.navbar .dropdown .dropdownMenu li:hover {
+    background-color: #f0f0f0;
+    color: #00753C;
+}
+
+/* 드롭다운 화살표 스타일 */
+.dropdownArrow {
+    margin-left: 0.5rem;
+    transition: transform 0.3s ease;
+}
+
+/* 드롭다운이 열렸을 때 화살표 회전 */
+.arrowUp {
+    transform: rotate(180deg);
+}
+
+
 @media (max-width: 768px) {
     .navbar {
         flex-direction: column;
         align-items: center;
+    }
+    .navbar .dropdown {
+        width: 100%; /* 모바일에서 드롭다운이 전체 너비를 차지하도록 */
+        justify-content: center;
+    }
+    .navbar .dropdown .dropdownMenu {
+        position: static; /* 모바일에서는 정적으로 배치 */
+        transform: none;
+        width: 100%;
+        box-shadow: none;
+        border-radius: 0;
+        padding: 0;
+    }
+    .navbar .dropdown .dropdownMenu li {
+        padding: 0.5rem 1rem;
+        border-top: 1px solid #eee;
     }
 }
 

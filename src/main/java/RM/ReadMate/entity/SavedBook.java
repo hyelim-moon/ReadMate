@@ -1,34 +1,52 @@
 package RM.ReadMate.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "saved_books")
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class SavedBook {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
+    private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id", nullable = false)
     private Book book;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Column(nullable = false)
+    private int currentPage = 0;
 
-    private int currentPage;     // 현재 읽고 있는 페이지
-    private int totalPages;      // 총 페이지 수
-    private LocalDate startedAt; // 읽기 시작 날짜
-    private LocalDate finishedAt; // 읽기 완료 날짜
-    private LocalDate savedAt;   // 저장 날짜
+    @Column(nullable = false)
+    private int totalPages;
 
+    private LocalDate startedAt;
+
+    private LocalDate finishedAt;
+
+    private LocalDate savedAt;
+
+    private Integer score; // 별점 (1~5)
+
+    private Integer wishScore; // 읽고 싶은 마음 (1~5)
+
+    public SavedBook(User user, Book book) {
+        this.user = user;
+        this.book = book;
+        this.totalPages = book.getPageCount();
+        this.savedAt = LocalDate.now();
+    }
 }

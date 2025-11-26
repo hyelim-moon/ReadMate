@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import styles from '../../assets/styles/BookDetail.module.css';
-import { FaHeart, FaRegHeart, FaBookOpen } from 'react-icons/fa'; // 찜 아이콘, 독서 기록 아이콘 추가
+import { FaHeart, FaRegHeart, FaBookOpen, FaBookmark, FaRegBookmark } from 'react-icons/fa'; // 찜 아이콘, 독서 기록 아이콘, 내 서재 아이콘 추가
 
 function BookDetail() {
     const { id } = useParams();
@@ -10,6 +10,7 @@ function BookDetail() {
     const [book, setBook] = useState(null);
     const [showFullContent, setShowFullContent] = useState(false);
     const [isWished, setIsWished] = useState(false); // 찜 여부 상태
+    const [isSaved, setIsSaved] = useState(false); // 내 서재 저장 여부 상태
 
     // 🔹 책 상세 정보 요청
     useEffect(() => {
@@ -27,20 +28,25 @@ function BookDetail() {
             });
     }, [id]);
 
-    // 🔹 찜 여부 확인
+    // 🔹 찜 여부 및 내 서재 저장 여부 확인
     useEffect(() => {
         if (!book?.id) return;
 
         const token = localStorage.getItem('ACCESS_TOKEN');
         if (!token) return;
 
-        axios.get(`http://localhost:8080/api/wishlist/check?bookId=${book.id}`, {
-            headers: { Authorization: `Bearer ${token}` }
-        })
+        const headers = { Authorization: `Bearer ${token}` };
+
+        // 찜 여부 확인
+        axios.get(`http://localhost:8080/api/wishlist/check?bookId=${book.id}`, { headers })
             .then(res => setIsWished(res.data))
-            .catch(err => {
-                console.error("찜 여부 확인 실패:", err);
-            });
+            .catch(err => console.error("찜 여부 확인 실패:", err));
+
+        // 내 서재 저장 여부 확인
+        axios.get(`http://localhost:8080/api/saved-books/check?bookId=${book.id}`, { headers })
+            .then(res => setIsSaved(res.data))
+            .catch(err => console.error("내 서재 저장 여부 확인 실패:", err));
+
     }, [book]);
 
     // 🔹 찜 버튼 토글
@@ -66,9 +72,32 @@ function BookDetail() {
         }
     };
 
+    // 🔹 내 서재 저장 버튼 토글
+    const toggleSaveBook = async () => {
+        const token = localStorage.getItem('ACCESS_TOKEN');
+        if (!token || !book?.id) {
+            alert('로그인이 필요합니다.');
+            return;
+        }
+
+        const url = `http://localhost:8080/api/saved-books/${book.id}`;
+        try {
+            if (isSaved) {
+                await axios.delete(url, { headers: { Authorization: `Bearer ${token}` } });
+                setIsSaved(false);
+            } else {
+                await axios.post(url, null, { headers: { Authorization: `Bearer ${token}` } });
+                setIsSaved(true);
+            }
+        } catch (err) {
+            console.error('내 서재 저장 처리 실패:', err);
+            alert('내 서재 저장 처리 중 오류가 발생했습니다.');
+        }
+    };
+
     if (!book) return <div>로딩 중...</div>;
 
-    const truncatedContent = book.content?.length > 150 // 더 긴 내용 표시를 위해 길이 조정
+    const truncatedContent = book.content?.length > 150
         ? book.content.slice(0, 150) + '...'
         : book.content;
 
@@ -89,6 +118,10 @@ function BookDetail() {
                             {isWished ? <FaHeart className={styles.heartIconFilled}/> : <FaRegHeart className={styles.heartIconEmpty}/>}
                             <span>{isWished ? '찜 해제' : '찜하기'}</span>
                         </button>
+                        <button onClick={toggleSaveBook} className={styles.saveBtn}>
+                            {isSaved ? <FaBookmark className={styles.saveIconFilled}/> : <FaRegBookmark className={styles.saveIconEmpty}/>}
+                            <span>{isSaved ? '내 서재에서 제거' : '내 서재에 저장'}</span>
+                        </button>
                         <button
                             className={styles.recordBtn}
                             onClick={() => navigate(`/record?bookId=${book.id}`)}
@@ -107,7 +140,7 @@ function BookDetail() {
                         {showFullContent ? book.content : truncatedContent}
                     </p>
                     {
-                        book.content?.length > 150 && ( // 길이 조정에 맞춰 조건 변경
+                        book.content?.length > 150 && (
                             <button onClick={() => setShowFullContent(prev => !prev)} className={styles.toggleBtn}>
                                 {showFullContent ? '접기' : '더보기'}
                             </button>
