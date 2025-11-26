@@ -127,4 +127,14 @@ public class CommunityPostController {
             return ResponseEntity.internalServerError().body("좋아요 처리 실패: " + e.getMessage());
         }
     }
+    @GetMapping("/search")
+    public ResponseEntity<List<CommunityPostDto>> searchPosts(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate
+    ) {
+        List<CommunityPostDto> results = postService.searchPosts(keyword, startDate, endDate);
+        return ResponseEntity.ok(results);
+    }
+
 }

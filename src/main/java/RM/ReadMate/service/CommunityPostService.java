@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -189,5 +190,44 @@ public class CommunityPostService {
         else if (minutes < 60) return minutes + "분 전";
         else if (minutes < 1440) return (minutes / 60) + "시간 전";
         else return (minutes / 1440) + "일 전";
+    }
+
+    // ✅ 수정된 searchPosts 메서드
+    public List<CommunityPostDto> searchPosts(String keyword, String startDate, String endDate) {
+        LocalDateTime start = null;
+        LocalDateTime end = null;
+
+        try {
+            if (startDate != null && !startDate.isEmpty()) {
+                start = LocalDate.parse(startDate).atStartOfDay();
+            }
+            if (endDate != null && !endDate.isEmpty()) {
+                end = LocalDate.parse(endDate).atTime(23, 59, 59);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        List<CommunityPost> posts = postRepository.searchPosts(keyword, start, end);
+        List<CommunityPostDto> result = new ArrayList<>();
+
+        for (CommunityPost post : posts) {
+            String timeAgo = calculateTimeAgo(post.getCreatedAt());
+            CommunityPostDto dto = new CommunityPostDto(
+                    post.getId(),
+                    post.getTitle(),
+                    post.getContent(),
+                    post.getTags(),
+                    post.getImagePath(),
+                    post.getLikes(),
+                    false,
+                    timeAgo,
+                    post.getCreatedAt(),
+                    post.getAuthorId()
+            );
+            result.add(dto);
+        }
+
+        return result;
     }
 }

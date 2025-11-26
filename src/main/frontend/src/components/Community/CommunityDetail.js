@@ -374,11 +374,17 @@ function CommunityDetail() {
                     <div className={styles.tagsContainer}>
                         {post.tags &&
                             JSON.parse(post.tags).map((tag) => (
-                                <span key={tag} className={styles.tag}>
-                  #{tag}
-                </span>
+                                <span
+                                    key={tag}
+                                    className={styles.tag}
+                                    style={{cursor: 'pointer'}}
+                                    onClick={() => navigate(`/community?tag=${encodeURIComponent(tag)}`)}
+                                >
+        #{tag}
+      </span>
                             ))}
                     </div>
+
 
                     <div className={styles.likeSection}>
                         <button

@@ -4,12 +4,14 @@ import RM.ReadMate.entity.Book;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface BookRepository extends JpaRepository<Book, Long> {
 
+    // 기존 서비스에서 쓰고 있는 메서드들 유지
     Optional<Book> findByIsbn(String isbn);
 
     Optional<Book> findFirstByBookNameOrderByIdDesc(String bookName);
@@ -34,4 +36,19 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             "   or (b.pageCount <= 0) " +
             "order by b.id asc")
     List<Book> findNeedEnrichmentAll();
+
+    @Query("""
+   SELECT b
+   FROM Book b
+   WHERE (:keyword IS NULL OR :keyword = '' 
+       OR LOWER(b.bookName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+       OR LOWER(b.author) LIKE LOWER(CONCAT('%', :keyword, '%'))
+       OR LOWER(b.publisher) LIKE LOWER(CONCAT('%', :keyword, '%')))
+""")
+    List<Book> searchByKeyword(@Param("keyword") String keyword);
+    List<Book> findByBookNameContainingIgnoreCase(String bookName);
+    List<Book> findByAuthorContainingIgnoreCase(String author);
+    List<Book> findByPublisherContainingIgnoreCase(String publisher);
+
+
 }

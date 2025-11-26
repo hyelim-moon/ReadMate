@@ -35,7 +35,6 @@ function Login({ onLoginSuccess }) {
             }
         }
     };
-
     return (
         <div className={styles.container}>
             <Link to={"/"}>

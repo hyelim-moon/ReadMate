@@ -18,7 +18,7 @@ spring:
     url: jdbc:mysql://127.0.0.1:3306/readmate?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root   # MySQL 실제 계정으로 변경
-    password: 1234   # MySQL 실제 비밀번호로 변경
+    password: 123456  # MySQL 실제 비밀번호로 변경
 
   jpa:
     hibernate:

@@ -33,6 +33,48 @@ public class BookService {
                 .orElseThrow(() -> new IllegalArgumentException("등록자 정보를 찾을 수 없습니다."));
         book.setUser(user);
 
+        // 이미지 고해상도 처리
+        if (!isBlank(book.getBookImage())) {
+            book.setBookImage(ensureHighRes(book.getBookImage()));
+        }
+
+        // ⭐ ISBN 중복이면 업데이트 처리(업서트)
+        if (!isBlank(book.getIsbn())) {
+            Optional<Book> existOpt = bookRepository.findByIsbn(book.getIsbn());
+
+            if (existOpt.isPresent()) {
+                Book exist = existOpt.get();
+
+                // 업데이트할 필드들만 덮어쓰기
+                exist.setBookName(firstNonEmpty(book.getBookName(), exist.getBookName()));
+                exist.setAuthor(firstNonEmpty(book.getAuthor(), exist.getAuthor()));
+                exist.setPublisher(firstNonEmpty(book.getPublisher(), exist.getPublisher()));
+                exist.setGenre(firstNonEmpty(book.getGenre(), exist.getGenre()));
+                exist.setContent(firstNonEmpty(book.getContent(), exist.getContent()));
+
+                if (book.getPageCount() > 0) {
+                    exist.setPageCount(book.getPageCount());
+                }
+
+                if (!isBlank(book.getBookImage())) {
+                    exist.setBookImage(ensureHighRes(book.getBookImage()));
+                }
+
+                return bookRepository.save(exist);  // update
+            }
+        }
+
+        // ⭐ 기존 책 없으면 신규 저장
+        return bookRepository.save(book);
+    }
+
+
+    /* @Transactional
+    public Book save(Book book, String userid) {
+        User user = userRepository.findByUserid(userid)
+                .orElseThrow(() -> new IllegalArgumentException("등록자 정보를 찾을 수 없습니다."));
+        book.setUser(user);
+
         // ✅ 수동 입력 시에도 이미지 고해상도 보정
         if (!isBlank(book.getBookImage())) {
             book.setBookImage(ensureHighRes(book.getBookImage()));
@@ -40,7 +82,7 @@ public class BookService {
 
         return bookRepository.save(book);
     }
-
+*/
     @Transactional(readOnly = true)
     public List<Book> findAll() { return bookRepository.findAll(); }
 
@@ -112,7 +154,11 @@ public class BookService {
                 enriched != null ? enriched.getIsbn() : null,
                 a.isbn13(), ""
         );
-        if (mergedIsbn.isBlank()) return null;
+        // ISBN 없는 데이터는 절대 저장 금지
+        if (mergedIsbn == null || mergedIsbn.isBlank()) {
+            System.out.println("⚠️ ISBN 없음 → 저장 제외: " + a.title());
+            return null;
+        }
 
         // 3) 이미지 후보 생성 (ensureHighRes가 자동 승격: google zoom=5, aladin cover→cover500 등)
         String candidateGoogle = ensureHighRes(enriched != null ? enriched.getBookImage() : null);

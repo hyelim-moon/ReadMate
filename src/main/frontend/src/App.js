@@ -36,6 +36,7 @@ import Challenge from "./components/Service/Challenge";
 import ChallengeDetail from "./components/Service/ChallengeDetail";
 import Help from "./components/Service/Help";
 import PointHistory from "./components/User/PointHistory";
+import SearchBookMore from "./components/Common/SearchBookMore";
 
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -99,8 +100,10 @@ function AppContent({ userid, onLoginSuccess, isLoggedIn }) {
           <Route path="/purchase-history" element={<PurchaseHistory />} />
           <Route path="/storage" element={<Storage />} />
           <Route path="/books/:id" element={<BookDetail />} />
+          <Route path="/search/books" element={<SearchBookMore />} />
 
-          {/* 문의 리스트 페이지 */}
+
+            {/* 문의 리스트 페이지 */}
           <Route
               path="/contactlist"
               element={
