@@ -2,18 +2,21 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import styles from '../../assets/styles/BookDetail.module.css';
-import { FaHeart, FaRegHeart, FaBookOpen, FaBookmark, FaRegBookmark } from 'react-icons/fa'; // 찜 아이콘, 독서 기록 아이콘, 내 서재 아이콘 추가
+import { FaHeart, FaRegHeart, FaBookOpen, FaBookmark, FaRegBookmark } from 'react-icons/fa'; // FaFlag 아이콘 제거
+import ReportModal from '../Common/ReportModal';
 
 function BookDetail() {
     const { id } = useParams();
     const navigate = useNavigate();
     const [book, setBook] = useState(null);
     const [showFullContent, setShowFullContent] = useState(false);
-    const [isWished, setIsWished] = useState(false); // 찜 여부 상태
-    const [isSaved, setIsSaved] = useState(false); // 내 서재 저장 여부 상태
-    const [currentUserId, setCurrentUserId] = useState(null); // 현재 로그인한 사용자 ID
+    const [isWished, setIsWished] = useState(false);
+    const [isSaved, setIsSaved] = useState(false);
+    const [currentUserId, setCurrentUserId] = useState(null);
 
-    // 🔹 현재 사용자 ID 가져오기 (로그인 상태 확인)
+    const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+    const [reportTargetReviewId, setReportTargetReviewId] = useState(null);
+
     useEffect(() => {
         const token = localStorage.getItem('ACCESS_TOKEN');
         if (token) {
@@ -31,7 +34,6 @@ function BookDetail() {
         }
     }, []);
 
-    // 🔹 책 상세 정보 요청
     useEffect(() => {
         if (!id) return;
 
@@ -47,7 +49,6 @@ function BookDetail() {
             });
     }, [id]);
 
-    // 🔹 찜 여부 및 내 서재 저장 여부 확인
     useEffect(() => {
         if (!book?.id || !currentUserId) return;
 
@@ -66,7 +67,6 @@ function BookDetail() {
 
     }, [book, currentUserId]);
 
-    // 🔹 찜 버튼 토글
     const toggleWishlist = async () => {
         const token = localStorage.getItem('ACCESS_TOKEN');
         if (!token || !book?.id) {
@@ -89,7 +89,6 @@ function BookDetail() {
         }
     };
 
-    // 🔹 내 서재 저장 버튼 토글
     const toggleSaveBook = async () => {
         const token = localStorage.getItem('ACCESS_TOKEN');
         if (!token || !book?.id) {
@@ -112,7 +111,6 @@ function BookDetail() {
         }
     };
 
-    // 🔹 리뷰 삭제 핸들러
     const handleDeleteReview = async (reviewId) => {
         if (!window.confirm('정말로 이 리뷰를 삭제하시겠습니까?')) {
             return;
@@ -137,14 +135,12 @@ function BookDetail() {
         }
     };
 
-    // 🔹 리뷰 신고 핸들러
-    const handleReportReview = async (reviewId) => {
-        const reason = prompt('신고 사유를 입력해주세요:');
-        if (!reason || reason.trim() === '') {
-            alert('신고 사유를 입력해야 합니다.');
-            return;
-        }
+    const handleOpenReportModal = (reviewId) => {
+        setReportTargetReviewId(reviewId);
+        setIsReportModalOpen(true);
+    };
 
+    const handleReportSubmit = async (reviewId, reason) => {
         const token = localStorage.getItem('ACCESS_TOKEN');
         if (!token) {
             alert('로그인이 필요합니다.');
@@ -241,7 +237,7 @@ function BookDetail() {
                 {book.reviews && book.reviews.length > 0 ? (
                     <ul className={styles.reviewList}>
                         {book.reviews.map((r, i) => (
-                            <li key={i} className={styles.reviewItem} style={{ marginBottom: '1rem', position: 'relative' }}>
+                            <li key={i} className={styles.reviewItem}>
                                 <div style={{ display: 'flex', alignItems: 'center' }}>
                                     <strong className={styles.reviewNickname}>{r.nickname}</strong>
                                     <span style={{ marginLeft: '0.5rem', color: '#ffc107' }}>
@@ -249,11 +245,13 @@ function BookDetail() {
                                     </span>
                                 </div>
                                 {currentUserId && (
-                                    <div style={{ position: 'absolute', top: '16px', right: '16px' }}>
+                                    <div className={styles.reviewActions}>
                                         {currentUserId === r.userId ? (
-                                            <button onClick={() => handleDeleteReview(r.id)} style={{ background: 'none', border: 'none', color: 'red', cursor: 'pointer', fontSize: '0.8rem' }}>삭제</button>
+                                            <button onClick={() => handleDeleteReview(r.id)} className={styles.deleteButton}>삭제</button>
                                         ) : (
-                                            <button onClick={() => handleReportReview(r.id)} style={{ background: 'none', border: 'none', color: '#007bff', cursor: 'pointer', fontSize: '0.8rem' }}>신고</button>
+                                            <button onClick={() => handleOpenReportModal(r.id)} className={styles.subtleReportLink}>
+                                                신고
+                                            </button>
                                         )}
                                     </div>
                                 )}
@@ -266,6 +264,12 @@ function BookDetail() {
                     <p className={styles.noReviews}>아직 등록된 리뷰가 없습니다.</p>
                 )}
             </div>
+            <ReportModal
+                isOpen={isReportModalOpen}
+                onClose={() => setIsReportModalOpen(false)}
+                reviewId={reportTargetReviewId}
+                onSubmit={handleReportSubmit}
+            />
         </div>
     );
 }

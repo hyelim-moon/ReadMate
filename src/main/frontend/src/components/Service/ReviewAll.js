@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { FaChevronLeft, FaChevronRight, FaStar } from 'react-icons/fa';
 import '../../styles/Service/ReviewAll.css';
+import ReportModal from '../Common/ReportModal';
 
 const ReviewAll = () => {
     const { id } = useParams();
@@ -12,9 +13,11 @@ const ReviewAll = () => {
     const [newReview, setNewReview] = useState('');
     const [rating, setRating] = useState(0);
     const reviewsPerPage = 10;
-    const [currentUserId, setCurrentUserId] = useState(null); // 현재 로그인한 사용자 ID
+    const [currentUserId, setCurrentUserId] = useState(null);
 
-    // 🔹 현재 사용자 ID 가져오기 (로그인 상태 확인)
+    const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+    const [reportTargetReviewId, setReportTargetReviewId] = useState(null);
+
     useEffect(() => {
         const token = localStorage.getItem('ACCESS_TOKEN');
         if (token) {
@@ -79,7 +82,6 @@ const ReviewAll = () => {
         });
     };
 
-    // 🔹 리뷰 삭제 핸들러
     const handleDeleteReview = async (reviewId) => {
         if (!window.confirm('정말로 이 리뷰를 삭제하시겠습니까?')) {
             return;
@@ -95,21 +97,19 @@ const ReviewAll = () => {
                 headers: { Authorization: `Bearer ${token}` }
             });
             alert('리뷰가 삭제되었습니다.');
-            fetchBookData(); // 리뷰 목록 새로고침
+            fetchBookData();
         } catch (error) {
             console.error('리뷰 삭제 실패:', error);
             alert('리뷰 삭제에 실패했습니다. 권한이 없거나 오류가 발생했습니다.');
         }
     };
 
-    // 🔹 리뷰 신고 핸들러
-    const handleReportReview = async (reviewId) => {
-        const reason = prompt('신고 사유를 입력해주세요:');
-        if (!reason || reason.trim() === '') {
-            alert('신고 사유를 입력해야 합니다.');
-            return;
-        }
+    const handleOpenReportModal = (reviewId) => {
+        setReportTargetReviewId(reviewId);
+        setIsReportModalOpen(true);
+    };
 
+    const handleReportSubmit = async (reviewId, reason) => {
         const token = localStorage.getItem('ACCESS_TOKEN');
         if (!token) {
             alert('로그인이 필요합니다.');
@@ -156,7 +156,7 @@ const ReviewAll = () => {
                     <textarea
                         value={newReview}
                         onChange={(e) => setNewReview(e.target.value)}
-                        placeholder="리뷰를 작성해주세요..."
+                        placeholder="리뷰를 작성해주세요"
                     />
                     <button type="submit">리뷰 등록</button>
                 </form>
@@ -165,27 +165,28 @@ const ReviewAll = () => {
             <div className="review-all-list">
                 {currentReviews.length > 0 ? (
                     currentReviews.map((review) => (
-                        <div key={review.id} className="review-all-item" style={{ position: 'relative' }}>
+                        <div key={review.id} className="review-all-item">
                             <div className="review-all-item-header">
-                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <div className="review-all-item-info">
                                     <span className="review-all-item-reviewer">{review.nickname}</span>
                                     <span className="review-all-item-rating">{'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}</span>
                                 </div>
-                                {console.log(`ReviewAll - Review ID: ${review.id}, Review User ID: ${review.userId}, Current User ID: ${currentUserId}, Is My Review: ${currentUserId === review.userId}`)}
                                 {currentUserId && (
-                                    <div style={{ position: 'absolute', top: '16px', right: '16px' }}>
+                                    <div className="review-all-actions">
                                         {currentUserId === review.userId ? (
-                                            <button onClick={() => handleDeleteReview(review.id)} style={{ background: 'none', border: 'none', color: 'red', cursor: 'pointer', fontSize: '0.8rem' }}>삭제</button>
+                                            <button onClick={() => handleDeleteReview(review.id)} className="deleteButton">삭제</button>
                                         ) : (
-                                            <button onClick={() => handleReportReview(review.id)} style={{ background: 'none', border: 'none', color: '#007bff', cursor: 'pointer', fontSize: '0.8rem' }}>신고</button>
+                                            <button onClick={() => handleOpenReportModal(review.id)} className="subtleReportLink">
+                                                신고
+                                            </button>
                                         )}
                                     </div>
                                 )}
                             </div>
                             <div className="review-all-item-body">
                                 <p>{review.content}</p>
-                                <span className="review-all-item-date" style={{ textAlign: 'right', display: 'block' }}>{review.createdAt}</span>
                             </div>
+                            <span className="review-all-item-date">{review.createdAt}</span> {/* 날짜를 여기로 이동 */}
                         </div>
                     ))
                 ) : (
@@ -208,6 +209,12 @@ const ReviewAll = () => {
                     </button>
                 </div>
             )}
+            <ReportModal
+                isOpen={isReportModalOpen}
+                onClose={() => setIsReportModalOpen(false)}
+                reviewId={reportTargetReviewId}
+                onSubmit={handleReportSubmit}
+            />
         </div>
     );
 };

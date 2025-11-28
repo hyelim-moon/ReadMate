@@ -196,7 +196,48 @@
     margin-bottom: 1rem;
     line-height: 1.6;
     font-size: 0.95rem;
+    position: relative; /* 추가: 자식 요소의 absolute 위치 지정을 위함 */
 }
+
+.reviewActions { /* 추가: 삭제/신고 버튼 컨테이너 스타일 */
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    display: flex;
+    gap: 0.5rem; /* 버튼 간 간격 */
+}
+
+.reviewActions button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.8rem;
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.reviewActions button:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.reviewActions .deleteButton {
+    color: #e74c3c; /* 삭제 버튼 색상 변경 */
+}
+
+.reviewActions .subtleReportLink { /* 새로운 신고 링크 스타일 */
+    color: #888; /* 회색 */
+    font-size: 0.85rem; /* 작은 폰트 */
+    text-decoration: none; /* 밑줄 없음 */
+    padding: 0.2rem 0.4rem; /* 클릭 영역 확보 */
+}
+
+.reviewActions .subtleReportLink:hover {
+    color: #555; /* 호버 시 약간 진하게 */
+    text-decoration: underline; /* 호버 시 밑줄 */
+    background-color: transparent; /* 배경색 제거 */
+}
+
 
 .reviewNickname {
     font-weight: 600;
