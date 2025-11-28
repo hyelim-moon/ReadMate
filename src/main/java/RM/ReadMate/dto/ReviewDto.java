@@ -13,6 +13,7 @@ import java.time.format.DateTimeFormatter;
 public class ReviewDto {
     private Long id;
     private Long bookId;
+    private Long userId; // 작성자 ID 추가
     private String content;
     private int rating;
     private String nickname;
@@ -21,6 +22,7 @@ public class ReviewDto {
     public ReviewDto(Review review) {
         this.id = review.getId();
         this.bookId = review.getBook().getId();
+        this.userId = review.getUser().getId(); // 작성자 ID 설정
         this.content = review.getContent();
         this.rating = review.getRating();
         this.nickname = review.getUser().getNickname();

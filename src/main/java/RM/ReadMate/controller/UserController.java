@@ -68,18 +68,20 @@ public class UserController {
         User user = userOpt.get();
         int availableCoupons = purchaseService.getAvailableCouponCount(userid); // 사용 가능한 쿠폰 개수 가져오기
 
-        Map<String, Object> profile = Map.of(
-                "username", user.getUserid(),
-                "nickname", user.getNickname(),
-                "name", user.getName(),
-                "email", user.getEmail(),
-                "phone", user.getPhone(),
-                "birthDate", user.getBirthdate(),
-                "coupons", availableCoupons, // 실제 쿠폰 값 반영
-                "mileage", user.getPoints(),
-                "wishlist", List.of(),
-                "recent", List.of()
-        );
+        // Map.of() 대신 HashMap을 사용하여 10개 이상의 요소를 추가
+        Map<String, Object> profile = new HashMap<>();
+        profile.put("id", user.getId()); // 사용자 ID 추가
+        profile.put("username", user.getUserid());
+        profile.put("nickname", user.getNickname());
+        profile.put("name", user.getName());
+        profile.put("email", user.getEmail());
+        profile.put("phone", user.getPhone());
+        profile.put("birthDate", user.getBirthdate());
+        profile.put("coupons", availableCoupons); // 실제 쿠폰 값 반영
+        profile.put("mileage", user.getPoints());
+        profile.put("wishlist", List.of());
+        profile.put("recent", List.of());
+
 
         return ResponseEntity.ok(profile);
     }

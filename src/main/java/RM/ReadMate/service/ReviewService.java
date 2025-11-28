@@ -34,4 +34,19 @@ public class ReviewService {
 
         return new ReviewDto(savedReview);
     }
+
+    @Transactional
+    public void deleteReview(Long reviewId, String username) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("Review not found with id: " + reviewId));
+
+        User user = userRepository.findByUserid(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with username: " + username));
+
+        if (!review.getUser().getId().equals(user.getId())) {
+            throw new IllegalArgumentException("You are not authorized to delete this review.");
+        }
+
+        reviewRepository.delete(review);
+    }
 }

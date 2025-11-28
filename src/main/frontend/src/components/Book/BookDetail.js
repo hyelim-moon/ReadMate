@@ -11,6 +11,25 @@ function BookDetail() {
     const [showFullContent, setShowFullContent] = useState(false);
     const [isWished, setIsWished] = useState(false); // 찜 여부 상태
     const [isSaved, setIsSaved] = useState(false); // 내 서재 저장 여부 상태
+    const [currentUserId, setCurrentUserId] = useState(null); // 현재 로그인한 사용자 ID
+
+    // 🔹 현재 사용자 ID 가져오기 (로그인 상태 확인)
+    useEffect(() => {
+        const token = localStorage.getItem('ACCESS_TOKEN');
+        if (token) {
+            axios.get('http://localhost:8080/api/users/me', {
+                headers: { Authorization: `Bearer ${token}` }
+            })
+            .then(response => {
+                setCurrentUserId(response.data.id);
+                console.log("Current User ID:", response.data.id);
+            })
+            .catch(error => {
+                console.error("사용자 정보 불러오기 실패:", error);
+                setCurrentUserId(null);
+            });
+        }
+    }, []);
 
     // 🔹 책 상세 정보 요청
     useEffect(() => {
@@ -30,24 +49,22 @@ function BookDetail() {
 
     // 🔹 찜 여부 및 내 서재 저장 여부 확인
     useEffect(() => {
-        if (!book?.id) return;
+        if (!book?.id || !currentUserId) return;
 
         const token = localStorage.getItem('ACCESS_TOKEN');
         if (!token) return;
 
         const headers = { Authorization: `Bearer ${token}` };
 
-        // 찜 여부 확인
         axios.get(`http://localhost:8080/api/wishlist/check?bookId=${book.id}`, { headers })
             .then(res => setIsWished(res.data))
             .catch(err => console.error("찜 여부 확인 실패:", err));
 
-        // 내 서재 저장 여부 확인
         axios.get(`http://localhost:8080/api/saved-books/check?bookId=${book.id}`, { headers })
             .then(res => setIsSaved(res.data))
             .catch(err => console.error("내 서재 저장 여부 확인 실패:", err));
 
-    }, [book]);
+    }, [book, currentUserId]);
 
     // 🔹 찜 버튼 토글
     const toggleWishlist = async () => {
@@ -94,6 +111,58 @@ function BookDetail() {
             alert('내 서재 저장 처리 중 오류가 발생했습니다.');
         }
     };
+
+    // 🔹 리뷰 삭제 핸들러
+    const handleDeleteReview = async (reviewId) => {
+        if (!window.confirm('정말로 이 리뷰를 삭제하시겠습니까?')) {
+            return;
+        }
+        const token = localStorage.getItem('ACCESS_TOKEN');
+        if (!token) {
+            alert('로그인이 필요합니다.');
+            return;
+        }
+
+        try {
+            await axios.delete(`http://localhost:8080/api/reviews/${reviewId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            alert('리뷰가 삭제되었습니다.');
+            axios.get(`http://localhost:8080/api/books/${id}`, { headers: { Authorization: `Bearer ${token}` } })
+                .then(res => setBook(res.data))
+                .catch(err => console.error("책 상세 정보 새로고침 실패:", err));
+        } catch (error) {
+            console.error('리뷰 삭제 실패:', error);
+            alert('리뷰 삭제에 실패했습니다. 권한이 없거나 오류가 발생했습니다.');
+        }
+    };
+
+    // 🔹 리뷰 신고 핸들러
+    const handleReportReview = async (reviewId) => {
+        const reason = prompt('신고 사유를 입력해주세요:');
+        if (!reason || reason.trim() === '') {
+            alert('신고 사유를 입력해야 합니다.');
+            return;
+        }
+
+        const token = localStorage.getItem('ACCESS_TOKEN');
+        if (!token) {
+            alert('로그인이 필요합니다.');
+            return;
+        }
+
+        try {
+            await axios.post(`http://localhost:8080/api/reviews/${reviewId}/report`,
+                { reason: reason },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            alert('리뷰가 신고되었습니다. 관리자 확인 후 조치될 예정입니다.');
+        } catch (error) {
+            console.error('리뷰 신고 실패:', error);
+            alert('리뷰 신고에 실패했습니다. 오류가 발생했습니다.');
+        }
+    };
+
 
     if (!book) return <div>로딩 중...</div>;
 
@@ -172,17 +241,24 @@ function BookDetail() {
                 {book.reviews && book.reviews.length > 0 ? (
                     <ul className={styles.reviewList}>
                         {book.reviews.map((r, i) => (
-                            <li key={i} className={styles.reviewItem} style={{ marginBottom: '1rem' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <div>
-                                        <strong className={styles.reviewNickname}>{r.nickname}</strong>
-                                        <span style={{ marginLeft: '0.5rem', color: '#ffc107' }}>
-                                            {'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}
-                                        </span>
-                                    </div>
-                                    <span style={{ fontSize: '0.8rem', color: '#888' }}>{r.createdAt}</span>
+                            <li key={i} className={styles.reviewItem} style={{ marginBottom: '1rem', position: 'relative' }}>
+                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                    <strong className={styles.reviewNickname}>{r.nickname}</strong>
+                                    <span style={{ marginLeft: '0.5rem', color: '#ffc107' }}>
+                                        {'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}
+                                    </span>
                                 </div>
-                                <p style={{ marginTop: '0.25rem' }}>{r.content}</p>
+                                {currentUserId && (
+                                    <div style={{ position: 'absolute', top: '16px', right: '16px' }}>
+                                        {currentUserId === r.userId ? (
+                                            <button onClick={() => handleDeleteReview(r.id)} style={{ background: 'none', border: 'none', color: 'red', cursor: 'pointer', fontSize: '0.8rem' }}>삭제</button>
+                                        ) : (
+                                            <button onClick={() => handleReportReview(r.id)} style={{ background: 'none', border: 'none', color: '#007bff', cursor: 'pointer', fontSize: '0.8rem' }}>신고</button>
+                                        )}
+                                    </div>
+                                )}
+                                <p style={{ marginTop: '0.25rem', marginBottom: '0.25rem' }}>{r.content}</p>
+                                <div style={{ textAlign: 'right', fontSize: '0.8rem', color: '#888' }}>{r.createdAt}</div>
                             </li>
                         ))}
                     </ul>
