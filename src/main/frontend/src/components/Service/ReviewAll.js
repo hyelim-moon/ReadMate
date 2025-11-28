@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { FaChevronLeft, FaChevronRight, FaStar } from 'react-icons/fa';
+import { FaChevronLeft, FaChevronRight, FaStar, FaArrowLeft } from 'react-icons/fa'; // FaArrowLeft 아이콘 추가
 import '../../styles/Service/ReviewAll.css';
 import ReportModal from '../Common/ReportModal';
 
 const ReviewAll = () => {
     const { id } = useParams();
+    const navigate = useNavigate();
     const [reviews, setReviews] = useState([]);
     const [bookTitle, setBookTitle] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
@@ -72,9 +73,10 @@ const ReviewAll = () => {
             { headers: { Authorization: `Bearer ${token}` } }
         )
         .then(() => {
-            fetchBookData(); 
+            alert('리뷰가 성공적으로 등록되었습니다.');
             setNewReview('');
             setRating(0);
+            fetchBookData();
         })
         .catch(error => {
             console.error('Error submitting review:', error);
@@ -117,7 +119,7 @@ const ReviewAll = () => {
         }
 
         try {
-            await axios.post(`http://localhost:8080/api/reviews/${reviewId}/report`,
+            await axios.post(`http://8080/api/reviews/${reviewId}/report`,
                 { reason: reason },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -136,6 +138,13 @@ const ReviewAll = () => {
 
     return (
         <div className="review-all-container">
+            <button
+                onClick={() => navigate(`/books/${id}`)}
+                className="back-to-detail-button"
+            >
+                <FaArrowLeft /> 책 정보
+            </button>
+
             <h1 className="review-all-title">{bookTitle} - 전체 리뷰</h1>
 
             <div className="review-form-container">
@@ -186,7 +195,7 @@ const ReviewAll = () => {
                             <div className="review-all-item-body">
                                 <p>{review.content}</p>
                             </div>
-                            <span className="review-all-item-date">{review.createdAt}</span> {/* 날짜를 여기로 이동 */}
+                            <span className="review-all-item-date">{review.createdAt}</span>
                         </div>
                     ))
                 ) : (
