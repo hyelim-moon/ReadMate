@@ -102,8 +102,7 @@ function AppContent({ userid, onLoginSuccess, isLoggedIn }) {
           <Route path="/storage" element={<Storage />} />
           <Route path="/books/:id" element={<BookDetail />} />
           <Route path="/search/books" element={<SearchBookMore />} />
-
-          <Route path="/reviewall" element={<ReviewAll/>} />
+          <Route path="/books/:id/reviews" element={<ReviewAll />} />
 
             {/* 문의 리스트 페이지 */}
           <Route
@@ -139,15 +138,10 @@ function App() {
   const [books, setBooks] = useState([]);
   const [bannerText, setBannerText] = useState("");
   const [userInfo, setUserInfo] = useState(null);
-  const [randomBook, setRandomBook] = useState(null);
 
   useEffect(() => {
     axios.get("http://localhost:8080/api/books/recommend")
         .then((res) => setBooks(res.data))
-        .catch((err) => console.error(err));
-
-    axios.get("http://localhost:8080/api/recommend")
-        .then((res) => setRandomBook(res.data))
         .catch((err) => console.error(err));
   }, []);
 

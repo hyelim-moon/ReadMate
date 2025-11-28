@@ -18,7 +18,7 @@ spring:
     url: jdbc:mysql://127.0.0.1:3306/readmate?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root   # MySQL 실제 계정으로 변경
-    password: 123456  # MySQL 실제 비밀번호로 변경
+    password: 1234  # MySQL 실제 비밀번호로 변경
 
   jpa:
     hibernate:
@@ -28,6 +28,7 @@ spring:
       hibernate:
         format_sql: true         # SQL 예쁘게 출력 (가독성 ↑)
         jdbc.time_zone: "Asia/Seoul"   # DB ↔ JPA 시간대 일치
+        dialect: org.hibernate.dialect.MySQLDialect # Explicitly set MySQL Dialect
 
   sql:
     init:

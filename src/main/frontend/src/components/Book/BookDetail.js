@@ -101,6 +101,15 @@ function BookDetail() {
         ? book.content.slice(0, 150) + '...'
         : book.content;
 
+    const calculateAverageRating = () => {
+        if (!book.reviews || book.reviews.length === 0) {
+            return "평점 없음";
+        }
+        const totalRating = book.reviews.reduce((acc, review) => acc + review.rating, 0);
+        const average = totalRating / book.reviews.length;
+        return `⭐ ${average.toFixed(1)}`;
+    };
+
     return (
         <div className={styles.container}>
             <div className={styles.topSection}>
@@ -152,7 +161,7 @@ function BookDetail() {
             <div className={styles.reviewSection}>
                 <h3 className={styles.sectionTitle}>리뷰</h3>
                 <div className={styles.reviewHeader}>
-                    <span className={styles.ratingDisplay}>⭐ 평점: {book.rating || '등록된 평점 없음'}</span>
+                    <span className={styles.ratingDisplay}>평점: {calculateAverageRating()}</span>
                     <button
                         className={styles.viewAllReviewsBtn}
                         onClick={() => navigate(`/books/${book.id}/reviews`)}
@@ -163,8 +172,17 @@ function BookDetail() {
                 {book.reviews && book.reviews.length > 0 ? (
                     <ul className={styles.reviewList}>
                         {book.reviews.map((r, i) => (
-                            <li key={i} className={styles.reviewItem}>
-                                <span className={styles.reviewNickname}>({r.nickname})</span>: {r.content}
+                            <li key={i} className={styles.reviewItem} style={{ marginBottom: '1rem' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <div>
+                                        <strong className={styles.reviewNickname}>{r.nickname}</strong>
+                                        <span style={{ marginLeft: '0.5rem', color: '#ffc107' }}>
+                                            {'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}
+                                        </span>
+                                    </div>
+                                    <span style={{ fontSize: '0.8rem', color: '#888' }}>{r.createdAt}</span>
+                                </div>
+                                <p style={{ marginTop: '0.25rem' }}>{r.content}</p>
                             </li>
                         ))}
                     </ul>
