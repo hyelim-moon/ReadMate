@@ -3,7 +3,7 @@ import axios from 'axios';
 import styles from '../../assets/styles/MyPage.module.css';
 import logoImg from '../../assets/images/logo.png';
 import { Link, useNavigate } from 'react-router-dom'; // useSearchParams 제거
-import { FiLogOut, FiMenu, FiX } from 'react-icons/fi';
+import { FiLogOut, FiMenu, FiX, FiUser, FiBook, FiAward, FiEdit, FiMessageSquare, FiArchive, FiShoppingBag, FiHelpCircle } from 'react-icons/fi';
 // import MyReviews from './MyReviews'; // MyReviews 컴포넌트 임포트 제거
 
 function MyPage() {
@@ -98,14 +98,14 @@ function MyPage() {
                 </div>
                 {menuOpen && (
                     <ul className={styles.menuList}>
-                        <li><Link to="/profile-edit">내 정보</Link></li>
-                        <li><Link to="/mylibrary">내 서재</Link></li>
-                        <li><Link to="/challenge">챌린지</Link></li>
-                        <li><Link to="/recordlist">독서기록</Link></li>
-                        <li><Link to="/myreviews">내 리뷰</Link></li>
-                        <li><Link to="/storage">보관함</Link></li>
-                        <li><Link to="/purchase-history">구매내역</Link></li>
-                        <li><Link to="/contactlist">문의하기</Link></li>
+                        <li><Link to="/profile-edit"><FiUser /><span>내 정보</span></Link></li>
+                        <li><Link to="/mylibrary"><FiBook /><span>내 서재</span></Link></li>
+                        <li><Link to="/challenge"><FiAward /><span>챌린지</span></Link></li>
+                        <li><Link to="/recordlist"><FiEdit /><span>독서기록</span></Link></li>
+                        <li><Link to="/myreviews"><FiMessageSquare /><span>내 리뷰</span></Link></li>
+                        <li><Link to="/storage"><FiArchive /><span>보관함</span></Link></li>
+                        <li><Link to="/purchase-history"><FiShoppingBag /><span>구매내역</span></Link></li>
+                        <li><Link to="/contactlist"><FiHelpCircle /><span>문의하기</span></Link></li>
                     </ul>
                 )}
             </header>
