@@ -20,7 +20,7 @@ import CommunityDetail from "./components/Community/CommunityDetail";
 import Search from './components/Common/Search';
 import Forgot from "./components/User/Forgot";
 import PointShop from "./components/Service/PointShop";
-import ProductDetail from './components/Service/ProductDetail';
+import ProductDetail from "./components/Service/ProductDetail";
 import MyPage from "./components/User/MyPage";
 import MyLibrary from "./components/Book/MyLibrary";
 import MyBook from "./components/Book/MyBook";
@@ -38,7 +38,8 @@ import Help from "./components/Service/Help";
 import PointHistory from "./components/User/PointHistory";
 import SearchBookMore from "./components/Common/SearchBookMore";
 import ReviewAll from "./components/Service/ReviewAll"
-import MyReviews from "./components/User/MyReviews"; // MyReviews 컴포넌트 임포트
+import MyReviews from "./components/User/MyReviews";
+import Friends from "./components/User/Friends"; // Friends 컴포넌트 임포트
 
 // ─────────────────────────────────────────────────────────────────────────────
 // userId를 props로 받도록 변경
@@ -54,8 +55,13 @@ function AppContent({ userid, onLoginSuccess, isLoggedIn }) {
     setInquiries(prev => [newInquiry, ...prev]);
   };
 
+  // 라우트 변경 시 스크롤을 최상단으로 이동
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
   // 로그인/회원가입/비밀번호 찾기/마이페이지 경로면 헤더와 네비 숨김
-  const hideGlobalHeader = ["/login", "/signup", "/forgot", "/mypage", "/myreviews"].includes(location.pathname); // /myreviews 추가
+  const hideGlobalHeader = ["/login", "/signup", "/forgot", "/mypage", "/myreviews"].includes(location.pathname);
 
   return (
       <div className="App">
@@ -75,6 +81,7 @@ function AppContent({ userid, onLoginSuccess, isLoggedIn }) {
           <Route path="/forgot" element={<Forgot />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/mypage" element={<MyPage />} />
+          <Route path="/friends" element={<Friends />} /> {/* Friends 라우트 추가 */}
           <Route path="/chat" element={<ChatBot />} />
           <Route path="/recordlist" element={<RecordList />} />
           <Route path="/pointshop" element={<PointShop userid={userid} />} />
@@ -103,7 +110,7 @@ function AppContent({ userid, onLoginSuccess, isLoggedIn }) {
           <Route path="/books/:id" element={<BookDetail />} />
           <Route path="/search/books" element={<SearchBookMore />} />
           <Route path="/books/:id/reviews" element={<ReviewAll />} />
-          <Route path="/myreviews" element={<MyReviews />} /> {/* 새로운 라우트 추가 */}
+          <Route path="/myreviews" element={<MyReviews />} />
 
             {/* 문의 리스트 페이지 */}
           <Route

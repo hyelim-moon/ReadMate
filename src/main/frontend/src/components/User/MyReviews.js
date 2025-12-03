@@ -4,7 +4,7 @@ import axios from 'axios';
 import { FaArrowLeft } from 'react-icons/fa';
 
 import Header from '../Common/Header';
-import styles from '../../styles/User/MyReviews.module.css'; // CSS 모듈 임포트
+import styles from '../../assets/styles/User/MyReviews.module.css'; // CSS 모듈 임포트
 
 const MyReviews = () => {
     const [myReviews, setMyReviews] = useState([]);

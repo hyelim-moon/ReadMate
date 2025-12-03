@@ -51,8 +51,6 @@
     border: 1px solid #e9ecef;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
     overflow: hidden;
-    display: flex;
-    flex-direction: column;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -63,8 +61,9 @@
 
 /* Main content area of the review */
 .mainContent {
+    position: relative; /* For positioning the date */
     padding: 20px 25px;
-    flex-grow: 1;
+    padding-bottom: 40px; /* Add padding to avoid overlap with the date */
 }
 
 .header {
@@ -106,7 +105,6 @@
 .meta {
     display: flex;
     align-items: center;
-    gap: 12px;
     margin-bottom: 16px;
 }
 
@@ -127,42 +125,40 @@
     word-break: break-word;
 }
 
-/* Review Footer Section */
-.reviewFooter {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 25px;
-    background-color: #f8f9fa;
-    border-top: 1px solid #e9ecef;
-}
-
 .date {
+    position: absolute;
+    bottom: 20px;
+    right: 25px;
     font-size: 0.9rem;
     color: #868e96;
 }
 
-.bookInfo {
+/* Book Link Section */
+.bookLink {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 15px;
+    padding: 15px 25px;
+    background-color: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
     text-decoration: none;
-    transition: opacity 0.2s ease;
 }
 
-.bookInfo:hover {
-    opacity: 0.8;
+.bookLink:hover {
+    background-color: #f1f3f5;
 }
 
 .bookThumbnail {
-    width: 32px; /* 작게 조정 */
+    width: 40px;
     height: auto;
     border-radius: 4px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .bookTitleLink {
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     color: #495057;
 }
 
@@ -193,16 +189,15 @@
 
     .mainContent {
         padding: 15px 20px;
+        padding-bottom: 35px;
+    }
+    
+    .date {
+        bottom: 15px;
+        right: 20px;
     }
 
-    .reviewFooter {
+    .bookLink {
         padding: 12px 20px;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-    }
-
-    .bookInfo {
-        align-self: flex-end; /* 오른쪽 정렬 */
     }
 }

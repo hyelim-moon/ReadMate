@@ -1,0 +1,227 @@
+/* Friends.module.css */
+
+/* 1) 전체 래퍼 - MyReviews.module.css의 .container와 동일 */
+.container {
+    max-width: 800px; /* MyReviews와 동일 */
+    margin: 0 auto; /* MyReviews와 동일 */
+    padding: 2rem 20px; /* MyReviews와 동일 */
+    font-family: 'Noto Sans KR', sans-serif; /* MyReviews와 동일 */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* 페이지 헤더 (제목만 남음) */
+.pageHeader {
+    max-width: 800px; /* container와 동일한 최대 너비 */
+    margin: 2rem auto 1.5rem auto; /* 상단 여백, 중앙 정렬, 하단 여백 */
+    padding: 0 20px; /* container의 좌우 패딩과 동일하게 설정 */
+    display: block; /* 블록 요소로 변경 */
+}
+
+/* 3) 페이지 제목 - MyReviews.module.css의 .title과 동일 */
+.title {
+    text-align: left;
+    font-size: 2.2rem;
+    color: #212529;
+    font-weight: 700;
+    
+    /* pageHeader 내에서 정렬되므로 margin-bottom, align-self 조정 */
+    margin: 0; /* pageHeader의 padding과 margin으로 여백 처리 */
+    line-height: 1; /* 버튼과 높이 맞추기 */
+}
+
+/* 4) 메인 콘텐츠 영역 - MyReviews의 .reviewList와 유사 */
+.mainContent {
+    width: 100%; /* container의 max-width를 따름 */
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem; /* MyReviews의 reviewList gap과 동일 */
+}
+
+/* 5) 각 섹션 카드 스타일 - MyReviews.module.css의 .reviewItem과 동일 */
+.sectionCard {
+    background-color: #ffffff; /* MyReviews와 동일 */
+    border-radius: 12px; /* MyReviews와 동일 */
+    border: 1px solid #e9ecef; /* MyReviews와 동일 */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04); /* MyReviews와 동일 */
+    overflow: hidden; /* MyReviews와 동일 */
+    transition: transform 0.2s ease, box-shadow 0.2s ease; /* MyReviews와 동일 */
+    padding: 1.5rem 2rem; /* MyReviews의 mainContent padding과 유사하게 조정 */
+}
+
+/* 6) 섹션 제목 스타일 - MyReviews.module.css의 .reviewerNickname과 유사 */
+.sectionTitle {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #343a40;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* 새로고침 버튼 스타일 */
+.refreshButton {
+    color: #6c757d; /* 회색 계열 */
+    font-size: 1.1em; /* 아이콘 크기 조정 */
+    padding: 5px; /* 클릭 영역 확보 */
+    border-radius: 50%; /* 원형 버튼 */
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    display: flex; /* 아이콘 중앙 정렬 */
+    align-items: center;
+    justify-content: center;
+}
+
+.refreshButton:hover {
+    background-color: #e9ecef;
+    transform: rotate(30deg); /* 호버 시 약간 회전 효과 */
+}
+
+
+/* 7) 검색창 컨테이너 (sectionCard 내부) */
+.searchContainer {
+    display: flex;
+    align-items: center;
+    border: 1px solid #dee2e6; /* MyReviews의 backButton border와 유사 */
+    border-radius: 8px; /* MyReviews의 backButton border-radius와 유사 */
+    padding: 0.5rem 1rem; /* MyReviews의 backButton padding과 유사 */
+    background-color: #f8f9fa; /* MyReviews의 bookLink 배경색과 유사 */
+}
+
+.searchInput {
+    flex-grow: 1;
+    border: none;
+    background: none;
+    outline: none;
+    font-size: 1rem;
+    color: #333;
+    padding: 0;
+}
+.searchInput::placeholder {
+    color: #bbb;
+}
+
+.searchButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #495057; /* MyReviews의 backButton color와 유사 */
+    font-size: 1.2rem;
+    padding: 0 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 8) 친구 목록 공통 스타일 */
+.friendList, .recommendedFriendList {
+    display: flex;
+    flex-direction: column;
+    gap: 0; /* 각 friendItem이 border-bottom으로 구분되므로 gap은 0 */
+}
+
+/* 9) 친구 항목 스타일 - MyReviews의 .reviewItem 내부 요소와 유사하게 */
+.friendItem, .recommendedFriendItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0; /* sectionCard의 좌우 패딩을 고려하여 좌우 0 */
+    background: transparent; /* 부모 sectionCard의 흰색 배경을 따름 */
+    border-bottom: 1px solid #eee; /* 항목 구분을 위한 하단 테두리 */
+}
+.friendItem:last-child, .recommendedFriendItem:last-child {
+    border-bottom: none; /* 마지막 항목은 하단 테두리 없음 */
+}
+
+.friendInfo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.friendImage {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: #3B6D41; /* 초록색 배경 유지 */
+    flex-shrink: 0;
+}
+
+.friendNickname {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #333;
+}
+
+.friendActions {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.actionButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 5px 8px;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+.actionButton:hover {
+    background-color: #f1f3f5;
+}
+
+.chatButton {
+    color: #4c6ef5; /* MyReviews의 editButton color와 유사 */
+}
+
+.deleteButton {
+    color: #fa5252; /* MyReviews의 deleteButton color와 동일 */
+}
+
+.addButton {
+    color: #66BB6A; /* 밝은 초록색 유지 */
+}
+
+/* 10) 빈 상태 박스 - MyReviews.module.css의 .noReviews를 참고하되, sectionCard 내부에 맞게 조정 */
+.emptyBox {
+    text-align: center;
+    color: #868e96;
+    padding: 1rem 0; /* 섹션 카드 내부 패딩을 고려하여 조정 */
+    margin-top: 0.5rem; /* 섹션 제목과의 간격 */
+}
+
+/* Responsive Design - MyReviews와 유사하게 */
+@media (max-width: 600px) {
+    .container {
+        padding: 1.5rem 15px;
+    }
+
+    .pageHeader {
+        width: calc(100% - 30px); /* 반응형 컨테이너 패딩 15px * 2 고려 */
+        margin: 1.5rem auto 1rem auto; /* 상단 여백, 중앙 정렬, 하단 여백 */
+        padding: 0 15px; /* 반응형 컨테이너 좌우 패딩과 동일하게 설정 */
+    }
+
+    .title {
+        font-size: 1.8rem;
+    }
+
+    .sectionCard {
+        padding: 1rem 15px;
+    }
+    
+    .searchContainer {
+        padding: 0.4rem 0.8rem;
+    }
+
+    .friendItem, .recommendedFriendItem {
+        padding: 0.6rem 0;
+    }
+}
