@@ -11,6 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class ReviewService {
@@ -48,5 +51,19 @@ public class ReviewService {
         }
 
         reviewRepository.delete(review);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReviewDto> getReviewsByUserId(Long userId) {
+        List<Review> reviews = reviewRepository.findByUserId(userId);
+        return reviews.stream()
+                .map(ReviewDto::new)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public User getUserByUsername(String username) {
+        return userRepository.findByUserid(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with username: " + username));
     }
 }

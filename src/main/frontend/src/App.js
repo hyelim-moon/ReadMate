@@ -38,7 +38,7 @@ import Help from "./components/Service/Help";
 import PointHistory from "./components/User/PointHistory";
 import SearchBookMore from "./components/Common/SearchBookMore";
 import ReviewAll from "./components/Service/ReviewAll"
-
+import MyReviews from "./components/User/MyReviews"; // MyReviews 컴포넌트 임포트
 
 // ─────────────────────────────────────────────────────────────────────────────
 // userId를 props로 받도록 변경
@@ -55,7 +55,7 @@ function AppContent({ userid, onLoginSuccess, isLoggedIn }) {
   };
 
   // 로그인/회원가입/비밀번호 찾기/마이페이지 경로면 헤더와 네비 숨김
-  const hideGlobalHeader = ["/login", "/signup", "/forgot", "/mypage"].includes(location.pathname);
+  const hideGlobalHeader = ["/login", "/signup", "/forgot", "/mypage", "/myreviews"].includes(location.pathname); // /myreviews 추가
 
   return (
       <div className="App">
@@ -103,6 +103,7 @@ function AppContent({ userid, onLoginSuccess, isLoggedIn }) {
           <Route path="/books/:id" element={<BookDetail />} />
           <Route path="/search/books" element={<SearchBookMore />} />
           <Route path="/books/:id/reviews" element={<ReviewAll />} />
+          <Route path="/myreviews" element={<MyReviews />} /> {/* 새로운 라우트 추가 */}
 
             {/* 문의 리스트 페이지 */}
           <Route

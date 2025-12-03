@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FaChevronLeft, FaChevronRight, FaStar, FaArrowLeft } from 'react-icons/fa'; // FaArrowLeft 아이콘 추가
-import '../../styles/Service/ReviewAll.css';
+import '../../assets/styles/Service/ReviewAll.css';
 import ReportModal from '../Common/ReportModal';
 
 const ReviewAll = () => {
