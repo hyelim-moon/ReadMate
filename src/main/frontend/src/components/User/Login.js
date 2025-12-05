@@ -20,8 +20,8 @@ function Login({ onLoginSuccess }) {
             });
             const { token, user } = response.data;
             localStorage.setItem("ACCESS_TOKEN", token);
-            console.log("로그인 후 user.id:", user.userid);
-            localStorage.setItem("USER_ID", user.userid);
+            console.log("로그인 후 user.id:", user.id); // user.id로 변경
+            localStorage.setItem("USER_ID", user.id); // user.id로 변경
             if (onLoginSuccess) {
                 console.log("로그인 응답 user 객체:", user); // 먼저 콘솔에 출력
                 onLoginSuccess(user); // 그 다음 전달

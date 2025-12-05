@@ -78,7 +78,7 @@ function Friends() {
 
             // 보낸 친구 요청 목록 불러오기
             const pendingSentResponse = await axios.get(`http://localhost:8080/api/friends/sent-requests/${userId}`, headers);
-            setPendingSentRequests(pendingSentResponse.data); // 이 부분은 유지
+            setPendingSentRequests(pendingSentResponse.data);
 
             setMessage('');
             setIsError(false);
@@ -99,6 +99,11 @@ function Friends() {
     useEffect(() => {
         console.log("Current pendingSentRequests state:", pendingSentRequests);
     }, [pendingSentRequests]);
+
+    // pendingReceivedRequests 상태가 변경될 때마다 로그 출력
+    useEffect(() => {
+        console.log("Current pendingReceivedRequests state:", pendingReceivedRequests);
+    }, [pendingReceivedRequests]);
 
 
     const handleSearch = () => {
