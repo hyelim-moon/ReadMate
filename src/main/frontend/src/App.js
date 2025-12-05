@@ -40,6 +40,7 @@ import SearchBookMore from "./components/Common/SearchBookMore";
 import ReviewAll from "./components/Service/ReviewAll"
 import MyReviews from "./components/User/MyReviews";
 import Friends from "./components/User/Friends"; // Friends 컴포넌트 임포트
+import TeamChallengePage from "./components/Service/TeamChallengePage"; // TeamChallengePage 임포트
 
 // ─────────────────────────────────────────────────────────────────────────────
 // userId를 props로 받도록 변경
@@ -86,6 +87,7 @@ function AppContent({ userid, onLoginSuccess, isLoggedIn }) {
           <Route path="/recordlist" element={<RecordList />} />
           <Route path="/pointshop" element={<PointShop userid={userid} />} />
           <Route path="/challenge" element={<Challenge />} />
+          <Route path="/team-challenge" element={<TeamChallengePage />} /> {/* TeamChallengePage 라우트 추가 */}
           <Route path="/challenges/:id" element={<ChallengeDetail />} />
           <Route path="/help" element={<Help />} />
           <Route path="/point-history" element={<PointHistory />} />

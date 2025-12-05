@@ -17,6 +17,7 @@ import {
 function Header() {
     const [dropdownOpen, setDropdownOpen] = useState(false); // 검색 카테고리 드롭다운
     const [bookDropdownOpen, setBookDropdownOpen] = useState(false); // 도서 관련 드롭다운
+    const [challengeDropdownOpen, setChallengeDropdownOpen] = useState(false); // 챌린지 드롭다운 추가
     const [selectedCategory, setSelectedCategory] = useState('전체');
     const [keyword, setKeyword] = useState('');
     const navigate = useNavigate();
@@ -34,6 +35,7 @@ function Header() {
     // 드롭다운 참조를 위한 useRef
     const bookDropdownRef = useRef(null);
     const searchDropdownRef = useRef(null);
+    const challengeDropdownRef = useRef(null); // 챌린지 드롭다운 참조 추가
 
     useEffect(() => {
         const token = localStorage.getItem('ACCESS_TOKEN');
@@ -77,6 +79,9 @@ function Header() {
             if (searchDropdownRef.current && !searchDropdownRef.current.contains(event.target)) {
                 setDropdownOpen(false);
             }
+            if (challengeDropdownRef.current && !challengeDropdownRef.current.contains(event.target)) { // 챌린지 드롭다운 참조 추가
+                setChallengeDropdownOpen(false);
+            }
         }
 
         document.addEventListener('mousedown', handleClickOutside);
@@ -89,6 +94,7 @@ function Header() {
     useEffect(() => {
         setBookDropdownOpen(false);
         setDropdownOpen(false);
+        setChallengeDropdownOpen(false); // 챌린지 드롭다운 닫기 추가
     }, [location.pathname]);
 
 
@@ -102,6 +108,12 @@ function Header() {
     const handleBookMenuItemClick = (path) => {
         navigate(path);
         setBookDropdownOpen(false); // 드롭다운 닫기
+    };
+
+    // 챌린지 드롭다운 메뉴 항목 클릭 시
+    const handleChallengeMenuItemClick = (path) => { // 챌린지 메뉴 클릭 핸들러 추가
+        navigate(path);
+        setChallengeDropdownOpen(false); // 드롭다운 닫기
     };
 
     const getRankDisplay = (rank) => {
@@ -196,9 +208,22 @@ function Header() {
                                 </ul>
                             )}
                         </div>
-                        <Link to="/challenge">
-                            <button><FaTrophy/> 챌린지</button>
-                        </Link>
+                        {/* 챌린지 관련 메뉴를 드롭다운으로 묶음 */}
+                        <div
+                            className={styles.dropdown}
+                            ref={challengeDropdownRef}
+                        >
+                            <button onClick={() => setChallengeDropdownOpen(!challengeDropdownOpen)}>
+                                <FaTrophy/> 챌린지 <FaChevronDown
+                                className={`${styles.dropdownArrow} ${challengeDropdownOpen ? styles.arrowUp : ''}`}/>
+                            </button>
+                            {challengeDropdownOpen && (
+                                <ul className={styles.dropdownMenu}>
+                                    <li onClick={() => handleChallengeMenuItemClick('/challenge')}>도전과제</li>
+                                    <li onClick={() => handleChallengeMenuItemClick('/team-challenge')}>팀 경쟁</li>
+                                </ul>
+                            )}
+                        </div>
                         <Link to="/pointShop">
                             <button><FaShoppingCart/> 포인트샵</button>
                         </Link>
