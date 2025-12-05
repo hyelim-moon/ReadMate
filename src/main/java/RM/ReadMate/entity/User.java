@@ -54,6 +54,11 @@ public class User {
     @Column
     private int points;
 
+    @Setter
+    @Column(nullable = false) // enabled 필드 추가
+    @Builder.Default
+    private boolean enabled = true;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     @Builder.Default

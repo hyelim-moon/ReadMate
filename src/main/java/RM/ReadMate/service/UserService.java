@@ -65,4 +65,9 @@ public class UserService {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
     }
+
+    // 닉네임으로 사용자 검색
+    public List<User> searchUsersByNickname(String nickname) {
+        return userRepository.findByNicknameContainingIgnoreCase(nickname);
+    }
 }
