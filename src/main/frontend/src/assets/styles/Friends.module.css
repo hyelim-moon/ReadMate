@@ -114,6 +114,48 @@
     justify-content: center;
 }
 
+/* 탭 메뉴 스타일 */
+.tabMenu {
+    display: flex;
+    justify-content: center; /* 탭 버튼들을 중앙 정렬 */
+    margin-bottom: 1.5rem; /* 아래쪽 여백 */
+    background-color: #f8f9fa; /* 탭 메뉴 배경색 */
+    border-radius: 12px;
+    overflow: hidden; /* 버튼의 border-radius가 잘 보이도록 */
+    border: 1px solid #e9ecef;
+}
+
+.tabButton {
+    flex: 1; /* 공간을 균등하게 분배 */
+    padding: 0.8rem 1.2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #495057; /* 기본 텍스트 색상 */
+    background-color: transparent; /* 기본 배경 투명 */
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative; /* activeTab 밑줄을 위해 */
+}
+
+.tabButton:hover {
+    background-color: #e9ecef; /* 호버 시 배경색 변경 */
+}
+
+.tabButton.activeTab {
+    color: #3B6D41; /* 활성화된 탭 텍스트 색상 */
+    font-weight: 700;
+    background-color: #ffffff; /* 활성화된 탭 배경색 */
+    border-bottom: 3px solid #3B6D41; /* 활성화된 탭 밑줄 */
+    z-index: 1; /* 다른 버튼 위에 오도록 */
+}
+
+/* 탭 버튼 사이의 구분선 (선택 사항) */
+.tabButton:not(:last-child) {
+    border-right: 1px solid #e9ecef;
+}
+
+
 /* 8) 친구 목록 공통 스타일 */
 .friendList, .recommendedFriendList {
     display: flex;

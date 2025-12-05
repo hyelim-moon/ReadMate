@@ -1,38 +1,109 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 import styles from '../../assets/styles/Friends.module.css';
-import { FiChevronLeft, FiMessageCircle, FiXCircle, FiUserPlus, FiSearch, FiRefreshCw } from 'react-icons/fi'; // FiRefreshCw 임포트
-
-// 초기 가상 친구 데이터 (상수로 정의하여 새로고침 시 사용)
-const initialMyFriends = [
-    { id: 1, nickname: '책벌레' },
-    { id: 2, nickname: '독서왕' },
-    { id: 3, nickname: '리드메이트' },
-    { id: 4, nickname: '글쓴이' },
-    { id: 5, nickname: '페이지터너' },
-];
-
-// 초기 가상 추천 친구 데이터 (상수로 정의하여 새로고침 시 사용)
-const initialRecommendedFriends = [
-    { id: 6, nickname: '새로운친구1' },
-    { id: 7, nickname: '새로운친구2' },
-    { id: 8, nickname: '새로운친구3' },
-    { id: 9, nickname: '독서친구' },
-    { id: 10, nickname: '책사랑' },
-];
+import { FiMessageCircle, FiXCircle, FiUserPlus, FiSearch, FiRefreshCw, FiCheckCircle } from 'react-icons/fi'; // FiCheckCircle 추가
 
 function Friends() {
-    // 가상 친구 데이터 (useState로 관리)
-    const [myFriends, setMyFriends] = useState(initialMyFriends);
-
-    // 가상 추천 친구 데이터 (useState로 관리)
-    const [recommendedFriends, setRecommendedFriends] = useState(initialRecommendedFriends);
-
+    const [myFriends, setMyFriends] = useState([]);
+    const [recommendedFriends, setRecommendedFriends] = useState([]);
+    const [pendingReceivedRequests, setPendingReceivedRequests] = useState([]); // 받은 친구 요청 목록
+    const [pendingSentRequests, setPendingSentRequests] = useState([]);     // 보낸 친구 요청 목록
     const [searchTerm, setSearchTerm] = useState('');
+
+    const [userId, setUserId] = useState(null);
+    const [token, setToken] = useState(null);
+    const [message, setMessage] = useState('');
+    const [isError, setIsError] = useState(false);
+    const [currentView, setCurrentView] = useState('myFriends'); // 'myFriends', 'pendingReceived', 'pendingSent'
+
+    useEffect(() => {
+        const storedUserId = localStorage.getItem("USER_ID");
+        const storedToken = localStorage.getItem("ACCESS_TOKEN");
+
+        if (storedUserId && storedToken) {
+            setUserId(Number(storedUserId));
+            setToken(storedToken);
+        } else {
+            setMessage("로그인이 필요합니다.");
+            setIsError(true);
+        }
+    }, []);
+
+    const getAuthHeaders = () => {
+        if (!token) {
+            throw new Error("인증 토큰이 없습니다. 로그인이 필요합니다.");
+        }
+        return {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        };
+    };
+
+    // 에러 메시지 추출 헬퍼 함수
+    const getErrorMessage = (error, defaultMessage) => {
+        if (error.response && error.response.data) {
+            // Spring Boot 기본 에러 형식 (message, error 필드)
+            if (typeof error.response.data === 'string') {
+                return error.response.data;
+            }
+            if (error.response.data.message) {
+                return error.response.data.message;
+            }
+            if (error.response.data.error) {
+                return error.response.data.error;
+            }
+        }
+        return defaultMessage;
+    };
+
+    const fetchFriendsData = async () => {
+        if (!userId || !token) return;
+
+        try {
+            const headers = getAuthHeaders();
+
+            // 내 친구 목록 불러오기
+            const myFriendsResponse = await axios.get(`http://localhost:8080/api/friends/${userId}`, headers);
+            setMyFriends(myFriendsResponse.data);
+
+            // 추천 친구 목록 불러오기
+            const recommendedFriendsResponse = await axios.get(`http://localhost:8080/api/friends/recommendations/${userId}`, headers);
+            setRecommendedFriends(recommendedFriendsResponse.data);
+
+            // 받은 친구 요청 목록 불러오기
+            const pendingReceivedResponse = await axios.get(`http://localhost:8080/api/friends/pending-requests/${userId}`, headers);
+            setPendingReceivedRequests(pendingReceivedResponse.data);
+
+            // 보낸 친구 요청 목록 불러오기
+            const pendingSentResponse = await axios.get(`http://localhost:8080/api/friends/sent-requests/${userId}`, headers);
+            setPendingSentRequests(pendingSentResponse.data); // 이 부분은 유지
+
+            setMessage('');
+            setIsError(false);
+        } catch (error) {
+            console.error("친구 데이터를 불러오는 데 실패했습니다:", error);
+            setMessage(getErrorMessage(error, '친구 데이터를 불러오는 데 실패했습니다.'));
+            setIsError(true);
+        }
+    };
+
+    useEffect(() => {
+        if (userId && token) {
+            fetchFriendsData();
+        }
+    }, [userId, token]);
+
+    // pendingSentRequests 상태가 변경될 때마다 로그 출력
+    useEffect(() => {
+        console.log("Current pendingSentRequests state:", pendingSentRequests);
+    }, [pendingSentRequests]);
+
 
     const handleSearch = () => {
         console.log('Searching for:', searchTerm);
-        // 실제 검색 로직은 백엔드 API 호출 등으로 구현될 수 있습니다.
+        // 백엔드에 검색 API가 있다면 여기에 호출 로직 추가
     };
 
     const onKeyPress = (e) => {
@@ -41,54 +112,140 @@ function Friends() {
         }
     };
 
-    // 친구 추가 핸들러
-    const handleAddFriend = (friendToAdd) => {
-        // 이미 친구 목록에 있는지 확인 (중복 추가 방지)
-        if (!myFriends.some(f => f.id === friendToAdd.id)) {
-            setMyFriends(prevFriends => [...prevFriends, friendToAdd]);
-            setRecommendedFriends(prevRecFriends =>
-                prevRecFriends.filter(f => f.id !== friendToAdd.id)
-            );
-            console.log(`${friendToAdd.nickname} 님을 친구로 추가했습니다.`);
-        } else {
-            console.log(`${friendToAdd.nickname} 님은 이미 친구입니다.`);
+    const handleAddFriend = async (friendToAdd) => {
+        if (!userId || !token) {
+            setMessage("로그인이 필요합니다.");
+            setIsError(true);
+            return;
+        }
+        try {
+            const headers = getAuthHeaders();
+            await axios.post(`http://localhost:8080/api/friends/request/${userId}`, { addresseeId: friendToAdd.id }, headers);
+            setMessage(`${friendToAdd.nickname} 님에게 친구 요청을 보냈습니다.`);
+            setIsError(false);
+            fetchFriendsData();
+        } catch (error) {
+            console.error("친구 요청 실패:", error);
+            setMessage(getErrorMessage(error, '친구 요청에 실패했습니다.'));
+            setIsError(true);
         }
     };
 
-    // 친구 삭제 핸들러
-    const handleDeleteFriend = (friendToDelete) => {
-        setMyFriends(prevFriends =>
-            prevFriends.filter(f => f.id !== friendToDelete.id)
-        );
-        // 삭제된 친구를 추천 친구 목록으로 다시 보낼 수도 있습니다.
-        // 여기서는 단순히 삭제만 합니다.
-        console.log(`${friendToDelete.nickname} 님을 친구 목록에서 삭제했습니다.`);
+    const handleDeleteFriend = async (friendToDelete) => {
+        if (!userId || !token) {
+            setMessage("로그인이 필요합니다.");
+            setIsError(true);
+            return;
+        }
+        try {
+            const headers = getAuthHeaders();
+            await axios.delete(`http://localhost:8080/api/friends/${userId}/${friendToDelete.id}`, headers);
+            setMessage(`${friendToDelete.nickname} 님을 친구 목록에서 삭제했습니다.`);
+            setIsError(false);
+            fetchFriendsData();
+        } catch (error) {
+            console.error("친구 삭제 실패:", error);
+            setMessage(getErrorMessage(error, '친구 삭제에 실패했습니다.'));
+            setIsError(true);
+        }
     };
 
-    // 추천 친구 목록 새로고침 핸들러
+    // 받은 친구 요청 수락
+    const handleAcceptRequest = async (request) => {
+        if (!userId || !token) {
+            setMessage("로그인이 필요합니다.");
+            setIsError(true);
+            return;
+        }
+        try {
+            const headers = getAuthHeaders();
+            await axios.put(`http://localhost:8080/api/friends/accept/${request.friendshipId}/${userId}`, {}, headers);
+            setMessage(`${request.nickname} 님의 친구 요청을 수락했습니다.`);
+            setIsError(false);
+            fetchFriendsData();
+        } catch (error) {
+            console.error("친구 요청 수락 실패:", error);
+            setMessage(getErrorMessage(error, '친구 요청 수락에 실패했습니다.'));
+            setIsError(true);
+        }
+    };
+
+    // 받은 친구 요청 거절
+    const handleRejectRequest = async (request) => {
+        if (!userId || !token) {
+            setMessage("로그인이 필요합니다.");
+            setIsError(true);
+            return;
+        }
+        try {
+            const headers = getAuthHeaders();
+            await axios.put(`http://localhost:8080/api/friends/reject/${request.friendshipId}/${userId}`, {}, headers);
+            setMessage(`${request.nickname} 님의 친구 요청을 거절했습니다.`);
+            setIsError(false);
+            fetchFriendsData();
+        } catch (error) {
+            console.error("친구 요청 거절 실패:", error);
+            setMessage(getErrorMessage(error, '친구 요청 거절에 실패했습니다.'));
+            setIsError(true);
+        }
+    };
+
+    // 보낸 친구 요청 취소 (백엔드 reject 엔드포인트 재활용)
+    const handleCancelRequest = async (request) => {
+        if (!userId || !token) {
+            setMessage("로그인이 필요합니다.");
+            setIsError(true);
+            return;
+        }
+        try {
+            const headers = getAuthHeaders();
+            await axios.put(`http://localhost:8080/api/friends/reject/${request.friendshipId}/${userId}`, {}, headers);
+            setMessage(`${request.nickname} 님에게 보낸 친구 요청을 취소했습니다.`);
+            setIsError(false);
+            fetchFriendsData();
+        } catch (error) {
+            console.error("친구 요청 취소 실패:", error);
+            setMessage(getErrorMessage(error, '친구 요청 취소에 실패했습니다.'));
+            setIsError(true);
+        }
+    };
+
     const handleRefreshRecommendedFriends = () => {
-        setRecommendedFriends(initialRecommendedFriends); // 초기 상태로 되돌림
-        console.log('추천 친구 목록을 새로고침했습니다.');
+        fetchFriendsData();
+        setMessage('추천 친구 목록을 새로고침했습니다.');
+        setIsError(false);
     };
 
-    // 내 친구 목록 필터링
     const filteredMyFriends = myFriends.filter(friend =>
         friend.nickname.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    // 추천 친구 목록 필터링
     const filteredRecommendedFriends = recommendedFriends.filter(recFriend =>
         recFriend.nickname.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    const filteredPendingReceivedRequests = pendingReceivedRequests.filter(request =>
+        request.nickname.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const filteredPendingSentRequests = pendingSentRequests.filter(request =>
+        request.nickname.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     return (
-        <> {/* 최상위 div 대신 Fragment 사용 */}
+        <>
             <div className={styles.pageHeader}>
                 <h1 className={styles.title}>친구</h1>
             </div>
 
             <div className={styles.container}>
                 <main className={styles.mainContent}>
+                    {message && (
+                        <p className={isError ? styles.errorMessage : styles.successMessage}>
+                            {message}
+                        </p>
+                    )}
+
                     {/* 검색 섹션 */}
                     <section className={styles.sectionCard}>
                         <h2 className={styles.sectionTitle}><FiSearch /> 친구 검색</h2>
@@ -107,47 +264,142 @@ function Friends() {
                         </div>
                     </section>
 
-                    {/* 내 친구 섹션 */}
-                    <section className={styles.sectionCard}>
-                        <h2 className={styles.sectionTitle}>내 친구</h2>
-                        <div className={styles.friendList}>
-                            {filteredMyFriends.length === 0 ? (
-                                <div className={styles.emptyBox}>
-                                    {searchTerm ? `'${searchTerm}'에 해당하는 친구가 없습니다.` : '친구가 없습니다.'}
-                                </div>
-                            ) : (
-                                filteredMyFriends.map(friend => (
-                                    <div key={friend.id} className={styles.friendItem}>
-                                        <div className={styles.friendInfo}>
-                                            <div className={styles.friendImage} />
-                                            <span className={styles.friendNickname}>{friend.nickname}</span>
-                                        </div>
-                                        <div className={styles.friendActions}>
-                                            <button className={`${styles.actionButton} ${styles.chatButton}`}>
-                                                <FiMessageCircle />
-                                                <span>채팅</span>
-                                            </button>
-                                            <button
-                                                className={`${styles.actionButton} ${styles.deleteButton}`}
-                                                onClick={() => handleDeleteFriend(friend)} // 삭제 버튼 연결
-                                            >
-                                                <FiXCircle />
-                                                <span>삭제</span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))
-                            )}
-                        </div>
-                    </section>
+                    {/* 탭 메뉴 */}
+                    <div className={styles.tabMenu}>
+                        <button
+                            className={`${styles.tabButton} ${currentView === 'myFriends' ? styles.activeTab : ''}`}
+                            onClick={() => setCurrentView('myFriends')}
+                        >
+                            내 친구
+                        </button>
+                        <button
+                            className={`${styles.tabButton} ${currentView === 'pendingReceived' ? styles.activeTab : ''}`}
+                            onClick={() => setCurrentView('pendingReceived')}
+                        >
+                            받은 요청 ({pendingReceivedRequests.length})
+                        </button>
+                        <button
+                            className={`${styles.tabButton} ${currentView === 'pendingSent' ? styles.activeTab : ''}`}
+                            onClick={() => setCurrentView('pendingSent')}
+                        >
+                            보낸 요청 ({pendingSentRequests.length})
+                        </button>
+                    </div>
 
-                    {/* 추천 친구 섹션 */}
+                    {/* 내 친구 섹션 */}
+                    {currentView === 'myFriends' && (
+                        <section className={styles.sectionCard}>
+                            <h2 className={styles.sectionTitle}>내 친구</h2>
+                            <div className={styles.friendList}>
+                                {filteredMyFriends.length === 0 ? (
+                                    <div className={styles.emptyBox}>
+                                        {searchTerm ? `'${searchTerm}'에 해당하는 친구가 없습니다.` : '친구가 없습니다.'}
+                                    </div>
+                                ) : (
+                                    filteredMyFriends.map(friend => (
+                                        <div key={friend.id} className={styles.friendItem}>
+                                            <div className={styles.friendInfo}>
+                                                <div className={styles.friendImage} />
+                                                <span className={styles.friendNickname}>{friend.nickname}</span>
+                                            </div>
+                                            <div className={styles.friendActions}>
+                                                <button className={`${styles.actionButton} ${styles.chatButton}`}>
+                                                    <FiMessageCircle />
+                                                    <span>채팅</span>
+                                                </button>
+                                                <button
+                                                    className={`${styles.actionButton} ${styles.deleteButton}`}
+                                                    onClick={() => handleDeleteFriend(friend)}
+                                                >
+                                                    <FiXCircle />
+                                                    <span>삭제</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        </section>
+                    )}
+
+                    {/* 받은 친구 요청 섹션 */}
+                    {currentView === 'pendingReceived' && (
+                        <section className={styles.sectionCard}>
+                            <h2 className={styles.sectionTitle}>받은 친구 요청</h2>
+                            <div className={styles.friendList}>
+                                {filteredPendingReceivedRequests.length === 0 ? (
+                                    <div className={styles.emptyBox}>
+                                        {searchTerm ? `'${searchTerm}'에 해당하는 받은 요청이 없습니다.` : '받은 친구 요청이 없습니다.'}
+                                    </div>
+                                ) : (
+                                    filteredPendingReceivedRequests.map(request => (
+                                        <div key={request.friendshipId} className={styles.friendItem}>
+                                            <div className={styles.friendInfo}>
+                                                <div className={styles.friendImage} />
+                                                <span className={styles.friendNickname}>{request.nickname}</span>
+                                            </div>
+                                            <div className={styles.friendActions}>
+                                                <button
+                                                    className={`${styles.actionButton} ${styles.acceptButton}`}
+                                                    onClick={() => handleAcceptRequest(request)}
+                                                >
+                                                    <FiCheckCircle />
+                                                    <span>수락</span>
+                                                </button>
+                                                <button
+                                                    className={`${styles.actionButton} ${styles.deleteButton}`}
+                                                    onClick={() => handleRejectRequest(request)}
+                                                >
+                                                    <FiXCircle />
+                                                    <span>거절</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        </section>
+                    )}
+
+                    {/* 보낸 친구 요청 섹션 */}
+                    {currentView === 'pendingSent' && (
+                        <section className={styles.sectionCard}>
+                            <h2 className={styles.sectionTitle}>보낸 친구 요청</h2>
+                            <div className={styles.friendList}>
+                                {filteredPendingSentRequests.length === 0 ? (
+                                    <div className={styles.emptyBox}>
+                                        {searchTerm ? `'${searchTerm}'에 해당하는 보낸 요청이 없습니다.` : '보낸 친구 요청이 없습니다.'}
+                                    </div>
+                                ) : (
+                                    filteredPendingSentRequests.map(request => (
+                                        <div key={request.friendshipId} className={styles.friendItem}>
+                                            <div className={styles.friendInfo}>
+                                                <div className={styles.friendImage} />
+                                                <span className={styles.friendNickname}>{request.nickname}</span>
+                                            </div>
+                                            <div className={styles.friendActions}>
+                                                <button
+                                                    className={`${styles.actionButton} ${styles.deleteButton}`}
+                                                    onClick={() => handleCancelRequest(request)}
+                                                >
+                                                    <FiXCircle />
+                                                    <span>취소</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        </section>
+                    )}
+
+                    {/* 추천 친구 섹션 (항상 표시) */}
                     <section className={styles.sectionCard}>
                         <h2 className={styles.sectionTitle}>
                             추천 친구
                             <button
-                                className={`${styles.actionButton} ${styles.refreshButton}`} // 새로고침 버튼 스타일 추가
-                                onClick={handleRefreshRecommendedFriends} // 새로고침 핸들러 연결
+                                className={`${styles.actionButton} ${styles.refreshButton}`}
+                                onClick={() => handleRefreshRecommendedFriends()} // 함수 호출 방식으로 변경
                                 title="추천 친구 새로고침"
                             >
                                 <FiRefreshCw />
@@ -168,7 +420,7 @@ function Friends() {
                                         <div className={styles.friendActions}>
                                             <button
                                                 className={`${styles.actionButton} ${styles.addButton}`}
-                                                onClick={() => handleAddFriend(recFriend)} // 추가 버튼 연결
+                                                onClick={() => handleAddFriend(recFriend)}
                                             >
                                                 <FiUserPlus />
                                                 <span>추가</span>
