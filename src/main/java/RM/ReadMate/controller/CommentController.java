@@ -32,7 +32,7 @@ public class CommentController {
     public CommentDto addComment(@PathVariable Long postId,
                                  @AuthenticationPrincipal UserDetails user,
                                  @RequestBody CommentDto commentDto) {
-        return commentService.addComment(postId, user.getUsername(), commentDto.getContent());
+        return commentService.addComment(postId, user.getUsername(), commentDto.getContent(), commentDto.getParentId());
     }
 
     @PutMapping("/{commentId}")

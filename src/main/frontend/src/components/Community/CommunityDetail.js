@@ -44,6 +44,10 @@ function CommunityDetail() {
     // 댓글 관련 ref (textarea 자동 크기 조절 가능)
     const commentInputRef = useRef(null);
 
+    const [replyTargetCommentId, setReplyTargetCommentId] = useState(null);
+    const [replyContent, setReplyContent] = useState('');
+
+
     useEffect(() => {
         if (!id) return;
 
@@ -216,13 +220,34 @@ function CommunityDetail() {
                 headers: { Authorization: `Bearer ${token}` },
             })
             .then(() => {
-                setComments((prev) => prev.filter((c) => c.id !== commentId));
+                setComments((prev) => {
+                    // 1) 삭제된 댓글 제거
+                    const filtered = prev.filter((c) => c.id !== commentId);
+
+                    // 2) "부모 → 자식" 재정렬
+                    const roots = filtered.filter(c => c.parentId === null);
+                    const children = filtered.filter(c => c.parentId !== null);
+
+                    const ordered = [];
+
+                    roots.forEach(root => {
+                        ordered.push(root);
+                        children.forEach(ch => {
+                            if (ch.parentId === root.id) {
+                                ordered.push(ch);
+                            }
+                        });
+                    });
+
+                    return ordered;
+                });
             })
             .catch((err) => {
                 console.error('댓글 삭제 실패:', err);
                 alert('댓글 삭제 중 오류가 발생했습니다.');
             });
     };
+
 
     // 태그 입력 핸들러 (쉼표, 스페이스, 엔터로 구분)
     const handleTagInputChange = (e) => setTagInput(e.target.value);
@@ -258,6 +283,66 @@ function CommunityDetail() {
         };
         reader.readAsDataURL(file);
     };
+
+    const handleAddReply = (parentId) => {
+        if (!replyContent.trim()) return;
+        if (!token) {
+            alert('로그인이 필요합니다.');
+            navigate('/login');
+            return;
+        }
+
+        axios.post(
+            `http://localhost:8080/api/community/${id}/comments`,
+            {
+                content: replyContent,
+                parentId: parentId
+            },
+            { headers: { Authorization: `Bearer ${token}` } }
+        )
+            .then(res => {
+                const newComment = res.data;
+                setComments(prev => {
+                    // 복사본
+                    const next = [...prev];
+
+                    // 부모 댓글 id
+                    const parentId = newComment.parentId;
+
+                    // 부모가 없는 경우(안될 일이지만) 그냥 뒤에 붙임
+                    if (parentId == null) {
+                        next.push(newComment);
+                        return next;
+                    }
+
+                    // 부모 인덱스 찾기
+                    const parentIndex = next.findIndex(c => c.id === parentId);
+                    if (parentIndex === -1) {
+                        // 부모를 못찾으면 그냥 뒤에 붙임
+                        next.push(newComment);
+                        return next;
+                    }
+
+                    // 삽입 위치: 부모 바로 다음, 그리고 부모의 기존 자식들(대댓글) 뒤
+                    let insertIndex = parentIndex + 1;
+                    while (insertIndex < next.length && next[insertIndex].parentId === parentId) {
+                        insertIndex++;
+                    }
+
+                    next.splice(insertIndex, 0, newComment);
+                    return next;
+                });
+
+                setReplyContent('');
+                setReplyTargetCommentId(null);
+            })
+
+            .catch(err => {
+                console.error('대댓글 추가 실패:', err);
+                alert('대댓글 등록 중 오류가 발생했습니다.');
+            });
+    };
+
 
     const isPostOwner = post?.authorId === currentUserId;
 
@@ -415,8 +500,17 @@ function CommunityDetail() {
                         <ul className={styles.commentList}>
                             {comments.map((comment) => {
                                 const isCommentAuthor = comment.authorId === currentUserId;
+                                const isChild = comment.parentId !== null;
                                 return (
-                                    <li key={comment.id} className={styles.commentItem}>
+                                    <li
+                                        key={comment.id}
+                                        className={styles.commentItem}
+                                        style={{
+                                            marginLeft: comment.parentId ? '20px' : '0px',
+                                            borderLeft: comment.parentId ? '2px solid #eee' : 'none',
+                                            paddingLeft: comment.parentId ? '12px' : '0'
+                                        }}
+                                    >
                                         {editingCommentId === comment.id ? (
                                             <>
                         <textarea
@@ -425,7 +519,7 @@ function CommunityDetail() {
                             onChange={(e) => setEditCommentContent(e.target.value)}
                             autoFocus
                         />
-                                                <div style={{ marginTop: 6 }}>
+                                                <div style={{marginTop: 6}}>
                                                     <button
                                                         onClick={() => handleUpdateComment(comment.id)}
                                                         className={styles.submitBtn}
@@ -446,23 +540,72 @@ function CommunityDetail() {
                                                 <div className={styles.commentMeta}>
                                                     {timeAgoFromDate(comment.createdAt)} · 익명
                                                 </div>
-                                                {(isCommentAuthor || isPostOwner) && (
-                                                    <div className={styles.commentButtons}>
-                                                        {isCommentAuthor && (
-                                                            <button
-                                                                onClick={() => {
-                                                                    setEditingCommentId(comment.id);
-                                                                    setEditCommentContent(comment.content);
-                                                                }}
-                                                            >
-                                                                수정
-                                                            </button>
-                                                        )}
+                                                <div className={styles.commentButtons}>
+
+                                                    {/* ✏️ 본인 댓글만 수정 버튼 */}
+                                                    {isCommentAuthor && (
+                                                        <button
+                                                            onClick={() => {
+                                                                setEditingCommentId(comment.id);
+                                                                setEditCommentContent(comment.content);
+                                                            }}
+                                                        >
+                                                            수정
+                                                        </button>
+                                                    )}
+
+                                                    {/* ❌ 댓글 작성자 또는 게시글 작성자만 삭제 */}
+                                                    {(isCommentAuthor || isPostOwner) && (
                                                         <button onClick={() => handleDeleteComment(comment.id)}>
                                                             삭제
                                                         </button>
+                                                    )}
+
+                                                    {/* 💬 댓글일 때만 답글 버튼 보이기 (대댓글이면 숨김) */}
+                                                    {comment.parentId === null && (
+                                                        <button
+                                                            onClick={() => {
+                                                                setReplyTargetCommentId(comment.id);
+                                                                setReplyContent("");
+                                                            }}
+                                                        >
+                                                            답글
+                                                        </button>
+                                                    )}
+
+                                                </div>
+
+                                                {/* 답글 입력창 (해당 댓글에 답글 달기) */}
+                                                {replyTargetCommentId === comment.id && (
+                                                    <div className={styles.replyBox}>
+        <textarea
+            className={styles.commentInput}
+            placeholder="답글을 입력하세요."
+            value={replyContent}
+            onChange={(e) => setReplyContent(e.target.value)}
+        />
+
+                                                        <div className={styles.replyActions}>
+                                                            <button
+                                                                className={styles.submitBtn}
+                                                                onClick={() => handleAddReply(comment.id)}
+                                                            >
+                                                                등록
+                                                            </button>
+
+                                                            <button
+                                                                className={styles.cancelBtn}
+                                                                onClick={() => {
+                                                                    setReplyTargetCommentId(null);
+                                                                    setReplyContent('');
+                                                                }}
+                                                            >
+                                                                취소
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 )}
+
                                             </>
                                         )}
                                     </li>

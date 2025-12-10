@@ -13,4 +13,5 @@ public class CommentDto {
     private String content;
     private String authorId;
     private String createdAt;
+    private Long parentId; // ⭐ 부모 댓글 ID (null이면 일반댓글)
 }

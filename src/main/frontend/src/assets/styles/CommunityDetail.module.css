@@ -416,3 +416,67 @@
 .cancelBtn:hover{
     background-color: #999;
 }
+
+.replyBox {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;   /* ⭐ 세로로 정렬 */
+    gap: 8px;
+}
+
+.replyActions {
+    display: flex;            /* 버튼을 가로로 정렬 */
+    gap: 8px;
+}
+
+.replyBox .commentInput {
+    width: 100%;
+    min-height: 56px;
+    resize: none;
+}
+
+.submitBtn, .cancelBtn {
+    padding: 6px 14px;
+    background-color: #ccc;
+    color: #555;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: background-color 0.3s ease;
+}
+
+.submitBtn:hover, .cancelBtn:hover {
+    background-color: #999;
+}
+
+/* ====== 댓글/대댓글 버튼 색상 변경 ====== */
+
+/* 대댓글 등록 버튼 */
+.replyBox .commentButton {
+    background-color: #014d37 !important;
+    color: white !important;
+    border: none;
+}
+.replyBox .commentButton:hover {
+    background-color: #003d2c !important;
+}
+
+/* 댓글 수정 완료 버튼 (submitBtn 재정의) */
+.submitBtn {
+    background-color: #014d37 !important;
+    color: white !important;
+}
+.submitBtn:hover {
+    background-color: #003d2c !important;
+}
+
+/* 필요 시 취소 버튼은 그대로 회색 유지 */
+.cancelBtn {
+    background-color: #ccc;
+}
+.cancelBtn:hover {
+    background-color: #999;
+}
+

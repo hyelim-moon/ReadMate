@@ -6,6 +6,24 @@
     color: #374151;
 }
 
+.bookCard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.bookImage {
+    width: 120px;
+    height: 170px;
+    object-fit: contain;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 6px;
+}
+
+
 /* ===== 제목 ===== */
 .titleRow {
     position: relative;
