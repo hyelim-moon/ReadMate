@@ -49,11 +49,6 @@ public class TeamChallengeService {
         Team team = new Team();
         team.setName(requestDto.getRoomName());
         
-        // 다대다 관계에서는 User 엔티티의 teams 리스트에도 Team을 추가해야 합니다.
-        // 하지만 여기서는 Team의 members 리스트만 관리하고, User의 teams는 지연 로딩되므로
-        // 명시적으로 추가하지 않아도 JPA가 처리합니다.
-        // 다만, 즉시 반영이 필요하다면 leader.getTeams().add(team); 후 userRepository.save(leader); 필요
-        
         teamRepository.save(team); // 먼저 팀을 저장하여 teamId를 할당받음
 
         List<User> members = new ArrayList<>();

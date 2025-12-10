@@ -32,7 +32,7 @@ const TeamChallengeDetail = ({ isLoggedIn }) => {
 
                     const challengeLeaderId = Number(response.data.leaderId); // Number로 명시적 변환
 
-                    // 디버깅을 위한 console.log 추가 (이전과 동일하게 유지)
+                    // 디버깅을 위한 console.log 추가
                     console.log('Fetched Challenge Details:', response.data);
                     console.log('Challenge Leader ID:', challengeLeaderId, typeof challengeLeaderId);
                     console.log('Current User ID:', fetchedUserId, typeof fetchedUserId);
@@ -128,6 +128,13 @@ const TeamChallengeDetail = ({ isLoggedIn }) => {
         maxMembers,
         leaderId
     } = challengeDetails;
+
+    // membersProgress 배열의 각 멤버에 대한 isLeader 값 확인
+    console.log('Members Progress Array:', membersProgress);
+    membersProgress.forEach(member => {
+        console.log(`Member ID: ${member.userId}, Nickname: ${member.nickname}, Is Leader: ${member.isLeader}`);
+    });
+
 
     return (
         <div className={styles.teamChallengeDetailPage}>
