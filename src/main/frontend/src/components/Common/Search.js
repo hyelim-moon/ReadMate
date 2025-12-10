@@ -83,28 +83,23 @@ function Search() {
                     {books.length > 0 ? (
                         <div className={styles.bookGrid}>
                             {books.slice(0, 6).map(book => (
-                                <div key={book.id} className={styles.bookCard}>
-
-                                    {/* 이미지 클릭 */}
+                                <div key={book.id} className={styles.bookCard}
+                                     onClick={() => navigate(`/books/${book.id}`)}
+                                >
+                                    {/* 이미지 왼쪽 */}
                                     <img
                                         src={book.bookImage}
                                         alt={book.bookName}
                                         className={styles.bookImage}
-                                        onClick={() => navigate(`/books/${book.id}`)}
-                                        style={{ cursor: 'pointer' }}
                                     />
 
-                                    {/* 제목 클릭 */}
-                                    <p
-                                        className={styles.bookTitle}
-                                        onClick={() => navigate(`/books/${book.id}`)}
-                                        style={{ cursor: 'pointer' }}
-                                    >
+                                    {/* 제목 오른쪽 */}
+                                    <p className={styles.bookTitle}>
                                         {book.bookName}
                                     </p>
-
                                 </div>
                             ))}
+
 
 
                         </div>
