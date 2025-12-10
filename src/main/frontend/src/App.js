@@ -41,6 +41,7 @@ import ReviewAll from "./components/Service/ReviewAll"
 import MyReviews from "./components/User/MyReviews";
 import Friends from "./components/User/Friends"; // Friends 컴포넌트 임포트
 import TeamChallengePage from "./components/Service/TeamChallengePage"; // TeamChallengePage 임포트
+import TeamChallengeDetail from "./components/Service/TeamChallengeDetail"; // TeamChallengeDetail 임포트 추가
 
 // ─────────────────────────────────────────────────────────────────────────────
 // userId를 props로 받도록 변경
@@ -48,12 +49,30 @@ function AppContent({ userid, onLoginSuccess, isLoggedIn }) {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // 문의 리스트 상태
-  const [inquiries, setInquiries] = useState([]);
+  // localStorage에서 데이터를 불러와 초기 상태를 설정
+  const [inquiries, setInquiries] = useState(() => {
+    const savedInquiries = localStorage.getItem('inquiries');
+    return savedInquiries ? JSON.parse(savedInquiries) : [];
+  });
+
+  // inquiries 상태가 변경될 때마다 localStorage에 저장
+  useEffect(() => {
+    localStorage.setItem('inquiries', JSON.stringify(inquiries));
+  }, [inquiries]);
 
   // 문의 추가 함수
   const addInquiry = (newInquiry) => {
-    setInquiries(prev => [newInquiry, ...prev]);
+    const inquiryWithId = { 
+      ...newInquiry, 
+      id: Date.now(),
+      createdAt: Date.now() // 작성 시간 추가
+    };
+    setInquiries(prev => [inquiryWithId, ...prev]);
+  };
+
+  // 문의 삭제 함수
+  const deleteInquiry = (inquiryId) => {
+    setInquiries(prevInquiries => prevInquiries.filter(inquiry => inquiry.id !== inquiryId));
   };
 
   // 라우트 변경 시 스크롤을 최상단으로 이동
@@ -88,6 +107,7 @@ function AppContent({ userid, onLoginSuccess, isLoggedIn }) {
           <Route path="/pointshop" element={<PointShop userid={userid} />} />
           <Route path="/challenge" element={<Challenge />} />
           <Route path="/team-challenge" element={<TeamChallengePage />} /> {/* TeamChallengePage 라우트 추가 */}
+          <Route path="/team-challenge/:id" element={<TeamChallengeDetail isLoggedIn={isLoggedIn} />} /> {/* TeamChallengeDetail 라우트 추가 */}
           <Route path="/challenges/:id" element={<ChallengeDetail />} />
           <Route path="/help" element={<Help />} />
           <Route path="/point-history" element={<PointHistory />} />
@@ -121,6 +141,7 @@ function AppContent({ userid, onLoginSuccess, isLoggedIn }) {
                 <ContactList
                     inquiries={inquiries}
                     onClickContact={() => navigate('/contact')}
+                    onDeleteContact={deleteInquiry}
                 />
               }
           />
@@ -150,7 +171,7 @@ function App() {
   const [userInfo, setUserInfo] = useState(null);
 
   useEffect(() => {
-    axios.get("http://localhost:8080/api/books/recommend")
+    axios.get("http://localhost:8080/api/books/bestseller")
         .then((res) => setBooks(res.data))
         .catch((err) => console.error(err));
   }, []);

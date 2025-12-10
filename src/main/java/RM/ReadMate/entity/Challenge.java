@@ -23,6 +23,7 @@ public class Challenge {
     private int reward;
     private LocalDate startDate;
     private LocalDate endDate;
+    private int goalQuantity; // 챌린지 목표 수량 (예: 읽을 책 권수)
 
     @OneToMany(mappedBy = "challenge", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChallengeParticipation> participations = new ArrayList<>();

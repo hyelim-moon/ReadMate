@@ -54,14 +54,13 @@ public class ChallengeService {
         challenge2.setEndDate(LocalDate.now().plusDays(1));
         challengeRepository.save(challenge2);
 
-        // 챌린지 3: 없으면 만들고, 있으면 정보 업데이트
-        Challenge challenge3 = challengeRepository.findByTitle("연말 독서 챌린지").orElse(new Challenge());
-        challenge3.setTitle("연말 독서 챌린지");
-        challenge3.setDescription("12월 한 달 동안 책 3권 읽기");
-        challenge3.setReward(300);
-        challenge3.setStartDate(LocalDate.of(2025, 12, 1));
-        challenge3.setEndDate(LocalDate.of(2025, 12, 31));
-        challengeRepository.save(challenge3);
+        // 챌린지 3: 없으면 만들고, 있으면 정보 업데이트 (12월 챌린지)
+        // challenge3.setTitle("연말 독서 챌린지"); // 이 챌린지를 삭제합니다.
+        // challenge3.setDescription("12월 한 달 동안 책 3권 읽기");
+        // challenge3.setReward(300);
+        // challenge3.setStartDate(LocalDate.of(2025, 12, 1));
+        // challenge3.setEndDate(LocalDate.of(2025, 12, 31));
+        // challengeRepository.save(challenge3);
 
         // 챌린지 4 (새로 추가): 다독왕 챌린지
         Challenge challenge4 = challengeRepository.findByTitle("다독왕 챌린지").orElse(new Challenge());
@@ -255,6 +254,7 @@ public class ChallengeService {
     }
     
     private int calculateProgress(User user, Challenge challenge, LocalDateTime startDate) {
+        // challenge.getEndDate()는 LocalDate이므로, atTime(23, 59, 59)를 사용하여 LocalDateTime으로 변환
         LocalDateTime endDate = challenge.getEndDate().atTime(23, 59, 59);
         if ("장르 탐험가 챌린지".equals(challenge.getTitle())) {
             List<Record> records = recordRepository.findByUserAndRecordDateBetween(user, startDate, endDate);

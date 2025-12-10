@@ -53,6 +53,10 @@ public class User {
     @Setter
     @Column
     private int points;
+    
+    @Setter
+    @Column
+    private String profileImageUrl;
 
     @Setter
     @Column(nullable = false) // enabled 필드 추가
@@ -79,6 +83,12 @@ public class User {
     @JsonIgnore
     @Builder.Default
     private List<ChallengeParticipation> challengeParticipations = new ArrayList<>();
+
+    // Team 엔티티와의 다대다 관계 추가
+    @ManyToMany(mappedBy = "members")
+    @JsonIgnore // 순환 참조 방지
+    @Builder.Default
+    private List<Team> teams = new ArrayList<>();
 
     public User(String nickname, int points) {
         this.nickname = nickname;

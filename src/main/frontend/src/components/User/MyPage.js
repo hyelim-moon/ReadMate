@@ -5,14 +5,6 @@ import logoImg from '../../assets/images/logo.png';
 import { Link, useNavigate } from 'react-router-dom';
 import { FiLogOut, FiMenu, FiX, FiUser, FiBook, FiAward, FiEdit, FiMessageSquare, FiArchive, FiShoppingBag, FiHelpCircle, FiUsers } from 'react-icons/fi';
 
-// 가상 친구 데이터 (이미지 URL 제거)
-const friends = [
-    { id: 1, nickname: '책벌레' },
-    { id: 2, nickname: '독서왕' },
-    { id: 3, nickname: '리드메이트' },
-    { id: 4, nickname: '글쓴이' },
-];
-
 function MyPage() {
     const [profile, setProfile] = useState({
         nickname: '',
@@ -21,13 +13,22 @@ function MyPage() {
         wishlist: [],
         records: []
     });
+    const [friends, setFriends] = useState([]); // 실제 친구 목록을 저장할 상태
     const [menuOpen, setMenuOpen] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
         const token = localStorage.getItem('ACCESS_TOKEN');
+        const userId = localStorage.getItem('USER_ID');
         const headers = { Authorization: `Bearer ${token}` };
 
+        if (!token || !userId) {
+            console.error("로그인 정보가 없습니다.");
+            navigate('/login');
+            return;
+        }
+
+        // 사용자 정보 가져오기
         axios.get('http://localhost:8080/api/users/me', { headers })
             .then(({ data }) => {
                 setProfile(prev => ({ ...prev, nickname: data.nickname, coupons: data.coupons, mileage: data.mileage }));
@@ -36,26 +37,38 @@ function MyPage() {
                 console.error(err);
                 if (err.response && err.response.status === 401) {
                     localStorage.removeItem('ACCESS_TOKEN');
-                    window.location.href = '/login';
+                    localStorage.removeItem('USER_ID');
+                    navigate('/login');
                 }
             });
 
+        // 최신 독서 기록 가져오기
         axios.get('http://localhost:8080/api/records/latest?limit=8', { headers })
             .then(({ data }) => {
                 setProfile(prev => ({ ...prev, records: data || [] }));
             })
             .catch(err => console.error('최신 독서 기록 불러오기 실패:', err));
 
+        // 찜한 도서 가져오기
         axios.get('http://localhost:8080/api/wishlist', { headers })
             .then(({ data }) => {
                 setProfile(prev => ({ ...prev, wishlist: data || [] }));
             })
             .catch(err => console.error('찜한 도서 불러오기 실패:', err));
-    }, []);
+
+        // 친구 목록 가져오기
+        axios.get(`http://localhost:8080/api/friends/${userId}`, { headers })
+            .then(({ data }) => {
+                setFriends(data || []);
+            })
+            .catch(err => console.error('친구 목록 불러오기 실패:', err));
+
+    }, [navigate]);
 
     const handleLogout = () => {
         localStorage.removeItem('ACCESS_TOKEN');
-        window.location.href = '/login';
+        localStorage.removeItem('USER_ID');
+        navigate('/login');
     };
 
     return (
@@ -146,7 +159,7 @@ function MyPage() {
                             <div className={styles.emptyBox}>친구가 없습니다.</div>
                         ) : (
                             <ul className={styles.friendList}>
-                                {friends.map(friend => (
+                                {friends.slice(0, 4).map(friend => ( // 최대 4명까지만 표시
                                     <li key={friend.id} className={styles.friendItem}>
                                         <div className={styles.friendImage} />
                                         <p className={styles.friendNickname}>{friend.nickname}</p>

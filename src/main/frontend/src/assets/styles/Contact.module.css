@@ -52,11 +52,24 @@
 }
 
 .inquiryItem {
+  position: relative;
   border: 1px solid #c9d7cc;
   border-radius: 8px;
-  padding: 15px;
+  padding: 20px;
   margin-bottom: 15px;
   background-color: #f7f9f7;
+}
+
+.inquiryHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.inquiryDate {
+  font-size: 0.9rem;
+  color: #888;
 }
 
 .contactButton {
@@ -76,4 +89,21 @@
 
 .contactButton:hover {
   background-color: #004524;
+}
+
+.deleteButton {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: color 0.2s ease-in-out;
+}
+
+.deleteButton:hover {
+  color: #e63946;
 }
