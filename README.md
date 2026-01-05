@@ -68,7 +68,7 @@ ReadMate
       ├─ resources
       │  └─ static
       └─ frontend
-
+```
 ---
 
 ## Build & Run
@@ -76,9 +76,10 @@ ReadMate
 ### Backend (Dev)
 ```bash
 ./gradlew bootRun
-
-Frontend (Dev)
+```
+### Frontend (Dev)
 npm start
 
-Production Build (React 포함)
+### Production Build (React 포함)
 ./gradlew build -Pprod
+
