@@ -78,8 +78,12 @@ ReadMate
 ./gradlew bootRun
 ```
 ### Frontend (Dev)
+```bash
 npm start
-
+```
 ### Production Build (React 포함)
+```bash
 ./gradlew build -Pprod
+```
+
 
